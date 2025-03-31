@@ -1,11 +1,4 @@
-torch
 openai
 pandas
-opencv-python
-dash
-Pillow
-transformers
-scikit-learn
-ollama
-accelerate
-dash_extensions
+geopandas
+plotly

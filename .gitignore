@@ -1,0 +1,10 @@
+.DS_Store
+*/.DS_Store
+*/*/.DS_Store
+*/*/*/.DS_Store
+results/
+results/*.json
+results/*/
+results/*/*.json
+datasets/gpkgs/
+datasets/gpkgs/*.gpkg

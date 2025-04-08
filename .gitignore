@@ -8,3 +8,6 @@ results/*/
 results/*/*.json
 datasets/gpkgs/
 datasets/gpkgs/*.gpkg
+.venv/*
+keys.py
+**/__pycache__/

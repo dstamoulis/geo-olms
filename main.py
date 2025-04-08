@@ -15,6 +15,11 @@ from evaluate.agent_task import AgentTask
 
 from geoplatform.platform import Platform
 
+import os
+import json_outputs.keys as keys
+
+os.environ["OPENAI_API_KEY"] = keys.get_openai_key()
+
 def main():
 
     model_client = BaseClient.from_cfg({

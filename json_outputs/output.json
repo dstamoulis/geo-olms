@@ -1,0 +1,183 @@
+{
+  "provider": "Agent",
+  "component_type": "Workflow",
+  "version": 1,
+  "component_version": 1,
+  "description": "Workflow to fetch xView1 images around Athens International Airport and analyze them.",
+  "label": "xView1 Image Fetching and Analysis",
+  "config": {
+    "participants": [
+      {
+        "provider": "Agent",
+        "component_type": "Geospatial Analyst",
+        "version": 1,
+        "component_version": 1,
+        "description": "Identifies geographical bounds for image fetching.",
+        "label": "Geospatial Analyst",
+        "config": {
+          "name": "Geospatial Analyst",
+          "model_client": {
+            "provider": "Model",
+            "component_type": "Geospatial",
+            "version": 1,
+            "component_version": 1,
+            "description": "Model to analyze geographical data.",
+            "label": "Geospatial Model",
+            "config": {
+              "model": "geospatial_model_v1"
+            }
+          },
+          "tools": [],
+          "handoffs": [],
+          "model_context": {
+            "provider": "ModelContext",
+            "component_type": "Geospatial",
+            "version": 1,
+            "component_version": 1,
+            "description": "Context for geographical analysis.",
+            "label": "Geospatial Context",
+            "config": {
+              "model": "context_model_v1"
+            }
+          },
+          "description": "Agent for defining geographical bounds around Athens International Airport.",
+          "system_message": "Please define the geographical bounds.",
+          "model_client_stream": false,
+          "reflect_on_tool_use": false,
+          "tool_call_summary_format": ""
+        }
+      },
+      {
+        "provider": "Agent",
+        "component_type": "Data Acquisition Specialist",
+        "version": 1,
+        "component_version": 1,
+        "description": "Fetches xView1 images based on defined geographical bounds.",
+        "label": "Data Acquisition Specialist",
+        "config": {
+          "name": "Data Acquisition Specialist",
+          "model_client": {
+            "provider": "Model",
+            "component_type": "DataFetcher",
+            "version": 1,
+            "component_version": 1,
+            "description": "Model to fetch data from APIs.",
+            "label": "Data Fetcher Model",
+            "config": {
+              "model": "data_fetcher_model_v1"
+            }
+          },
+          "tools": [],
+          "handoffs": [],
+          "model_context": {
+            "provider": "ModelContext",
+            "component_type": "DataContext",
+            "version": 1,
+            "component_version": 1,
+            "description": "Context for data fetching operations.",
+            "label": "Data Fetching Context",
+            "config": {
+              "model": "data_context_model_v1"
+            }
+          },
+          "description": "Agent for fetching xView1 images based on geographical bounds.",
+          "system_message": "Please fetch xView1 images.",
+          "model_client_stream": false,
+          "reflect_on_tool_use": false,
+          "tool_call_summary_format": ""
+        }
+      },
+      {
+        "provider": "Agent",
+        "component_type": "Image Analysis Specialist",
+        "version": 1,
+        "component_version": 1,
+        "description": "Runs object detection on fetched images using the Swin-L detector.",
+        "label": "Image Analysis Specialist",
+        "config": {
+          "name": "Image Analysis Specialist",
+          "model_client": {
+            "provider": "Model",
+            "component_type": "ImageAnalyzer",
+            "version": 1,
+            "component_version": 1,
+            "description": "Model for analyzing images.",
+            "label": "Image Analysis Model",
+            "config": {
+              "model": "image_analysis_model_v1"
+            }
+          },
+          "tools": [],
+          "handoffs": [],
+          "model_context": {
+            "provider": "ModelContext",
+            "component_type": "ImageContext",
+            "version": 1,
+            "component_version": 1,
+            "description": "Context for image analysis.",
+            "label": "Image Analysis Context",
+            "config": {
+              "model": "image_context_model_v1"
+            }
+          },
+          "description": "Specialist for running analysis on fetched images.",
+          "system_message": "Please analyze the images for objects.",
+          "model_client_stream": false,
+          "reflect_on_tool_use": false,
+          "tool_call_summary_format": ""
+        }
+      },
+      {
+        "provider": "Agent",
+        "component_type": "Mapping Specialist",
+        "version": 1,
+        "component_version": 1,
+        "description": "Zooms the map to visualize the area around Athens International Airport.",
+        "label": "Mapping Specialist",
+        "config": {
+          "name": "Mapping Specialist",
+          "model_client": {
+            "provider": "Model",
+            "component_type": "MappingTool",
+            "version": 1,
+            "component_version": 1,
+            "description": "Model for mapping visualization.",
+            "label": "Mapping Model",
+            "config": {
+              "model": "mapping_model_v1"
+            }
+          },
+          "tools": [],
+          "handoffs": [],
+          "model_context": {
+            "provider": "ModelContext",
+            "component_type": "MappingContext",
+            "version": 1,
+            "component_version": 1,
+            "description": "Context for mapping tasks.",
+            "label": "Mapping Context",
+            "config": {
+              "model": "mapping_context_model_v1"
+            }
+          },
+          "description": "Specialist for zooming and visualizing within maps.",
+          "system_message": "Please zoom in on the specified map area.",
+          "model_client_stream": false,
+          "reflect_on_tool_use": false,
+          "tool_call_summary_format": ""
+        }
+      }
+    ],
+    "termination_condition": {
+      "provider": "Termination",
+      "component_type": "CompletionCondition",
+      "version": 1,
+      "component_version": 1,
+      "description": "Completion condition for the workflow.",
+      "label": "Workflow Completion",
+      "config": {
+        "text": "All tasks completed successfully."
+      }
+    }
+  }
+}

@@ -27,12 +27,12 @@ class AgentConfig(BaseModel):
     model_client: ModelClient
     tools: list[str]  
     handoffs: list[str]
-    model_context: ModelContext
+    # model_context: ModelContext
     description: str
-    system_message: str
-    model_client_stream: bool
-    reflect_on_tool_use: bool
-    tool_call_summary_format: str
+    # system_message: str
+    # model_client_stream: bool
+    # reflect_on_tool_use: bool
+    # tool_call_summary_format: str
 
 class Agent(BaseModel):
     provider: str
@@ -57,7 +57,7 @@ class TerminationCondition(BaseModel):
 
 class WorkflowConfig(BaseModel):
     participants: list[Agent]
-    termination_condition: TerminationCondition
+    # termination_condition: TerminationCondition
 
 class AutogenWorkflow(BaseModel):
     provider: str

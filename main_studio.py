@@ -15,9 +15,9 @@ from geoplatform.platform_studio import PlatformStudio
 
 import json
 
-# import os
-# import json_outputs.keys as keys
-# os.environ["OPENAI_API_KEY"] = keys.get_openai_key()
+import os
+import json_outputs.keys as keys
+os.environ["OPENAI_API_KEY"] = keys.get_openai_key()
 
 def main():
 

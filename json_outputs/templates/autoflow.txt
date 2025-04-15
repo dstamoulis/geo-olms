@@ -1,0 +1,24 @@
+The CoRE language defines four components to organize workflows as natural language instructions.
+• Step Name 
+    - is used to uniquely identify each step of the workflow.
+• Step Type 
+    - defines the type of instruction for each step. There are three different types of steps:
+        – Process: The process step transitions to the next specified step after executing the current step.
+        – Decision: Similar to conditional statements (e.g., “if-else”), the decision step is used for branching the program flow based on evaluated conditions.
+        – Terminal: The terminal step represents the end of the program.
+• Step Instruction 
+    - is a natural language instruction to be executed in the step.
+• Step Connection 
+    - points to the next step, which establishs the program execution flow.
+
+
+An example workflow for image-text processing on the OpenAGI benchmark is shown as follows:
+
+Step 1::: Process ::: Identify the input data type based on the objective .::: next :: Step 2
+Step 2::: Process ::: Identify the output data type based on the objective .::: next :: Step 3
+Step 3::: Process ::: Select tools in the provided tool list to generate a plan .::: next :: Step 4
+Step 4::: Decision ::: Check whether every tool in the plan is in the provided tool list .::: Yes :: Step 5:: No :: Step 3
+Step 5::: Decision ::: Check whether the output data type of the previous tool is the input data type of the next tool .::: Yes :: Step 6:: No :: Step 3
+Step 6::: Terminal ::: Output the plan by listing the tool names .:::
+
+In the autoFlow paper, they use ‘:::’ to delimit the above four components in each step.

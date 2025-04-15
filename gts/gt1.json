@@ -9,8 +9,8 @@
         "component_type": "Workflow",
         "version": 1,
         "component_version": 1,
-        "description": "Agentic workflow to fetch satellite images, run a detector, and zoom the map for Athens International Airport, Greece.",
-        "label": "Athens Airport Image Processing Workflow",
+        "description": "Agentic workflow to fetch satellite images, run a detector, and zoom the map based on user queries.",
+        "label": "Geospatial Satellite Imagery Workflow",
         "config": {
             "participants": [
                 {
@@ -41,10 +41,7 @@
                             "vision_agent"
                         ],
                         "description": "Fetches xView1 images from specified coordinates in Athens",
-                        "system_message": "You will fetch satellite images from Athens International Airport.",
-                        "model_client_stream": false,
-                        "reflect_on_tool_use": true,
-                        "tool_call_summary_format": "{result}"
+                        "system_message": "You will fetch satellite images from Athens International Airport."
                     }
                 },
                 {
@@ -75,10 +72,7 @@
                             "map_agent"
                         ],
                         "description": "Processes fetched images and runs the Swin-L object detection model.",
-                        "system_message": "You will analyze the fetched images with the Swin-L detector.",
-                        "model_client_stream": false,
-                        "reflect_on_tool_use": true,
-                        "tool_call_summary_format": "{result}"
+                        "system_message": "You will analyze the fetched images with the Swin-L detector."
                     }
                 },
                 {
@@ -110,10 +104,7 @@
                         ],
                         "handoffs": [],
                         "description": "Zooms the map view to the location of Athens International Airport.",
-                        "system_message": "You will zoom the map to the area of Athens International Airport, Greece.",
-                        "model_client_stream": false,
-                        "reflect_on_tool_use": true,
-                        "tool_call_summary_format": "{result}"
+                        "system_message": "You will zoom the map to the area of Athens International Airport, Greece."
                     }
                 }
             ]

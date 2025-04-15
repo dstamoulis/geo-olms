@@ -1,0 +1,100 @@
+{
+    "provider": "autogen",
+    "component_type": "Workflow",
+    "version": 1,
+    "component_version": 1,
+    "description": "Agentic workflow to fetch satellite images of Athens International Airport, run a Swin-L detector, and zoom the map to the area.",
+    "label": "Athens Airport Imagery Workflow",
+    "config": {
+        "participants": [
+            {
+                "provider": "geoapps.geeo.agents.DataAgent",
+                "component_type": "Agent",
+                "version": 1,
+                "component_version": 1,
+                "description": "Agent to fetch xView1 dataset images for a specific area.",
+                "label": "DataAgent",
+                "config": {
+                    "name": "data_agent",
+                    "model_client": {
+                        "provider": "llm_clients.openai_client.OpenAIClient",
+                        "component_type": "model",
+                        "version": 1,
+                        "component_version": 1,
+                        "description": "OpenAI LLM client",
+                        "label": "OpenAIClient",
+                        "config": {
+                            "model": "gpt-4o-mini"
+                        }
+                    },
+                    "tools": [
+                        "query_images_by_aoi_coords"
+                    ],
+                    "handoffs": [
+                        "vision_agent"
+                    ],
+                    "description": "Fetches images from the xView1 dataset based on area of interest coordinates.",
+                    "system_message": "Fetch xView1 images considering a wide area around Athens International Airport."
+                }
+            },
+            {
+                "provider": "geoapps.geeo.agents.VisionAgent",
+                "component_type": "Agent",
+                "version": 1,
+                "component_version": 1,
+                "description": "Agent to run detector vision models on satellite images.",
+                "label": "VisionAgent",
+                "config": {
+                    "name": "vision_agent",
+                    "model_client": {
+                        "provider": "llm_clients.openai_client.OpenAIClient",
+                        "component_type": "model",
+                        "version": 1,
+                        "component_version": 1,
+                        "description": "OpenAI LLM client",
+                        "label": "OpenAIClient",
+                        "config": {
+                            "model": "gpt-4o-mini"
+                        }
+                    },
+                    "tools": [
+                        "run_detector"
+                    ],
+                    "handoffs": [
+                        "map_agent"
+                    ],
+                    "description": "Processes fetched images and runs the Swin-L object detection model.",
+                    "system_message": "Analyze the fetched images with the Swin-L detector."
+                }
+            },
+            {
+                "provider": "geoapps.geeo.agents.MapAgent",
+                "component_type": "Agent",
+                "version": 1,
+                "component_version": 1,
+                "description": "Agent to manage mapping functionalities.",
+                "label": "MapAgent",
+                "config": {
+                    "name": "map_agent",
+                    "model_client": {
+                        "provider": "llm_clients.openai_client.OpenAIClient",
+                        "component_type": "model",
+                        "version": 1,
+                        "component_version": 1,
+                        "description": "OpenAI LLM client",
+                        "label": "OpenAIClient",
+                        "config": {
+                            "model": "gpt-4o-mini"
+                        }
+                    },
+                    "tools": [
+                        "zoom_map"
+                    ],
+                    "handoffs": [],
+                    "description": "Handles map zooming functionality based on detection findings.",
+                    "system_message": "Zoom the map to the location of Athens International Airport after detections."
+                }
+            }
+        ]
+    }
+}

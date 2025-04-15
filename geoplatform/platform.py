@@ -1,7 +1,7 @@
 # geoplatform/platform.py
 
 class Platform:
-    def __init__(self, model_client, messages, database, vision, map_ops, agent):
+    def __init__(self, model_client, messages, database, vision, map_tools, agent):
         """
         Initialize the Platform with all system components.
 
@@ -10,14 +10,14 @@ class Platform:
             messages (Messages): The conversation/messages container.
             database: Instance of Database (or similar) for memory management.
             vision: Instance of your Vision object.
-            map_ops: Instance of your Map operations object.
+            map_tools: Instance of your Map operations object.
             agent: The agent instance (e.g., FlatAgent) that orchestrates the interaction.
         """
         self.model_client = model_client
         self.messages = messages
         self.database = database
         self.vision = vision
-        self.map_ops = map_ops
+        self.map_tools = map_tools
         self.agent = agent
 
     def reset(self):
@@ -29,7 +29,7 @@ class Platform:
         # self.agent.reset_agent()
         self.database.reset_database()
         self.vision.reset_vision()
-        self.map_ops.reset_map()
+        self.map_tools.reset_map()
 
     def run_query(self, query):
         """
@@ -47,6 +47,6 @@ class Platform:
         return {
             "messages": self.messages.to_list_dict(),
             "database": self.database.__dict__ if hasattr(self.database, "__dict__") else str(self.database),
-            "map": self.map_ops.__dict__ if hasattr(self.map_ops, "__dict__") else str(self.map_ops)
+            "map": self.map_tools.__dict__ if hasattr(self.map_tools, "__dict__") else str(self.map_tools)
             # Add other components as needed.
         }

@@ -1,0 +1,122 @@
+[
+    {
+        "Strting query": "Please create an agentic workflow json template that can solve this task:",
+        "user query": "Fetch xView1 images from Athens International Airport, Greece. Consider a wide area. Then run the Swin-L detector and finally please zoom the map there!",
+        "task description": " Appropriately break down the task and assign relevant realistic agent definitions including tools and a smart workflow coordination of these agents."
+    },            
+    {
+        "provider": "autogen",
+        "component_type": "Workflow",
+        "version": 1,
+        "component_version": 1,
+        "description": "Agentic workflow to fetch satellite images, run a detector, and zoom the map for Athens International Airport, Greece.",
+        "label": "Athens Airport Image Processing Workflow",
+        "config": {
+            "participants": [
+                {
+                    "provider": "geoapps.geeo.agents.DatabaseAgent",
+                    "component_type": "Agent",
+                    "version": 1,
+                    "component_version": 1,
+                    "description": "Agent to fetch satellite images given a specified dataset, dates, and coordinates.",
+                    "label": "DatabaseAgent",
+                    "config": {
+                        "name": "database_agent",
+                        "model_client": {
+                            "provider": "llm_clients.openai_client.OpenAIClient",
+                            "component_type": "model",
+                            "version": 1,
+                            "component_version": 1,
+                            "description": "OpenAI LLM client",
+                            "label": "OpenAIClient",
+                            "config": {
+                                "model": "gpt-4o-mini"
+                            }
+                        },
+                        "tools": [
+                            "query_dataset_images",
+                            "query_images_by_aoi_coords"
+                        ],
+                        "handoffs": [
+                            "vision_agent"
+                        ],
+                        "description": "Fetches xView1 images from specified coordinates in Athens",
+                        "system_message": "You will fetch satellite images from Athens International Airport.",
+                        "model_client_stream": false,
+                        "reflect_on_tool_use": true,
+                        "tool_call_summary_format": "{result}"
+                    }
+                },
+                {
+                    "provider": "geoapps.geeo.agents.VisionAgent",
+                    "component_type": "Agent",
+                    "version": 1,
+                    "component_version": 1,
+                    "description": "Agent to run detector vision models on satellite images.",
+                    "label": "VisionAgent",
+                    "config": {
+                        "name": "vision_agent",
+                        "model_client": {
+                            "provider": "llm_clients.openai_client.OpenAIClient",
+                            "component_type": "model",
+                            "version": 1,
+                            "component_version": 1,
+                            "description": "OpenAI LLM client",
+                            "label": "OpenAIClient",
+                            "config": {
+                                "model": "gpt-4o-mini"
+                            }
+                        },
+                        "tools": [
+                            "run_detector",
+                            "run_land_coverage_classifier"
+                        ],
+                        "handoffs": [
+                            "map_agent"
+                        ],
+                        "description": "Processes fetched images and runs the Swin-L object detection model.",
+                        "system_message": "You will analyze the fetched images with the Swin-L detector.",
+                        "model_client_stream": false,
+                        "reflect_on_tool_use": true,
+                        "tool_call_summary_format": "{result}"
+                    }
+                },
+                {
+                    "provider": "geoapps.geeo.agents.MapAgent",
+                    "component_type": "Agent",
+                    "version": 1,
+                    "component_version": 1,
+                    "description": "Agent to perform map actions.",
+                    "label": "MapAgent",
+                    "config": {
+                        "name": "map_agent",
+                        "model_client": {
+                            "provider": "llm_clients.openai_client.OpenAIClient",
+                            "component_type": "model",
+                            "version": 1,
+                            "component_version": 1,
+                            "description": "OpenAI LLM client",
+                            "label": "OpenAIClient",
+                            "config": {
+                                "model": "gpt-4o-mini"
+                            }
+                        },
+                        "tools": [
+                            "plot_images_scatter_map",
+                            "plot_detections_catergory_scatter_map",
+                            "plot_land_cover_class_scatter_map",
+                            "reset_map",
+                            "zoom_map"
+                        ],
+                        "handoffs": [],
+                        "description": "Zooms the map view to the location of Athens International Airport.",
+                        "system_message": "You will zoom the map to the area of Athens International Airport, Greece.",
+                        "model_client_stream": false,
+                        "reflect_on_tool_use": true,
+                        "tool_call_summary_format": "{result}"
+                    }
+                }
+            ]
+        }
+    }
+]

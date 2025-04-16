@@ -1,0 +1,135 @@
+[
+  {
+      "Strting query": "Please create an agentic workflow json template that can solve this task:",
+      "user query": "Fetch xView1 images from Athens International Airport, Greece. Consider a wide area. Then run the Swin-L detector and finally please zoom the map there!",
+      "task description": " Appropriately break down the task and assign relevant realistic agent definitions including tools and a smart workflow coordination of these agents."
+  },       
+      
+  {
+    "provider": "autogen",
+    "component_type": "Workflow",
+    "version": 1,
+    "component_version": 1,
+    "description": "Agentic workflow to fetch satellite images around Athens International Airport, run detections, and visualize the area on a map.",
+    "label": "Athens International Airport Image Fetch and Analyze Workflow",
+    "config": {
+      "participants": [
+        {
+          "provider": "geoapps.geeo.agents.GeospatialAnalyst",
+          "component_type": "Agent",
+          "version": 1,
+          "component_version": 1,
+          "description": "Identify and define the geographical bounds around Athens International Airport for image fetching.",
+          "label": "DataAgent",
+          "config": {
+            "name": "geospatial_analyst",
+            "model_client": {
+              "provider": "llm_clients.openai_client.OpenAIClient",
+              "component_type": "model",
+              "version": 1,
+              "component_version": 1,
+              "description": "OpenAI LLM client",
+              "label": "OpenAIClient",
+              "config": {
+                "model": "gpt-4o-mini"
+              }
+            },
+            "tools": [],
+            "handoffs": [
+              "data_acquisition_specialist",
+              "mapping_specialist"
+            ],
+            "description": "Defines the geographical bounds for the area around Athens International Airport.",
+            "system_message": "You will define the geographical bounds around Athens International Airport, Greece."
+          }
+        },
+        {
+          "provider": "geoapps.geeo.agents.DataAcquisitionSpecialist",
+          "component_type": "Agent",
+          "version": 1,
+          "component_version": 1,
+          "description": "Fetch xView1 images based on the defined geographical bounds.",
+          "label": "DataAgent",
+          "config": {
+            "name": "data_acquisition_specialist",
+            "model_client": {
+              "provider": "llm_clients.openai_client.OpenAIClient",
+              "component_type": "model",
+              "version": 1,
+              "component_version": 1,
+              "description": "OpenAI LLM client",
+              "label": "OpenAIClient",
+              "config": {
+                "model": "gpt-4o-mini"
+              }
+            },
+            "tools": [
+              "query_dataset_images"
+            ],
+            "handoffs": [
+              "vision_analysis_agent"
+            ],
+            "description": "Fetches xView1 images defined by the geographical bounds.",
+            "system_message": "You will fetch xView1 images based on the defined geographical bounds."
+          }
+        },
+        {
+          "provider": "geoapps.geeo.agents.VisionAnalysisAgent",
+          "component_type": "Agent",
+          "version": 1,
+          "component_version": 1,
+          "description": "Run the Swin-L detector on the fetched xView1 images.",
+          "label": "VisionAgent",
+          "config": {
+            "name": "vision_analysis_agent",
+            "model_client": {
+              "provider": "llm_clients.openai_client.OpenAIClient",
+              "component_type": "model",
+              "version": 1,
+              "component_version": 1,
+              "description": "OpenAI LLM client",
+              "label": "OpenAIClient",
+              "config": {
+                "model": "gpt-4o-mini"
+              }
+            },
+            "tools": [
+              "run_detector"
+            ],
+            "handoffs": [],
+            "description": "Processes the fetched images through the Swin-L detector.",
+            "system_message": "You will run the Swin-L detector on the fetched images."
+          }
+        },
+        {
+          "provider": "geoapps.geeo.agents.MappingSpecialist",
+          "component_type": "Agent",
+          "version": 1,
+          "component_version": 1,
+          "description": "Zoom the map to visualize the area around Athens International Airport.",
+          "label": "MapAgent",
+          "config": {
+            "name": "mapping_specialist",
+            "model_client": {
+              "provider": "llm_clients.openai_client.OpenAIClient",
+              "component_type": "model",
+              "version": 1,
+              "component_version": 1,
+              "description": "OpenAI LLM client",
+              "label": "OpenAIClient",
+              "config": {
+                "model": "gpt-4o-mini"
+              }
+            },
+            "tools": [
+              "zoom_map"
+            ],
+            "handoffs": [],
+            "description": "Visualizes the area by zooming into the specified bounds on a map.",
+            "system_message": "You will zoom into the map around Athens International Airport."
+          }
+        }
+      ]
+    }
+  }
+]

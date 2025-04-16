@@ -37,7 +37,7 @@ def main():
     
     query = 'Fetch xView1 images from Athens International Airport, Greece. Consider a wide area. Then run the Swin-L detector and finally please zoom the map there!'
 
-    workflow_json = 'results/gt1.json'
+    workflow_json = 'json_outputs/past_jsons/output_wLiterals.json'
     with open(workflow_json, 'r') as workflow_file:
         workflow_dict = json.load(workflow_file)
 

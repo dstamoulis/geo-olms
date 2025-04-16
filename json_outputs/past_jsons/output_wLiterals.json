@@ -1,0 +1,136 @@
+[
+  {
+      "Strting query": "Please create an agentic workflow json template that can solve this task:",
+      "user query": "Fetch xView1 images from Athens International Airport, Greece. Consider a wide area. Then run the Swin-L detector and finally please zoom the map there!",
+      "task description": " Appropriately break down the task and assign relevant realistic agent definitions including tools and a smart workflow coordination of these agents."
+  },       
+      
+  {
+    "provider": "autogen",
+    "component_type": "Workflow",
+    "version": 1,
+    "component_version": 1,
+    "description": "Agentic workflow to identify geographical bounds, fetch xView1 images, run the Swin-L detector, and visualize the area around Athens International Airport.",
+    "label": "Athens International Airport Workflow",
+    "config": {
+      "participants": [
+        {
+          "provider": "geospatial_analyst",
+          "component_type": "Agent",
+          "version": 1,
+          "component_version": 1,
+          "description": "Identifies and defines the geographical bounds for the wide area around Athens International Airport for image fetching.",
+          "label": "DataAgent",
+          "config": {
+            "name": "geo_bounds_agent",
+            "model_client": {
+              "provider": "llm_clients.openai_client.OpenAIClient",
+              "component_type": "model",
+              "version": 1,
+              "component_version": 1,
+              "description": "OpenAI LLM client",
+              "label": "OpenAIClient",
+              "config": {
+                "model": "gpt-4"
+              }
+            },
+            "tools": [],
+            "handoffs": [
+              "data_acquisition_agent",
+              "map_agent"
+            ],
+            "description": "Defines geographical bounds for image fetching.",
+            "system_message": "Define the geographical bounds for the image fetching."
+          }
+        },
+        {
+          "provider": "data_acquisition_specialist",
+          "component_type": "Agent",
+          "version": 1,
+          "component_version": 1,
+          "description": "Fetches xView1 images based on the geographical bounds defined around Athens International Airport.",
+          "label": "DataAgent",
+          "config": {
+            "name": "data_acquisition_agent",
+            "model_client": {
+              "provider": "llm_clients.openai_client.OpenAIClient",
+              "component_type": "model",
+              "version": 1,
+              "component_version": 1,
+              "description": "OpenAI LLM client",
+              "label": "OpenAIClient",
+              "config": {
+                "model": "gpt-4"
+              }
+            },
+            "tools": [
+              "query_dataset_images",
+              "zoom_map"
+            ],
+            "handoffs": [
+              "detection_agent"
+            ],
+            "description": "Fetches xView1 images based on specified geographical bounds.",
+            "system_message": "Fetch images based on geographical bounds."
+          }
+        },
+        {
+          "provider": "swin_detector",
+          "component_type": "Agent",
+          "version": 1,
+          "component_version": 1,
+          "description": "Runs the Swin-L detector on fetched xView1 images to identify objects and generate a detailed report.",
+          "label": "DataAgent",
+          "config": {
+            "name": "detection_agent",
+            "model_client": {
+              "provider": "llm_clients.openai_client.OpenAIClient",
+              "component_type": "model",
+              "version": 1,
+              "component_version": 1,
+              "description": "OpenAI LLM client",
+              "label": "OpenAIClient",
+              "config": {
+                "model": "gpt-4"
+              }
+            },
+            "tools": [
+              "run_detector"
+            ],
+            "handoffs": [],
+            "description": "Identifies objects in the fetched xView1 images using the Swin-L detector.",
+            "system_message": "Run the Swin-L detector on the fetched images to generate a report."
+          }
+        },
+        {
+          "provider": "mapping_specialist",
+          "component_type": "Agent",
+          "version": 1,
+          "component_version": 1,
+          "description": "Zooms the map around Athens International Airport to visualize the area where images were fetched.",
+          "label": "MapAgent",
+          "config": {
+            "name": "map_agent",
+            "model_client": {
+              "provider": "llm_clients.openai_client.OpenAIClient",
+              "component_type": "model",
+              "version": 1,
+              "component_version": 1,
+              "description": "OpenAI LLM client",
+              "label": "OpenAIClient",
+              "config": {
+                "model": "gpt-4"
+              }
+            },
+            "tools": [
+              "zoom_map"
+            ],
+            "handoffs": [],
+            "description": "Visualizes the fetched xView1 images on a mapping platform.",
+            "system_message": "Zoom the map around the specified bounds to visualize the image coverage."
+          }
+        }
+      ]
+    }
+  }
+]

@@ -1,0 +1,100 @@
+{
+  "provider": "autogen_agentchat.teams.RoundRobinGroupChat",
+  "component_type": "team",
+  "version": 1,
+  "component_version": 1,
+  "description": "Agentic workflow to fetch xView1 images, run the Swin-L detector on Athen International Airport images, and zoom in the map.",
+  "label": "Geospatial Imaging Workflow for Athens Airport",
+  "config": {
+    "participants": [
+      {
+        "provider": "autogen_agentchat.agents.AssistantAgent",
+        "component_type": "agent",
+        "version": 1,
+        "component_version": 1,
+        "description": "This agent queries the dataset for images from the xView1 dataset focusing on a wide area around Athens International Airport.",
+        "label": "DataAgent",
+        "config": {
+          "name": "data_fetch_agent",
+          "model_client": {
+            "provider": "autogen_ext.models.openai.OpenAIChatCompletionClient",
+            "component_type": "model",
+            "version": 1,
+            "component_version": 1,
+            "description": "OpenAI LLM client",
+            "label": "OpenAIClient",
+            "config": {
+              "model": "gpt-4o-mini"
+            }
+          },
+          "tools": [
+            "query_images_by_aoi_coords"
+          ],
+          "handoffs": [
+            "vision_agent"
+          ],
+          "description": "Agent to fetch images from the xView1 dataset based on specified coordinates.",
+          "system_message": "You will retrieve xView1 images for Athens International Airport."
+        }
+      },
+      {
+        "provider": "autogen_agentchat.agents.AssistantAgent",
+        "component_type": "agent",
+        "version": 1,
+        "component_version": 1,
+        "description": "This agent processes the fetched images and runs the Swin-L object detector.",
+        "label": "VisionAgent",
+        "config": {
+          "name": "vision_agent",
+          "model_client": {
+            "provider": "autogen_ext.models.openai.OpenAIChatCompletionClient",
+            "component_type": "model",
+            "version": 1,
+            "component_version": 1,
+            "description": "OpenAI LLM client",
+            "label": "OpenAIClient",
+            "config": {
+              "model": "gpt-4o-mini"
+            }
+          },
+          "tools": [
+            "run_detector"
+          ],
+          "handoffs": [
+            "map_agent"
+          ],
+          "description": "Agent to run detector vision models on satellite images.",
+          "system_message": "You will analyze the fetched images with the Swin-L detector."
+        }
+      },
+      {
+        "provider": "autogen_agentchat.agents.AssistantAgent",
+        "component_type": "agent",
+        "version": 1,
+        "component_version": 1,
+        "description": "This agent zooms the map to the area around Athens International Airport after detections have been made.",
+        "label": "MapAgent",
+        "config": {
+          "name": "map_agent",
+          "model_client": {
+            "provider": "autogen_ext.models.openai.OpenAIChatCompletionClient",
+            "component_type": "model",
+            "version": 1,
+            "component_version": 1,
+            "description": "OpenAI LLM client",
+            "label": "OpenAIClient",
+            "config": {
+              "model": "gpt-4o-mini"
+            }
+          },
+          "tools": [
+            "zoom_map"
+          ],
+          "handoffs": [],
+          "description": "Agent to zoom the map for better visibility of the detected area.",
+          "system_message": "You will zoom into the map for Athens International Airport."
+        }
+      }
+    ]
+  }
+}

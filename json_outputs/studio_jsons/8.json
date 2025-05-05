@@ -1,0 +1,100 @@
+{
+  "provider": "autogen_agentchat.teams.RoundRobinGroupChat",
+  "component_type": "team",
+  "version": 1,
+  "component_version": 1,
+  "description": "Agentic workflow to fetch BigEarthNet dataset in Switzerland, run a ResNet-32 classifier, and plot specific land cover classes on the map.",
+  "label": "BigEarthNet Switzerland Workflow",
+  "config": {
+    "participants": [
+      {
+        "provider": "autogen_agentchat.agents.AssistantAgent",
+        "component_type": "agent",
+        "version": 1,
+        "component_version": 1,
+        "description": "Fetches satellite images from the BigEarthNet dataset for a specific area of interest in Switzerland.",
+        "label": "DataAgent",
+        "config": {
+          "name": "fetch_bigearthnet_agent",
+          "model_client": {
+            "provider": "autogen_ext.models.openai.OpenAIChatCompletionClient",
+            "component_type": "model",
+            "version": 1,
+            "component_version": 1,
+            "description": "OpenAI LLM client",
+            "label": "OpenAIClient",
+            "config": {
+              "model": "gpt-4o-mini"
+            }
+          },
+          "tools": [
+            "query_dataset_images"
+          ],
+          "handoffs": [
+            "classifier_agent"
+          ],
+          "description": "Fetch BigEarthNet images in Switzerland for specified area.",
+          "system_message": "Fetch images from the BigEarthNet dataset for Switzerland."
+        }
+      },
+      {
+        "provider": "autogen_agentchat.agents.AssistantAgent",
+        "component_type": "agent",
+        "version": 1,
+        "component_version": 1,
+        "description": "Runs the ResNet-32 classifier on fetched satellite images.",
+        "label": "VisionAgent",
+        "config": {
+          "name": "run_classifier_agent",
+          "model_client": {
+            "provider": "autogen_ext.models.openai.OpenAIChatCompletionClient",
+            "component_type": "model",
+            "version": 1,
+            "component_version": 1,
+            "description": "OpenAI LLM client",
+            "label": "OpenAIClient",
+            "config": {
+              "model": "gpt-4o-mini"
+            }
+          },
+          "tools": [
+            "run_land_coverage_classifier"
+          ],
+          "handoffs": [
+            "map_agent"
+          ],
+          "description": "Classifies the fetched images using a ResNet-32 model.",
+          "system_message": "Run the ResNet-32 classifier on the images obtained."
+        }
+      },
+      {
+        "provider": "autogen_agentchat.agents.AssistantAgent",
+        "component_type": "agent",
+        "version": 1,
+        "component_version": 1,
+        "description": "Plots specified land cover classes on the map.",
+        "label": "MapAgent",
+        "config": {
+          "name": "plot_classes_agent",
+          "model_client": {
+            "provider": "autogen_ext.models.openai.OpenAIChatCompletionClient",
+            "component_type": "model",
+            "version": 1,
+            "component_version": 1,
+            "description": "OpenAI LLM client",
+            "label": "OpenAIClient",
+            "config": {
+              "model": "gpt-4o-mini"
+            }
+          },
+          "tools": [
+            "plot_land_cover_class_scatter_map"
+          ],
+          "handoffs": [],
+          "description": "Plots the 'Vineyards' and 'Fruit trees and berry plantations' classes on the map.",
+          "system_message": "Plot the specified land cover classes on the map."
+        }
+      }
+    ]
+  }
+}

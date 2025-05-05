@@ -1,0 +1,139 @@
+{
+  "provider": "autogen_agentchat.teams.RoundRobinGroupChat",
+  "component_type": "team",
+  "version": 1,
+  "component_version": 1,
+  "description": "Agentic workflow to fetch BigEarthNet images from June 2017, classify them with the ResNet-32 LCC classifier, and plot the LCC classes for Non-irrigated arable land.",
+  "label": "BigEarthNet Image Classification and Plotting Workflow",
+  "config": {
+    "participants": [
+      {
+        "provider": "autogen_agentchat.agents.AssistantAgent",
+        "component_type": "agent",
+        "version": 1,
+        "component_version": 1,
+        "description": "Agent to fetch BigEarthNet images for a specified date.",
+        "label": "DataAgent",
+        "config": {
+          "name": "data_fetch_agent",
+          "model_client": {
+            "provider": "autogen_ext.models.openai.OpenAIChatCompletionClient",
+            "component_type": "model",
+            "version": 1,
+            "component_version": 1,
+            "description": "OpenAI LLM client",
+            "label": "OpenAIClient",
+            "config": {
+              "model": "gpt-4o-mini"
+            }
+          },
+          "tools": [
+            {
+              "provider": "autogen_core.tools.FunctionTool",
+              "component_type": "tool",
+              "version": 1,
+              "component_version": 1,
+              "description": "A tool that performs Google searches",
+              "label": "query_dataset_images",
+              "config": {
+                "source_code": "",
+                "name": "query_dataset_images",
+                "description": "Perform Google searches",
+                "has_cancellation_support": false
+              }
+            }
+          ],
+          "handoffs": [
+            "classification_agent"
+          ],
+          "description": "Fetches BigEarthNet images from the specified date.",
+          "system_message": "You will fetch BigEarthNet images from June 2017."
+        }
+      },
+      {
+        "provider": "autogen_agentchat.agents.AssistantAgent",
+        "component_type": "agent",
+        "version": 1,
+        "component_version": 1,
+        "description": "Agent to run LCC classification on fetched images using ResNet-32.",
+        "label": "VisionAgent",
+        "config": {
+          "name": "classification_agent",
+          "model_client": {
+            "provider": "autogen_ext.models.openai.OpenAIChatCompletionClient",
+            "component_type": "model",
+            "version": 1,
+            "component_version": 1,
+            "description": "OpenAI LLM client",
+            "label": "OpenAIClient",
+            "config": {
+              "model": "gpt-4o-mini"
+            }
+          },
+          "tools": [
+            {
+              "provider": "autogen_core.tools.FunctionTool",
+              "component_type": "tool",
+              "version": 1,
+              "component_version": 1,
+              "description": "A tool that performs Google searches",
+              "label": "run_land_coverage_classifier",
+              "config": {
+                "source_code": "",
+                "name": "run_land_coverage_classifier",
+                "description": "Perform Google searches",
+                "has_cancellation_support": false
+              }
+            }
+          ],
+          "handoffs": [
+            "plotting_agent"
+          ],
+          "description": "Classifies images into land cover categories using the ResNet-32 classifier.",
+          "system_message": "You will analyze the fetched images using the ResNet-32 LCC classifier."
+        }
+      },
+      {
+        "provider": "autogen_agentchat.agents.AssistantAgent",
+        "component_type": "agent",
+        "version": 1,
+        "component_version": 1,
+        "description": "Agent to plot classified land cover classes of specific category.",
+        "label": "MapAgent",
+        "config": {
+          "name": "plotting_agent",
+          "model_client": {
+            "provider": "autogen_ext.models.openai.OpenAIChatCompletionClient",
+            "component_type": "model",
+            "version": 1,
+            "component_version": 1,
+            "description": "OpenAI LLM client",
+            "label": "OpenAIClient",
+            "config": {
+              "model": "gpt-4o-mini"
+            }
+          },
+          "tools": [
+            {
+              "provider": "autogen_core.tools.FunctionTool",
+              "component_type": "tool",
+              "version": 1,
+              "component_version": 1,
+              "description": "A tool that performs Google searches",
+              "label": "plot_land_cover_class_scatter_map",
+              "config": {
+                "source_code": "",
+                "name": "plot_land_cover_class_scatter_map",
+                "description": "Perform Google searches",
+                "has_cancellation_support": false
+              }
+            }
+          ],
+          "handoffs": [],
+          "description": "Plots the land cover classes of category 'Non-irrigated arable land' on a scatter map.",
+          "system_message": "You will plot the classified LCC classes for Non-irrigated arable land."
+        }
+      }
+    ]
+  }
+}

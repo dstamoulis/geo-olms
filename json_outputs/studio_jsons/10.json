@@ -1,0 +1,70 @@
+{
+  "provider": "autogen_agentchat.teams.RoundRobinGroupChat",
+  "component_type": "team",
+  "version": 1,
+  "component_version": 1,
+  "description": "Agentic workflow to fetch xView1 images from Greece and count the number of fetched images.",
+  "label": "xView1 Image Fetching Workflow",
+  "config": {
+    "participants": [
+      {
+        "provider": "autogen_agentchat.agents.AssistantAgent",
+        "component_type": "agent",
+        "version": 1,
+        "component_version": 1,
+        "description": "Agent to fetch xView1 images from the specified area of interest (Greece).",
+        "label": "DataAgent",
+        "config": {
+          "name": "fetch_images_agent",
+          "model_client": {
+            "provider": "autogen_ext.models.openai.OpenAIChatCompletionClient",
+            "component_type": "model",
+            "version": 1,
+            "component_version": 1,
+            "description": "OpenAI LLM client",
+            "label": "OpenAIClient",
+            "config": {
+              "model": "gpt-4o-mini"
+            }
+          },
+          "tools": [
+            "query_dataset_images"
+          ],
+          "handoffs": [
+            "count_images_agent"
+          ],
+          "description": "Fetches images from xView1 dataset based on the specified coordinates.",
+          "system_message": "You will fetch xView1 images from Greece."
+        }
+      },
+      {
+        "provider": "autogen_agentchat.agents.AssistantAgent",
+        "component_type": "agent",
+        "version": 1,
+        "component_version": 1,
+        "description": "Agent to count the number of images fetched by the fetch_images agent.",
+        "label": "DatabaseAgent",
+        "config": {
+          "name": "count_images_agent",
+          "model_client": {
+            "provider": "autogen_ext.models.openai.OpenAIChatCompletionClient",
+            "component_type": "model",
+            "version": 1,
+            "component_version": 1,
+            "description": "OpenAI LLM client",
+            "label": "OpenAIClient",
+            "config": {
+              "model": "gpt-4o-mini"
+            }
+          },
+          "tools": [
+            "count_filtered_images"
+          ],
+          "handoffs": [],
+          "description": "Counts the number of fetched images.",
+          "system_message": "You will count the number of fetched xView1 images."
+        }
+      }
+    ]
+  }
+}

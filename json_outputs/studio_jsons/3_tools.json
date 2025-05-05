@@ -1,0 +1,240 @@
+{
+  "provider": "autogen_agentchat.teams.RoundRobinGroupChat",
+  "component_type": "team",
+  "version": 1,
+  "component_version": 1,
+  "description": "Agentic workflow to fetch images from xView1 and FAIR1M, run object detection, and plot specific category detections.",
+  "label": "Image Fetching and Detection Workflow",
+  "config": {
+    "participants": [
+      {
+        "provider": "autogen_agentchat.agents.AssistantAgent",
+        "component_type": "agent",
+        "version": 1,
+        "component_version": 1,
+        "description": "Agent to fetch images from the xView1 dataset.",
+        "label": "DataAgent",
+        "config": {
+          "name": "fetch_xView1_images",
+          "model_client": {
+            "provider": "autogen_ext.models.openai.OpenAIChatCompletionClient",
+            "component_type": "model",
+            "version": 1,
+            "component_version": 1,
+            "description": "OpenAI LLM client",
+            "label": "OpenAIClient",
+            "config": {
+              "model": "gpt-4o-mini"
+            }
+          },
+          "tools": [
+            {
+              "provider": "autogen_core.tools.FunctionTool",
+              "component_type": "tool",
+              "version": 1,
+              "component_version": 1,
+              "description": "A tool that performs Google searches",
+              "label": "query_dataset_images",
+              "config": {
+                "source_code": "",
+                "name": "query_dataset_images",
+                "description": "Perform Google searches",
+                "has_cancellation_support": false
+              }
+            }
+          ],
+          "handoffs": [
+            "fetch_FAIR1M_images"
+          ],
+          "description": "This agent retrieves images from the xView1 dataset for a specified date.",
+          "system_message": "Fetch xView1 images from July 2017."
+        }
+      },
+      {
+        "provider": "autogen_agentchat.agents.AssistantAgent",
+        "component_type": "agent",
+        "version": 1,
+        "component_version": 1,
+        "description": "Agent to fetch images from the FAIR1M dataset.",
+        "label": "DataAgent",
+        "config": {
+          "name": "fetch_FAIR1M_images",
+          "model_client": {
+            "provider": "autogen_ext.models.openai.OpenAIChatCompletionClient",
+            "component_type": "model",
+            "version": 1,
+            "component_version": 1,
+            "description": "OpenAI LLM client",
+            "label": "OpenAIClient",
+            "config": {
+              "model": "gpt-4o-mini"
+            }
+          },
+          "tools": [
+            {
+              "provider": "autogen_core.tools.FunctionTool",
+              "component_type": "tool",
+              "version": 1,
+              "component_version": 1,
+              "description": "A tool that performs Google searches",
+              "label": "query_dataset_images",
+              "config": {
+                "source_code": "",
+                "name": "query_dataset_images",
+                "description": "Perform Google searches",
+                "has_cancellation_support": false
+              }
+            }
+          ],
+          "handoffs": [
+            "run_detector_on_xView1",
+            "run_detector_on_FAIR1M"
+          ],
+          "description": "This agent retrieves images from the FAIR1M dataset for a specified date.",
+          "system_message": "Fetch FAIR1M images from July 2017."
+        }
+      },
+      {
+        "provider": "autogen_agentchat.agents.AssistantAgent",
+        "component_type": "agent",
+        "version": 1,
+        "component_version": 1,
+        "description": "Agent to run the Swin-L object detector on images from xView1.",
+        "label": "VisionAgent",
+        "config": {
+          "name": "run_detector_on_xView1",
+          "model_client": {
+            "provider": "autogen_ext.models.openai.OpenAIChatCompletionClient",
+            "component_type": "model",
+            "version": 1,
+            "component_version": 1,
+            "description": "OpenAI LLM client",
+            "label": "OpenAIClient",
+            "config": {
+              "model": "gpt-4o-mini"
+            }
+          },
+          "tools": [
+            {
+              "provider": "autogen_core.tools.FunctionTool",
+              "component_type": "tool",
+              "version": 1,
+              "component_version": 1,
+              "description": "A tool that performs Google searches",
+              "label": "run_detector",
+              "config": {
+                "source_code": "",
+                "name": "run_detector",
+                "description": "Perform Google searches",
+                "has_cancellation_support": false
+              }
+            }
+          ],
+          "handoffs": [
+            "run_detector_on_FAIR1M"
+          ],
+          "description": "Processes fetched xView1 images and runs the Swin-L detector.",
+          "system_message": "Run the Swin-L detector on xView1 images."
+        }
+      },
+      {
+        "provider": "autogen_agentchat.agents.AssistantAgent",
+        "component_type": "agent",
+        "version": 1,
+        "component_version": 1,
+        "description": "Agent to run the Swin-L object detector on images from FAIR1M.",
+        "label": "VisionAgent",
+        "config": {
+          "name": "run_detector_on_FAIR1M",
+          "model_client": {
+            "provider": "autogen_ext.models.openai.OpenAIChatCompletionClient",
+            "component_type": "model",
+            "version": 1,
+            "component_version": 1,
+            "description": "OpenAI LLM client",
+            "label": "OpenAIClient",
+            "config": {
+              "model": "gpt-4o-mini"
+            }
+          },
+          "tools": [
+            {
+              "provider": "autogen_core.tools.FunctionTool",
+              "component_type": "tool",
+              "version": 1,
+              "component_version": 1,
+              "description": "A tool that performs Google searches",
+              "label": "run_detector",
+              "config": {
+                "source_code": "",
+                "name": "run_detector",
+                "description": "Perform Google searches",
+                "has_cancellation_support": false
+              }
+            },
+            {
+              "provider": "autogen_core.tools.FunctionTool",
+              "component_type": "tool",
+              "version": 1,
+              "component_version": 1,
+              "description": "A tool that performs Google searches",
+              "label": "count_detections_by_category",
+              "config": {
+                "source_code": "",
+                "name": "count_detections_by_category",
+                "description": "Perform Google searches",
+                "has_cancellation_support": false
+              }
+            }
+          ],
+          "handoffs": [
+            "plot_detections_for_Van"
+          ],
+          "description": "Processes fetched FAIR1M images and runs the Swin-L detector.",
+          "system_message": "Run the Swin-L detector on FAIR1M images."
+        }
+      },
+      {
+        "provider": "autogen_agentchat.agents.AssistantAgent",
+        "component_type": "agent",
+        "version": 1,
+        "component_version": 1,
+        "description": "Agent to plot the detections of a specific category from the FAIR1M results.",
+        "label": "MapAgent",
+        "config": {
+          "name": "plot_detections_for_Van",
+          "model_client": {
+            "provider": "autogen_ext.models.openai.OpenAIChatCompletionClient",
+            "component_type": "model",
+            "version": 1,
+            "component_version": 1,
+            "description": "OpenAI LLM client",
+            "label": "OpenAIClient",
+            "config": {
+              "model": "gpt-4o-mini"
+            }
+          },
+          "tools": [
+            {
+              "provider": "autogen_core.tools.FunctionTool",
+              "component_type": "tool",
+              "version": 1,
+              "component_version": 1,
+              "description": "A tool that performs Google searches",
+              "label": "plot_detections_catergory_scatter_map",
+              "config": {
+                "source_code": "",
+                "name": "plot_detections_catergory_scatter_map",
+                "description": "Perform Google searches",
+                "has_cancellation_support": false
+              }
+            }
+          ],
+          "handoffs": [],
+          "description": "Plots detections of category Van from the results of FAIR1M images analysis.",
+          "system_message": "Plot the detections of category Van from FAIR1M images."
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,100 @@
+{
+  "provider": "autogen_agentchat.teams.RoundRobinGroupChat",
+  "component_type": "team",
+  "version": 1,
+  "component_version": 1,
+  "description": "Agentic workflow to fetch images from xView1 in Greece, run a detection model, and plot the results for the Passenger Vehicle category.",
+  "label": "xView1 Images Processing Workflow",
+  "config": {
+    "participants": [
+      {
+        "provider": "autogen_agentchat.agents.AssistantAgent",
+        "component_type": "agent",
+        "version": 1,
+        "component_version": 1,
+        "description": "Agent to fetch xView1 images from a specified area of interest.",
+        "label": "DataAgent",
+        "config": {
+          "name": "fetch_images_agent",
+          "model_client": {
+            "provider": "autogen_ext.models.openai.OpenAIChatCompletionClient",
+            "component_type": "model",
+            "version": 1,
+            "component_version": 1,
+            "description": "OpenAI LLM client",
+            "label": "OpenAIClient",
+            "config": {
+              "model": "gpt-4o-mini"
+            }
+          },
+          "tools": [
+            "query_images_by_aoi_coords"
+          ],
+          "handoffs": [
+            "vision_agent"
+          ],
+          "description": "Fetch images from xView1 dataset for a specified AOI.",
+          "system_message": "You will fetch xView1 images from the given area of interest (Greece)."
+        }
+      },
+      {
+        "provider": "autogen_agentchat.agents.AssistantAgent",
+        "component_type": "agent",
+        "version": 1,
+        "component_version": 1,
+        "description": "Agent to process images using the Swin-L detector.",
+        "label": "VisionAgent",
+        "config": {
+          "name": "vision_agent",
+          "model_client": {
+            "provider": "autogen_ext.models.openai.OpenAIChatCompletionClient",
+            "component_type": "model",
+            "version": 1,
+            "component_version": 1,
+            "description": "OpenAI LLM client",
+            "label": "OpenAIClient",
+            "config": {
+              "model": "gpt-4o-mini"
+            }
+          },
+          "tools": [
+            "run_detector"
+          ],
+          "handoffs": [
+            "plot_agent"
+          ],
+          "description": "Run the Swin-L detector on the fetched images.",
+          "system_message": "You will analyze the fetched images using the Swin-L object detection model."
+        }
+      },
+      {
+        "provider": "autogen_agentchat.agents.AssistantAgent",
+        "component_type": "agent",
+        "version": 1,
+        "component_version": 1,
+        "description": "Agent to plot the detection results of the Swin-L detector for specific categories.",
+        "label": "MapAgent",
+        "config": {
+          "name": "plot_agent",
+          "model_client": {
+            "provider": "autogen_ext.models.openai.OpenAIChatCompletionClient",
+            "component_type": "model",
+            "version": 1,
+            "component_version": 1,
+            "description": "OpenAI LLM client",
+            "label": "OpenAIClient",
+            "config": {
+              "model": "gpt-4o-mini"
+            }
+          },
+          "tools": [
+            "plot_detections_catergory_scatter_map"
+          ],
+          "handoffs": [],
+          "description": "Plot the detections of specified categories on a map.",
+          "system_message": "You will plot the detections for the category Passenger Vehicle."
+        }
+      }
+    ]
+  }
+}

@@ -11,8 +11,8 @@ class ModelClientConfig(BaseModel):
         }
 
 class ModelClient(BaseModel):
-    provider: str = Field(..., description="Path or name of the LLM provider implementation.")
-    component_type: str = Field(..., description="Component type, e.g., 'model'.")
+    provider: Literal["autogen_ext.models.openai.OpenAIChatCompletionClient"]
+    component_type: Literal["model"]
     version: int = Field(..., description="Component spec version.")
     component_version: int = Field(..., description="Implementation version of the component.")
     description: str = Field(..., description="Human-readable description of the model client.")
@@ -58,8 +58,8 @@ class AgentConfig(BaseModel):
         }
 
 class Agent(BaseModel):
-    provider: str = Field(..., description="Full path or identifier of the agent provider.")
-    component_type: str = Field(..., description="Type of this component (e.g., 'Agent').")
+    provider: Literal["autogen_agentchat.agents.AssistantAgent"]
+    component_type: Literal["agent"]
     version: int = Field(..., description="Spec version for this component.")
     component_version: int = Field(..., description="Implementation version for the agent.")
     description: str = Field(..., description="Human-readable summary of what this agent does.")
@@ -95,8 +95,8 @@ class WorkflowConfig(BaseModel):
         }
 
 class AutogenWorkflow(BaseModel):
-    provider: str = Field(..., description="The provider of this workflow, e.g., 'autogen'.")
-    component_type: str = Field(..., description="The component type, should be 'Workflow'.")
+    provider: Literal["autogen_agentchat.teams.RoundRobinGroupChat"]
+    component_type: Literal["team"]
     version: int = Field(..., description="The spec version of this workflow.")
     component_version: int = Field(..., description="The implementation version of this workflow.")
     description: str = Field(..., description="Description of the full workflow and its intent.")

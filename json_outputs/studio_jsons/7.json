@@ -1,0 +1,73 @@
+{
+  "provider": "autogen_agentchat.teams.RoundRobinGroupChat",
+  "component_type": "team",
+  "version": 1,
+  "component_version": 1,
+  "description": "Workflow to fetch and plot xView1 images for a specific area and date.",
+  "label": "Geospatial Image Plotting Workflow",
+  "config": {
+    "participants": [
+      {
+        "provider": "autogen_agentchat.agents.AssistantAgent",
+        "component_type": "agent",
+        "version": 1,
+        "component_version": 1,
+        "description": "Agent to query dataset images based on AOI coordinates and time.",
+        "label": "DataAgent",
+        "config": {
+          "name": "data_query_agent",
+          "model_client": {
+            "provider": "autogen_ext.models.openai.OpenAIChatCompletionClient",
+            "component_type": "model",
+            "version": 1,
+            "component_version": 1,
+            "description": "OpenAI LLM client",
+            "label": "OpenAIClient",
+            "config": {
+              "model": "gpt-4o-mini"
+            }
+          },
+          "tools": [
+            "query_images_by_aoi_coords",
+            "query_dataset_images"
+          ],
+          "handoffs": [
+            "map_plotting_agent"
+          ],
+          "description": "Fetches images from the xView1 dataset based on specified coordinates and time.",
+          "system_message": "You will query the dataset for images in Dar es-Salam, Tanzania from Summer 2017."
+        }
+      },
+      {
+        "provider": "autogen_agentchat.agents.AssistantAgent",
+        "component_type": "agent",
+        "version": 1,
+        "component_version": 1,
+        "description": "Agent to process and plot the fetched images.",
+        "label": "MapAgent",
+        "config": {
+          "name": "map_plotting_agent",
+          "model_client": {
+            "provider": "autogen_ext.models.openai.OpenAIChatCompletionClient",
+            "component_type": "model",
+            "version": 1,
+            "component_version": 1,
+            "description": "OpenAI LLM client",
+            "label": "OpenAIClient",
+            "config": {
+              "model": "gpt-4o-mini"
+            }
+          },
+          "tools": [
+            "plot_images_scatter_map",
+            "zoom_map",
+            "reset_map"
+          ],
+          "handoffs": [],
+          "description": "Plots the fetched images on the map and visualizes them appropriately.",
+          "system_message": "You will plot the fetched images on the map after receiving them."
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,100 @@
+{
+  "provider": "autogen_agentchat.teams.RoundRobinGroupChat",
+  "component_type": "team",
+  "version": 1,
+  "component_version": 1,
+  "description": "Agentic workflow to fetch xView1 and FAIR1M images from July 2017 and run the Swin-L detector on each imagery source.",
+  "label": "Image Fetch and Detection Workflow",
+  "config": {
+    "participants": [
+      {
+        "provider": "autogen_agentchat.agents.AssistantAgent",
+        "component_type": "agent",
+        "version": 1,
+        "component_version": 1,
+        "description": "Agent to fetch images from the xView1 dataset for July 2017.",
+        "label": "DataAgent",
+        "config": {
+          "name": "fetch_xview1_images",
+          "model_client": {
+            "provider": "autogen_ext.models.openai.OpenAIChatCompletionClient",
+            "component_type": "model",
+            "version": 1,
+            "component_version": 1,
+            "description": "OpenAI LLM client",
+            "label": "OpenAIClient",
+            "config": {
+              "model": "gpt-4o-mini"
+            }
+          },
+          "tools": [
+            "query_dataset_images"
+          ],
+          "handoffs": [
+            "run_detector_agent"
+          ],
+          "description": "Fetch xView1 images from July 2017.",
+          "system_message": "You will fetch images from the xView1 dataset for the date July 2017."
+        }
+      },
+      {
+        "provider": "autogen_agentchat.agents.AssistantAgent",
+        "component_type": "agent",
+        "version": 1,
+        "component_version": 1,
+        "description": "Agent to fetch images from the FAIR1M dataset for July 2017.",
+        "label": "DataAgent",
+        "config": {
+          "name": "fetch_fair1m_images",
+          "model_client": {
+            "provider": "autogen_ext.models.openai.OpenAIChatCompletionClient",
+            "component_type": "model",
+            "version": 1,
+            "component_version": 1,
+            "description": "OpenAI LLM client",
+            "label": "OpenAIClient",
+            "config": {
+              "model": "gpt-4o-mini"
+            }
+          },
+          "tools": [
+            "query_dataset_images"
+          ],
+          "handoffs": [
+            "run_detector_agent"
+          ],
+          "description": "Fetch FAIR1M images from July 2017.",
+          "system_message": "You will fetch images from the FAIR1M dataset for the date July 2017."
+        }
+      },
+      {
+        "provider": "autogen_agentchat.agents.AssistantAgent",
+        "component_type": "agent",
+        "version": 1,
+        "component_version": 1,
+        "description": "Agent to run the Swin-L detector on the fetched images.",
+        "label": "VisionAgent",
+        "config": {
+          "name": "run_detector_agent",
+          "model_client": {
+            "provider": "autogen_ext.models.openai.OpenAIChatCompletionClient",
+            "component_type": "model",
+            "version": 1,
+            "component_version": 1,
+            "description": "OpenAI LLM client",
+            "label": "OpenAIClient",
+            "config": {
+              "model": "gpt-4o-mini"
+            }
+          },
+          "tools": [
+            "run_detector"
+          ],
+          "handoffs": [],
+          "description": "Run the Swin-L detector on the fetched images.",
+          "system_message": "You will analyze the fetched images with the Swin-L detector."
+        }
+      }
+    ]
+  }
+}

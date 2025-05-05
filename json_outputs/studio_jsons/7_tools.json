@@ -1,0 +1,138 @@
+{
+  "provider": "autogen_agentchat.teams.RoundRobinGroupChat",
+  "component_type": "team",
+  "version": 1,
+  "component_version": 1,
+  "description": "Workflow to fetch and plot xView1 images for a specific area and date.",
+  "label": "Geospatial Image Plotting Workflow",
+  "config": {
+    "participants": [
+      {
+        "provider": "autogen_agentchat.agents.AssistantAgent",
+        "component_type": "agent",
+        "version": 1,
+        "component_version": 1,
+        "description": "Agent to query dataset images based on AOI coordinates and time.",
+        "label": "DataAgent",
+        "config": {
+          "name": "data_query_agent",
+          "model_client": {
+            "provider": "autogen_ext.models.openai.OpenAIChatCompletionClient",
+            "component_type": "model",
+            "version": 1,
+            "component_version": 1,
+            "description": "OpenAI LLM client",
+            "label": "OpenAIClient",
+            "config": {
+              "model": "gpt-4o-mini"
+            }
+          },
+          "tools": [
+            {
+              "provider": "autogen_core.tools.FunctionTool",
+              "component_type": "tool",
+              "version": 1,
+              "component_version": 1,
+              "description": "A tool that performs Google searches",
+              "label": "query_images_by_aoi_coords",
+              "config": {
+                "source_code": "",
+                "name": "query_images_by_aoi_coords",
+                "description": "Perform Google searches",
+                "has_cancellation_support": false
+              }
+            },
+            {
+              "provider": "autogen_core.tools.FunctionTool",
+              "component_type": "tool",
+              "version": 1,
+              "component_version": 1,
+              "description": "A tool that performs Google searches",
+              "label": "query_dataset_images",
+              "config": {
+                "source_code": "",
+                "name": "query_dataset_images",
+                "description": "Perform Google searches",
+                "has_cancellation_support": false
+              }
+            }
+          ],
+          "handoffs": [
+            "map_plotting_agent"
+          ],
+          "description": "Fetches images from the xView1 dataset based on specified coordinates and time.",
+          "system_message": "You will query the dataset for images in Dar es-Salam, Tanzania from Summer 2017."
+        }
+      },
+      {
+        "provider": "autogen_agentchat.agents.AssistantAgent",
+        "component_type": "agent",
+        "version": 1,
+        "component_version": 1,
+        "description": "Agent to process and plot the fetched images.",
+        "label": "MapAgent",
+        "config": {
+          "name": "map_plotting_agent",
+          "model_client": {
+            "provider": "autogen_ext.models.openai.OpenAIChatCompletionClient",
+            "component_type": "model",
+            "version": 1,
+            "component_version": 1,
+            "description": "OpenAI LLM client",
+            "label": "OpenAIClient",
+            "config": {
+              "model": "gpt-4o-mini"
+            }
+          },
+          "tools": [
+            {
+              "provider": "autogen_core.tools.FunctionTool",
+              "component_type": "tool",
+              "version": 1,
+              "component_version": 1,
+              "description": "A tool that performs Google searches",
+              "label": "plot_images_scatter_map",
+              "config": {
+                "source_code": "",
+                "name": "plot_images_scatter_map",
+                "description": "Perform Google searches",
+                "has_cancellation_support": false
+              }
+            },
+            {
+              "provider": "autogen_core.tools.FunctionTool",
+              "component_type": "tool",
+              "version": 1,
+              "component_version": 1,
+              "description": "A tool that performs Google searches",
+              "label": "zoom_map",
+              "config": {
+                "source_code": "",
+                "name": "zoom_map",
+                "description": "Perform Google searches",
+                "has_cancellation_support": false
+              }
+            },
+            {
+              "provider": "autogen_core.tools.FunctionTool",
+              "component_type": "tool",
+              "version": 1,
+              "component_version": 1,
+              "description": "A tool that performs Google searches",
+              "label": "reset_map",
+              "config": {
+                "source_code": "",
+                "name": "reset_map",
+                "description": "Perform Google searches",
+                "has_cancellation_support": false
+              }
+            }
+          ],
+          "handoffs": [],
+          "description": "Plots the fetched images on the map and visualizes them appropriately.",
+          "system_message": "You will plot the fetched images on the map after receiving them."
+        }
+      }
+    ]
+  }
+}

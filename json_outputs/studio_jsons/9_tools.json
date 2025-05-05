@@ -1,0 +1,53 @@
+{
+  "provider": "autogen_agentchat.teams.RoundRobinGroupChat",
+  "component_type": "team",
+  "version": 1,
+  "component_version": 1,
+  "description": "Agentic workflow to zoom the map to the capital city of the UK.",
+  "label": "Map Zoom Workflow",
+  "config": {
+    "participants": [
+      {
+        "provider": "autogen_agentchat.agents.AssistantAgent",
+        "component_type": "agent",
+        "version": 1,
+        "component_version": 1,
+        "description": "Agent to handle user requests to zoom the map.",
+        "label": "MapAgent",
+        "config": {
+          "name": "map_agent",
+          "model_client": {
+            "provider": "autogen_ext.models.openai.OpenAIChatCompletionClient",
+            "component_type": "model",
+            "version": 1,
+            "component_version": 1,
+            "description": "OpenAI LLM client",
+            "label": "OpenAIClient",
+            "config": {
+              "model": "gpt-4o-mini"
+            }
+          },
+          "tools": [
+            {
+              "provider": "autogen_core.tools.FunctionTool",
+              "component_type": "tool",
+              "version": 1,
+              "component_version": 1,
+              "description": "A tool that performs Google searches",
+              "label": "zoom_map",
+              "config": {
+                "source_code": "",
+                "name": "zoom_map",
+                "description": "Perform Google searches",
+                "has_cancellation_support": false
+              }
+            }
+          ],
+          "handoffs": [],
+          "description": "Responsible for zooming the map to specific locations.",
+          "system_message": "You will zoom the map to the capital city of the UK."
+        }
+      }
+    ]
+  }
+}

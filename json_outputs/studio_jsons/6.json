@@ -1,0 +1,100 @@
+{
+  "provider": "autogen_agentchat.teams.RoundRobinGroupChat",
+  "component_type": "team",
+  "version": 1,
+  "component_version": 1,
+  "description": "Agentic workflow to plot BigEarthNet and xView1 images on a map for Germany from the 2nd half of 2017.",
+  "label": "Satellite Imagery Plotting Workflow",
+  "config": {
+    "participants": [
+      {
+        "provider": "autogen_agentchat.agents.AssistantAgent",
+        "component_type": "agent",
+        "version": 1,
+        "component_version": 1,
+        "description": "Agent to query dataset images for BigEarthNet and xView1 in Germany for the specified timeframe.",
+        "label": "DataAgent",
+        "config": {
+          "name": "data_query_agent",
+          "model_client": {
+            "provider": "autogen_ext.models.openai.OpenAIChatCompletionClient",
+            "component_type": "model",
+            "version": 1,
+            "component_version": 1,
+            "description": "OpenAI LLM client",
+            "label": "OpenAIClient",
+            "config": {
+              "model": "gpt-4o-mini"
+            }
+          },
+          "tools": [
+            "query_dataset_images"
+          ],
+          "handoffs": [
+            "image_filter_agent"
+          ],
+          "description": "This agent queries the dataset for images.",
+          "system_message": "You will find images from BigEarthNet and xView1 datasets in Germany from the 2nd half of 2017."
+        }
+      },
+      {
+        "provider": "autogen_agentchat.agents.AssistantAgent",
+        "component_type": "agent",
+        "version": 1,
+        "component_version": 1,
+        "description": "Agent to filter images based on the specified category and time.",
+        "label": "DataAgent",
+        "config": {
+          "name": "image_filter_agent",
+          "model_client": {
+            "provider": "autogen_ext.models.openai.OpenAIChatCompletionClient",
+            "component_type": "model",
+            "version": 1,
+            "component_version": 1,
+            "description": "OpenAI LLM client",
+            "label": "OpenAIClient",
+            "config": {
+              "model": "gpt-4o-mini"
+            }
+          },
+          "tools": [
+            "count_filtered_images"
+          ],
+          "handoffs": [
+            "map_plotting_agent"
+          ],
+          "description": "This agent filters and counts images based on the specified criteria.",
+          "system_message": "You will filter the fetched images by category and ensure they fulfill the requirements."
+        }
+      },
+      {
+        "provider": "autogen_agentchat.agents.AssistantAgent",
+        "component_type": "agent",
+        "version": 1,
+        "component_version": 1,
+        "description": "Agent to plot the filtered images on the map for the specified location.",
+        "label": "MapAgent",
+        "config": {
+          "name": "map_plotting_agent",
+          "model_client": {
+            "provider": "autogen_ext.models.openai.OpenAIChatCompletionClient",
+            "component_type": "model",
+            "version": 1,
+            "component_version": 1,
+            "description": "OpenAI LLM client",
+            "label": "OpenAIClient",
+            "config": {
+              "model": "gpt-4o-mini"
+            }
+          },
+          "tools": [
+            "plot_images_scatter_map"
+          ],
+          "handoffs": [],
+          "description": "This agent is responsible for plotting images on the map.",
+          "system_message": "You will plot the filtered images on the map for Germany."
+        }
+      }
+    ]
+  }
+}

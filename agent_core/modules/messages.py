@@ -255,7 +255,10 @@ class Messages:
                     "role": msg.role,
                     "content": msg.content
                 }
-            api_messages.append(api_msg)
+            if isinstance(api_msg, list):
+                api_messages.extend(api_msg)
+            else:
+                api_messages.append(api_msg)
         return api_messages
 
 

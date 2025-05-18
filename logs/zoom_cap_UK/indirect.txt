@@ -1,0 +1,9 @@
+[single_agent] Adding user message to conversation history.
+[single_agent] Requesting response from OpenAIClient client (gpt-4o-mini)...
+[single_agent] Received response: ToolCallRequestMessage: Role: assistant | Input Tokens: 858 | Cached Tokens: 0 | Output Tokens: 30 | Tool Calls: ['ToolCall(id=call_WyWeOIwh5LjYGMfjZK9u8mLd, name=zoom_map, arguments={"lat":53.4084,"lon":-2.9916,"zoom":10}, type=function)'] | Source: {'client_class': 'OpenAIClient', 'model': 'gpt-4o-mini'} | Time Elapsed: 0.91
+[single_agent] Calling tool: zoom_map({'lat': 53.4084, 'lon': -2.9916, 'zoom': 10})
+[single_agent] Requesting response from OpenAIClient client (gpt-4o-mini)...
+[single_agent] Received response: ChatResponseMessage: Role: assistant | Content: The map has been zoomed in to the capital of the United Kingdom, where Liverpool is located. | Input Tokens: 898 | Cached Tokens: 0 | Output Tokens: 22 | Source: {'client_class': 'OpenAIClient', 'model': 'gpt-4o-mini'} | Time Elapsed: 0.7314
+ChatResponseMessage: Role: assistant | Content: The map has been zoomed in to the capital of the United Kingdom, where Liverpool is located. | Input Tokens: 898 | Cached Tokens: 0 | Output Tokens: 22 | Source: {'client_class': 'OpenAIClient', 'model': 'gpt-4o-mini'} | Time Elapsed: 0.7314
+{}
+{}

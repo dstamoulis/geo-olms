@@ -15,8 +15,10 @@ from evaluate.agent_task import AgentTask
 
 from geoplatform.platform import Platform
 
-def main():
+import argparse
 
+def main(args):
+    
     model_client = BaseClient.from_cfg({
             "client": "openai",      # Options: "openai", "ollama", "vllm"
             "model": "gpt-4o-mini",    # Model name, e.g., "gpt-4o-mini" or "llama3.3:70b" for ollama
@@ -29,6 +31,7 @@ def main():
     data_tools = DataTools(database, vision)
     
     single_agent = SingleAgent(
+        api=args.api,
         name="single_agent",
         model_client=model_client,
         messages=messages,
@@ -47,14 +50,24 @@ def main():
     query = "Plot on the map the BigEarthNet, xView1 images in Germany from 2nd half of 2017"
     query = "Plot on the map the xView1 images in Dar es-Salam, Tanzania from Summer 2017! Make sure you consider a very very wide area!"
     query = "Fetch BigEarthNet in Switzerland for and run the ResNet-32 classifier. Please plot on the map the 'Vineyards' and 'Fruit trees and berry plantations' LCC classes"
-    query = "Zoom the map to the capital of UK please"
-    query = "Fetch xView1 images from Greece. How many images we got?"
-    query = "Run the YOLO-v6 LCC model on BigEarthNet from April 2018. How many 'Airports' LCC classification results we got?"
-    query = "Plot on the map the FAIR1M, BigEarthNet, and xView1 images in Greece from 2nd half of 2012"
-    query = "Let's start by getting the xView1 images from Prague, Czech Republic for Summer 2017. Consider a wide area. Then run the Swin-L detector. Last, can you please tell me how many 'Passenger Car' you got?"
-    query = "Where is 39.3434\u00b0 N, 117.3616\u00b0 E? I want to see it on the map; please zoom there!"
-    query = "First, let's load the xView1 images from Signapore for Summer 2017, but please make sure you consider a wide area. Then run the Swin-L detector. Based on the detection counts, which category showed up with more objects in that area: 'Oil Tanker', 'Ferry', or 'Sailboat'? Thanks in advance for the help!"
-    query = "Fetch xView1 images from Turkey. How many images are there?"
+    # query = "Zoom the map to the capital of UK please"
+    # query = "Tell me a joke please"
+    # query = "Zoom the map to the capital of UK please. What is the name of the capital?"
+    # query = "Fetch xView1 images from Greece. How many images we got?"
+    # query = "Run the YOLO-v6 LCC model on BigEarthNet from April 2018. How many 'Airports' LCC classification results we got?"
+    # query = "Plot on the map the FAIR1M, BigEarthNet, and xView1 images in Greece from 2nd half of 2012"
+    # query = "Let's start by getting the xView1 images from Prague, Czech Republic for Summer 2017. Consider a wide area. Then run the Swin-L detector. Last, can you please tell me how many 'Passenger Car' you got?"
+    # query = "Where is 39.3434\u00b0 N, 117.3616\u00b0 E? I want to see it on the map; please zoom there!"
+    # query = "First, let's load the xView1 images from Signapore for Summer 2017, but please make sure you consider a wide area. Then run the Swin-L detector. Based on the detection counts, which category showed up with more objects in that area: 'Oil Tanker', 'Ferry', or 'Sailboat'? Thanks in advance for the help!"
+    # query = "Fetch xView1 images from Turkey. How many images are there?"
+    # # added ------------------------------------
+    # # make the query vague
+    # query = "Zoom the map to the capital of the country where Liverpool is located!"
+    # query = "Plot the Swin-L detected Passenger Vehicle on xView1 images in Greece!"
+    # # take back the request and change to a new one
+    # query = "Fetch xView1 images from Turkey, wait, don't do that, fetch from Greece actually, then run the Swin-L detector and plot the detections of category Passenger Vehicle!"
+    # take back + vague
+    # query = "Plot the detected Passenger Vehicle on xView1 images in Turkey. Wait, do Greece instead, and use Swin-L please!"
     response = platform.agent.run_query(query)
 
     print(response)
@@ -66,4 +79,7 @@ def main():
     # platform.reset()
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(description='geo-olm agent')
+    parser.add_argument('--api', default='ChatCompletion', help='choose between Responses and ChatCompletion')
+    args = parser.parse_args()
+    main(args)

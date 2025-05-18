@@ -1,0 +1,190 @@
+-----------------------Pure Message--------------------------------
+User message: TextMessage: Role: user | Content: Tell me a joke please | Source: user
+[single_agent] Requesting response from OpenAIClient client (gpt-4o-mini)...
+-----
+OpenAI response:
+ChatCompletion(
+    id='chatcmpl-BYIsoBK5UFqpbPtySru78bgpVKhaO',
+    choices=[
+        Choice(
+            finish_reason='stop',
+            index=0,
+            logprobs=None,
+            message=ChatCompletionMessage(
+                content='Why did the scarecrow win an award?\n\nBecause he was outstanding in his field!',
+                refusal=None,
+                role='assistant',
+                annotations=[],
+                audio=None,
+                function_call=None,
+                tool_calls=None
+            )
+        )
+    ],
+    created=1747515438,
+    model='gpt-4o-mini-2024-07-18',
+    object='chat.completion',
+    service_tier='default',
+    system_fingerprint='fp_71b02749fa',
+    usage=CompletionUsage(
+        completion_tokens=18,
+        prompt_tokens=849,
+        total_tokens=867,
+        completion_tokens_details=CompletionTokensDetails(
+            accepted_prediction_tokens=0,
+            audio_tokens=0,
+            reasoning_tokens=0,
+            rejected_prediction_tokens=0
+        ),
+        prompt_tokens_details=PromptTokensDetails(
+            audio_tokens=0,
+            cached_tokens=0
+        )
+    )
+)
+-----
+
+
+
+
+
+-----------------------Tool Call--------------------------------
+User message: TextMessage: Role: user | Content: Zoom the map to the capital of UK please | Source: user
+-----
+OpenAI response:
+ChatCompletion(
+    id='chatcmpl-BYHuzdXcjX3ix6DzIrDAsIj0rTYUV',
+    choices=[
+        Choice(
+            finish_reason='tool_calls',
+            index=0,
+            logprobs=None,
+            message=ChatCompletionMessage(
+                content=None,
+                refusal=None,
+                role='assistant',
+                annotations=[],
+                audio=None,
+                function_call=None,
+                tool_calls=[
+                    ChatCompletionMessageToolCall(
+                        id='call_IHYuLy4tyllC7PbqukRCbqTB',
+                        function=Function(
+                            arguments='{"lat":51.5074,"lon":-0.1278,"zoom":10}',
+                            name='zoom_map'
+                        ),
+                        type='function'
+                    )
+                ]
+            )
+        )
+    ],
+    created=1747511729,
+    model='gpt-4o-mini-2024-07-18',
+    object='chat.completion', service_tier='default', system_fingerprint='fp_92e0377081', usage=CompletionUsage(completion_tokens=29, prompt_tokens=853, total_tokens=882, completion_tokens_details=CompletionTokensDetails(accepted_prediction_tokens=0, audio_tokens=0, reasoning_tokens=0, rejected_prediction_tokens=0), prompt_tokens_details=PromptTokensDetails(audio_tokens=0, cached_tokens=0)))
+-----
+
+
+
+
+
+-----------------------Tool Call + Message--------------------------------
+User message: TextMessage: Role: user | Content: Zoom the map to the capital of UK please. What is the name of the capital? | Source: user
+[single_agent] Requesting response from OpenAIClient client (gpt-4o-mini)...
+-----
+OpenAI response:
+ChatCompletion(
+    id='chatcmpl-BYIpHvy2HJxrBhu1jxtNDBLj1wReN',
+    choices=[
+        Choice(
+            finish_reason='tool_calls',
+            index=0,
+            logprobs=None,
+            message=ChatCompletionMessage(
+                content="The capital of the United Kingdom is London. I will zoom the map to London now. The coordinates for London are approximately 51.5074° N latitude and 0.1278° W longitude. Let's set the zoom level to 10 for a closer view.",
+                refusal=None,
+                role='assistant',
+                annotations=[],
+                audio=None,
+                function_call=None,
+                tool_calls=[
+                    ChatCompletionMessageToolCall(
+                        id='call_m0lWJrPYMZuy0yvBJLlt6KBU',
+                        function=Function(
+                            arguments='{"lat":51.5074,"lon":-0.1278,"zoom":10}',
+                            name='zoom_map'
+                        ),
+                        type='function'
+                    )
+                ]
+            )
+        )
+    ],
+    created=1747515219,
+    model='gpt-4o-mini-2024-07-18',
+    object='chat.completion',
+    service_tier='default',
+    system_fingerprint='fp_71b02749fa',
+    usage=CompletionUsage(
+        completion_tokens=85,
+        prompt_tokens=862,
+        total_tokens=947,
+        completion_tokens_details=CompletionTokensDetails(
+            accepted_prediction_tokens=0,
+            audio_tokens=0,
+            reasoning_tokens=0,
+            rejected_prediction_tokens=0
+        ),
+        prompt_tokens_details=PromptTokensDetails(
+            audio_tokens=0,
+            cached_tokens=0
+        )
+    )
+)
+-----
+
+
+
+
+-----------------------Multiple Tools--------------------------------
+User message: TextMessage: Role: user | Content: Plot on the map the BigEarthNet, xView1 images in Germany from 2nd half of 2017 | Source: user
+[single_agent] Requesting response from OpenAIClient client (gpt-4o-mini)...
+-----
+OpenAI response:
+ChatCompletion(
+    id='chatcmpl-BYKMWEzXdZEyyDaeWSULffPxzWsG1',
+    choices=[
+        Choice(
+            finish_reason='tool_calls',
+            index=0,
+            logprobs=None,
+            message=ChatCompletionMessage(
+                content=None,
+                refusal=None,
+                role='assistant',
+                annotations=[],
+                audio=None,
+                function_call=None,
+                tool_calls=[
+                    ChatCompletionMessageToolCall(
+                        id='call_Dyzl7GmwMcSPw9nlaj26Ho4e',
+                        function=Function(
+                            arguments='{"dataset": "BigEarthNet", "start_date": "2017-07-01", "end_date": "2017-12-31"}',
+                            name='query_dataset_images'
+                        ),
+                        type='function'
+                    ),
+                    ChatCompletionMessageToolCall(
+                        id='call_loL7pjgx0T7CGBBua9tVcYhT',
+                        function=Function(
+                            arguments='{"dataset": "xView1", "start_date": "2017-07-01", "end_date": "2017-12-31"}',
+                            name='query_dataset_images'
+                        ),
+                        type='function'
+                    )
+                ]
+            )
+        )
+    ],
+    created=1747521124, model='gpt-4o-mini-2024-07-18', object='chat.completion', service_tier='default', system_fingerprint='fp_92e0377081', usage=CompletionUsage(completion_tokens=90, prompt_tokens=868, total_tokens=958, completion_tokens_details=CompletionTokensDetails(accepted_prediction_tokens=0, audio_tokens=0, reasoning_tokens=0, rejected_prediction_tokens=0), prompt_tokens_details=PromptTokensDetails(audio_tokens=0, cached_tokens=0)))
+-----

@@ -39,7 +39,7 @@ class AssistantAgent(BaseAgent):
         print(f"User message: {self.messages}")
         response = self.get_response()
         return response.content if ui_mode else response
-    
+
 
     def execute_tool_call(self, tool_call):
         
@@ -116,13 +116,34 @@ class AssistantAgent(BaseAgent):
         """
         Retrieves the conversation history in API format, then calls the model client to get a response.
         """
+        # turn = 0
         num_init_messages = len(self.messages)
 
         while True:
 
             self.log(f"Requesting response from {self.model_client.client_class} client ({self.model_client.model})...")
             messages = [{"role": "system", "content": self.system_message}] if self.system_message is not None else []
+
+            # experiment: return function call result without having a function call request
+            # if turn == 1:
+            #     print(f"#####\nmessages before tampering: {messages}\n#####")
+            #     messages.append({
+            #         'arguments': '{"lat":51.5074,"lon":-0.1278,"zoom":10}',
+            #         'call_id': 'call_fake_1',
+            #         'name': 'zoom_map',
+            #         'type': 'function_call',
+            #         'id': 'fc_fake_1',
+            #         'status': 'completed'
+            #     })
+            #     messages.append({
+            #         'type': 'function_call_output',
+            #         'call_id': 'fake_call_1',
+            #         'output': 'Zoom updated.'
+            #     })
+            #     print(f"#####\nmessages after tampering: {messages}\n#####")
+
             messages = messages + self.messages.get_client_messages(self.model_client.client_class)
+            self.log(f"=====\nMessages sent to model: {messages}\n=====")
             if self.api == "Responses":
                 chat_response = self.model_client.get_response_Response(messages, tools=self.tool_schemas)
             else:
@@ -142,5 +163,82 @@ class AssistantAgent(BaseAgent):
                     tool_response = self.execute_tool_call(tool_call)
                 self.messages.add_message(tool_response)
 
+            # turn += 1
+
+        return chat_response
+    
+
+    # ------------------------------------------------
+    # Workflow execution
+    # ------------------------------------------------
+    def get_response_workflow(self, task_id, workflow):
+        while True:
+            self.log(f"Requesting response from {self.model_client.client_class} client ({self.model_client.model})...")
+            messages = [{"role": "system", "content": self.system_message}] if self.system_message is not None else []
+
+            messages = messages + self.messages.get_client_messages(self.model_client.client_class)
+            self.log(f"===Messages sent to model===\n{messages}\n\n")
+            if self.api == "Responses":
+                chat_response = self.model_client.get_response_Response(messages, tools=self.tool_schemas)
+            else:
+                chat_response = self.model_client.get_response(messages, tools=self.tool_schemas)
+            self.log(f"Received response: {chat_response}")
+            self.messages.add_message(chat_response)
+
+            if not isinstance(chat_response, ToolCallRequestMessage):  # if finished handling tool calls, break
+                break
+
+            # === handle tool calls ===
+            for tool_call in chat_response.tool_calls:
+                # tool_response = self.execute_tool_call(tool_call)
+                if self.api == "Responses":
+                    tool_response = self.execute_tool_call_Response(tool_call)
+                else:
+                    tool_response = self.execute_tool_call(tool_call)
+                self.messages.add_message(tool_response)
+
+        workflow[task_id]['history'] = chat_response.content
         return chat_response
 
+    def run_workflow(self, workflow: dict, ui_mode=False):
+        for task_id, task in workflow.items():
+            print(f"Processing task {task_id} with objective: {task['objective']}\n\n\n")
+            self.log(f"Processing {task_id}.")
+            context = get_context(task_id, workflow)
+            downstream_objectives = get_downstream_objectives(task_id, workflow)
+            content = format_content(task['objective'], context, downstream_objectives)
+            text_message = TextMessage(role='user', content=content, source='user')
+            self.messages.add_message(text_message)
+            # print(f"User message:\n{self.messages}")
+            response = self.get_response_workflow(task_id, workflow)
+        with open("target.json", "w") as f:
+            json.dump(workflow, f, indent=2)
+        return response.content if ui_mode else response
+    
+def get_context(task_id: str, workflow: dict):
+    context_lines = []
+    for prev_id in workflow[task_id]['prev']:
+        if prev_id in workflow:
+            context_lines.append(
+                    f"Task {prev_id}:\n"
+                    f"  Objective: {workflow[prev_id]['objective']}\n"
+                    f"  Result: {workflow[prev_id]['history']}\n"
+                )
+        
+        if context_lines:
+            return "\n".join(context_lines)
+        else:
+            return "No completed previous tasks context available."
+    return context_lines
+
+def get_downstream_objectives(task_id: str, workflow: dict):
+    downstream_objectives = []
+    for next_id in workflow[task_id]['next']:
+        if next_id in workflow:
+            downstream_objectives.append(workflow[next_id]['objective'])
+    return downstream_objectives if downstream_objectives else ["No downstream objectives available."]
+
+def format_content(objective, context, downstream_objectives):
+    return f"\n**Objective**\n{objective}\n\
+            **Context from upstream tasks**\n{context if context else "No context available."}\n\
+            **Downstream objectives**\n{downstream_objectives if downstream_objectives else 'No downstream objectives available.'}\n"

@@ -17,7 +17,34 @@ from geoplatform.platform import Platform
 
 import argparse
 
-def main(args):
+import json
+import time
+
+def load_json_file(file_path):
+    """
+    Loads JSON data from a file.
+
+    Args:
+        file_path (str): The path to the JSON file.
+
+    Returns:
+        dict or list: The loaded JSON data as a Python dictionary or list, or None if an error occurs.
+    """
+    try:
+        with open(file_path, 'r') as file:
+            data = json.load(file)
+            return data
+    except FileNotFoundError:
+        print(f"Error: File not found: {file_path}")
+        return None
+    except json.JSONDecodeError:
+        print(f"Error: Invalid JSON format in: {file_path}")
+        return None
+    except Exception as e:
+         print(f"An unexpected error occurred: {e}")
+         return None
+
+def main(args, workflow=None):
     
     model_client = BaseClient.from_cfg({
             "client": "openai",      # Options: "openai", "ollama", "vllm"
@@ -47,11 +74,12 @@ def main(args):
     query = 'Fetch xView1 and FAIR1M images from July 2017. Then run the Swin-L detector on each imagery source. Last, from FAIR1M, plot the detections of category Van.'
     query = "Fetch BigEarthNet images from June 2017. Then run the ResNet-32 LCC classifer on the images. Last, plot the LCC classes of category 'Non-irrigated arable land'."
     query = 'Fetch xView1 images from Greece. Then run the Swin-L detector and plot the detections of category Passenger Vehicle!'
-    query = "Plot on the map the BigEarthNet, xView1 images in Germany from 2nd half of 2017"
-    query = "Plot on the map the xView1 images in Dar es-Salam, Tanzania from Summer 2017! Make sure you consider a very very wide area!"
-    query = "Fetch BigEarthNet in Switzerland for and run the ResNet-32 classifier. Please plot on the map the 'Vineyards' and 'Fruit trees and berry plantations' LCC classes"
+    # query = "Plot on the map the BigEarthNet, xView1 images in Germany from 2nd half of 2017"
+    # query = "Plot on the map the xView1 images in Dar es-Salam, Tanzania from Summer 2017! Make sure you consider a very very wide area!"
+    # query = "Fetch BigEarthNet in Switzerland for and run the ResNet-32 classifier. Please plot on the map the 'Vineyards' and 'Fruit trees and berry plantations' LCC classes"
     # query = "Zoom the map to the capital of UK please"
     # query = "Tell me a joke please"
+    # query = "Fetch xView1 images from Athens International Airport, Greece."
     # query = "Zoom the map to the capital of UK please. What is the name of the capital?"
     # query = "Fetch xView1 images from Greece. How many images we got?"
     # query = "Run the YOLO-v6 LCC model on BigEarthNet from April 2018. How many 'Airports' LCC classification results we got?"
@@ -68,7 +96,13 @@ def main(args):
     # query = "Fetch xView1 images from Turkey, wait, don't do that, fetch from Greece actually, then run the Swin-L detector and plot the detections of category Passenger Vehicle!"
     # take back + vague
     # query = "Plot the detected Passenger Vehicle on xView1 images in Turkey. Wait, do Greece instead, and use Swin-L please!"
-    response = platform.agent.run_query(query)
+
+    start_time = time.time()
+    # response = platform.agent.run_query(query)
+    response = platform.agent.run_workflow(workflow)
+    end_time = time.time()
+    elapsed_time = round(end_time - start_time, 4)
+    print("===elapsed time: ", elapsed_time, " s===")
 
     print(response)
     print(platform.database.images_gdf)
@@ -82,4 +116,5 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='geo-olm agent')
     parser.add_argument('--api', default='ChatCompletion', help='choose between Responses and ChatCompletion')
     args = parser.parse_args()
-    main(args)
+    geo_flow = load_json_file('./workflows/geo_1/init.json')['tasks']
+    main(args, geo_flow)

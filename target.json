@@ -1,22 +1,21 @@
 {
   "task0": {
     "id": "task0",
-    "objective": "Identify and gather xView1 dataset images specifically from Greece.",
+    "objective": "Fetch images from the xView1 dataset and filter the imags specifically from Greece.",
     "agent_id": 0,
     "next": [
-      "task1",
-      "task2"
+      "task1"
     ],
     "prev": [],
     "status": "pending",
-    "history": "I have successfully gathered 24 images from the xView1 dataset specifically from Greece. \n\nNext, would you like me to set up the Swin-L detector environment and dependencies?",
+    "history": "I have successfully fetched 24 images from the xView1 dataset specifically for Greece. If you need further details or specific images, please let me know!",
     "remaining_dependencies": 0,
-    "agent": "Data Retrieval Specialist"
+    "agent": "database_agent"
   },
   "task1": {
     "id": "task1",
-    "objective": "Set up the Swin-L detector environment and dependencies.",
-    "agent_id": 1,
+    "objective": "Run the Swin-L detector on the fetched images to detect Passenger Vehicles.",
+    "agent_id": 2,
     "next": [
       "task2"
     ],
@@ -24,37 +23,21 @@
       "task0"
     ],
     "status": "pending",
-    "history": "The Swin-L detector has successfully run on the 24 xView1 images, detecting Passenger Vehicles. \n\nIf you need any further analysis or actions, please let me know!",
-    "remaining_dependencies": 1,
-    "agent": "Machine Learning Engineer"
+    "history": "The Swin-L detector has successfully completed its analysis on the 24 xView1 images, detecting passenger vehicles. If you need the results or any further analysis, please let me know!",
+    "remaining_dependencies": 2,
+    "agent": "detector_agent"
   },
   "task2": {
     "id": "task2",
-    "objective": "Run the Swin-L detector on the fetched images to detect Passenger Vehicles.",
-    "agent_id": 2,
-    "next": [
-      "task3"
-    ],
-    "prev": [
-      "task0",
-      "task1"
-    ],
-    "status": "pending",
-    "history": "A scatter plot has been created, highlighting 23 detections of Passenger Vehicles using the Swin-L detector on the xView1 dataset images from Greece.\n\nIf you need any further analysis or actions, feel free to ask!",
-    "remaining_dependencies": 2,
-    "agent": "Machine Learning Engineer"
-  },
-  "task3": {
-    "id": "task3",
     "objective": "Plot the detection results highlighting the Passenger Vehicle category.",
     "agent_id": 3,
     "next": [],
     "prev": [
-      "task2"
+      "task1"
     ],
     "status": "pending",
-    "history": "The detection results have been successfully plotted, and there are no further downstream objectives available. \n\nIf you have any additional tasks or questions, please let me know!",
+    "history": "The detection results have been plotted, highlighting 23 passenger vehicle detections using the Swin-L detector on the xView1 dataset. If you need any further analysis or actions, feel free to ask!",
     "remaining_dependencies": 1,
-    "agent": "Data Visualization Expert"
+    "agent": "map_agent"
   }
 }

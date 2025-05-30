@@ -168,23 +168,22 @@ class AssistantAgent(BaseAgent):
         return chat_response
     
 
-    # ------------------------------------------------
-    # Workflow execution
-    # ------------------------------------------------
+# ------------------------------------------------
+# Workflow execution
+# ------------------------------------------------
     def get_response_workflow(self, task_id, workflow):
         while True:
             self.log(f"Requesting response from {self.model_client.client_class} client ({self.model_client.model})...")
             messages = [{"role": "system", "content": self.system_message}] if self.system_message is not None else []
 
             messages = messages + self.messages.get_client_messages(self.model_client.client_class)
-            self.log(f"===Messages sent to model===\n{messages}\n\n")
+            self.log(f"Messages sent to model\n{messages}\n")
             if self.api == "Responses":
                 chat_response = self.model_client.get_response_Response(messages, tools=self.tool_schemas)
             else:
                 chat_response = self.model_client.get_response(messages, tools=self.tool_schemas)
             self.log(f"Received response: {chat_response}")
             self.messages.add_message(chat_response)
-            print(f"***\nself.messages: {self.messages}\n***")
 
             if not isinstance(chat_response, ToolCallRequestMessage):  # if finished handling tool calls, break
                 break
@@ -203,15 +202,16 @@ class AssistantAgent(BaseAgent):
 
     def run_workflow(self, agents: dict, workflow: dict, ui_mode=False):
         for task_id, task in workflow.items():
-            print(f"Processing task {task_id} with objective: {task['objective']}\n\n\n")
+            print(f"\nProcessing task {task_id} with objective: {task['objective']}")
             handoff_agent = agents[task['agent']]
-            self.log(f"Processing {task_id}.")
-            context = get_context(task_id, workflow)
-            downstream_objectives = get_downstream_objectives(task_id, workflow)
-            content = format_content(task['objective'], context, downstream_objectives)
+            # self.log(f"Processing {task_id}.")
+            # context = get_context(task_id, workflow)
+            # downstream_objectives = get_downstream_objectives(task_id, workflow)
+            # content = format_content(task['objective'], context, downstream_objectives)
+            content = task['objective']
             text_message = TextMessage(role='user', content=content, source='user')
             self.messages.add_message(text_message)
-            print(f"User message:\n{self.messages}")
+            # print(f"User message:\n{self.messages}")
             response = handoff_agent.get_response_workflow(task_id, workflow)
         with open("target.json", "w") as f:
             json.dump(workflow, f, indent=2)

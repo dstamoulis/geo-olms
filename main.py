@@ -87,6 +87,14 @@ def main(args, workflow=None):
         toolsets_list=[vision],
         system_message="You are the detector agent!"
     )
+    orch_agent = SingleAgent(
+        api=args.api,
+        name="orch_agent",
+        model_client=model_client,
+        messages=messages,
+        toolsets_list=[database, vision, map_tools, data_tools],
+        system_message="You are an orchastrating agent handing off tasks to subagents to complete given task!"
+    )
     
     single_agent = SingleAgent(
         api=args.api,
@@ -98,7 +106,8 @@ def main(args, workflow=None):
     )
 
     # Solving with an agent!
-    platform = Platform(model_client, messages, database, vision, map_tools, single_agent)
+    # platform = Platform(model_client, messages, database, vision, map_tools, single_agent)
+    platform = Platform(model_client, messages, database, vision, map_tools, orch_agent)
     agent_run = AgentRun(platform, results_output_file='./results/single_agent_test.json')
     query = 'Fetch xView1 images from Athens International Airport, Greece. Consider a wide area. Then run the Swin-L detector and finally please zoom the map there!'
     query = 'Fetch xView1 and FAIR1M images from July 2017. Then run the Swin-L detector on each imagery source. '
@@ -150,5 +159,5 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='geo-olm agent')
     parser.add_argument('--api', default='ChatCompletion', help='choose between Responses and ChatCompletion')
     args = parser.parse_args()
-    geo_flow = load_json_file('./workflows/geo_1/init.json')['tasks']
+    geo_flow = load_json_file('./workflows/geo_1/init_2.json')['tasks']
     main(args, geo_flow)

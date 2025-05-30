@@ -26,7 +26,7 @@
             "status": "pending",
             "history": "",
             "remaining_dependencies": 2,
-            "agent": "Detector Agent"
+            "agent": "detector_agent"
         },
         "task2": {
             "id": "task2",

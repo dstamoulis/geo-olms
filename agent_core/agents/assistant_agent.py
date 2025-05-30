@@ -8,7 +8,7 @@ from agent_core.modules.messages import ChatResponseMessage, TextMessage, ToolCa
 from agent_core.modules.tool_schema import function_to_tool_json, function_to_tool_json_Response
 
 class AssistantAgent(BaseAgent):
-    def __init__(self, api, name, model_client, messages, handoffs=[], tools=None, system_message="", console=None):
+    def __init__(self, name, model_client, messages, api="ChatCompletion", handoffs=[], tools=None, system_message="", console=None):
         """
         AssistantAgent extends BaseAgent with tool calling and orchestration logic.
         """
@@ -184,6 +184,7 @@ class AssistantAgent(BaseAgent):
                 chat_response = self.model_client.get_response(messages, tools=self.tool_schemas)
             self.log(f"Received response: {chat_response}")
             self.messages.add_message(chat_response)
+            print(f"***\nself.messages: {self.messages}\n***")
 
             if not isinstance(chat_response, ToolCallRequestMessage):  # if finished handling tool calls, break
                 break
@@ -200,17 +201,18 @@ class AssistantAgent(BaseAgent):
         workflow[task_id]['history'] = chat_response.content
         return chat_response
 
-    def run_workflow(self, workflow: dict, ui_mode=False):
+    def run_workflow(self, agents: dict, workflow: dict, ui_mode=False):
         for task_id, task in workflow.items():
             print(f"Processing task {task_id} with objective: {task['objective']}\n\n\n")
+            handoff_agent = agents[task['agent']]
             self.log(f"Processing {task_id}.")
             context = get_context(task_id, workflow)
             downstream_objectives = get_downstream_objectives(task_id, workflow)
             content = format_content(task['objective'], context, downstream_objectives)
             text_message = TextMessage(role='user', content=content, source='user')
             self.messages.add_message(text_message)
-            # print(f"User message:\n{self.messages}")
-            response = self.get_response_workflow(task_id, workflow)
+            print(f"User message:\n{self.messages}")
+            response = handoff_agent.get_response_workflow(task_id, workflow)
         with open("target.json", "w") as f:
             json.dump(workflow, f, indent=2)
         return response.content if ui_mode else response

@@ -24,5 +24,5 @@ class SingleAgent(AssistantAgent):
             # We add the tool callables to our aggregated list.
             aggregated_tools.extend(toolset_list)
         
-        super().__init__(api, name, model_client, messages, handoffs, aggregated_tools, system_message, console)
+        super().__init__(name, model_client, messages, api, handoffs, aggregated_tools, system_message, console)
         self.toolsets_list = toolsets_list

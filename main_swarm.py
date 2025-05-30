@@ -5,8 +5,8 @@ from agent_core.agents.assistant_agent import AssistantAgent
 from agent_core.teams.swarm_agent import SwarmAgent
 
 from geoapps.geeo.database import Database
-from geoapps.geeo.map_ops import Map
-from geoapps.geeo.detector import Detector
+from geoapps.geeo.map_tools import MapTools
+from geoapps.geeo.vision import Vision
 from geoapps.geeo.triage import Triage
 
 from llm_clients.base_client import BaseClient
@@ -24,8 +24,8 @@ def main():
         })
     messages = Messages()
     database = Database()    
-    detector = Detector(database)    
-    map_ops = Map(database, detector, map_style="open-street-map")
+    detector = Vision(database)    
+    map_ops = MapTools(database, detector, map_style="open-street-map")
     triage = Triage()
 
     swarm_agent = SwarmAgent(
@@ -35,7 +35,8 @@ def main():
         database=database, 
         detector=detector, 
         map_ops=map_ops,
-        triage=triage
+        triage=triage,
+        
     )
 
     # Solving with an agent!

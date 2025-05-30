@@ -20,6 +20,10 @@ import argparse
 import json
 import time
 
+
+# ------------------------------
+# Added
+# ------------------------------
 def load_json_file(file_path):
     """
     Loads JSON data from a file.
@@ -43,6 +47,7 @@ def load_json_file(file_path):
     except Exception as e:
          print(f"An unexpected error occurred: {e}")
          return None
+    
 
 def main(args, workflow=None):
     
@@ -56,6 +61,32 @@ def main(args, workflow=None):
     vision = Vision(database)    
     map_tools = MapTools(database, vision, map_style="open-street-map")
     data_tools = DataTools(database, vision)
+
+    # Subagents
+    database_agent = SingleAgent(
+        api=args.api,
+        name="database_agent",
+        model_client=model_client,
+        messages=messages,
+        toolsets_list=[database],
+        system_message="You are the database agent!"
+    )
+    map_agent = SingleAgent(
+        api=args.api,
+        name="map_agent",
+        model_client=model_client,
+        messages=messages,
+        toolsets_list=[map_tools],
+        system_message="You are the map agent!"
+    )
+    detector_agent = SingleAgent(
+        api=args.api,
+        name="detector_agent",
+        model_client=model_client,
+        messages=messages,
+        toolsets_list=[vision],
+        system_message="You are the detector agent!"
+    )
     
     single_agent = SingleAgent(
         api=args.api,
@@ -99,7 +130,10 @@ def main(args, workflow=None):
 
     start_time = time.time()
     # response = platform.agent.run_query(query)
-    response = platform.agent.run_workflow(workflow)
+    response = platform.agent.run_workflow(
+        {"database_agent": database_agent, "map_agent": map_agent, "detector_agent": detector_agent},
+        workflow
+    )
     end_time = time.time()
     elapsed_time = round(end_time - start_time, 4)
     print("===elapsed time: ", elapsed_time, " s===")

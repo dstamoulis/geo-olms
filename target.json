@@ -24,7 +24,7 @@
       "task0"
     ],
     "status": "pending",
-    "history": "The Swin-L detector has been successfully set up and run on the 24 xView1 images, detecting Passenger Vehicles. \n\nIf you need any further analysis or actions, please let me know!",
+    "history": "The Swin-L detector has successfully run on the 24 xView1 images, detecting Passenger Vehicles. \n\nIf you need any further analysis or actions, please let me know!",
     "remaining_dependencies": 1,
     "agent": "Machine Learning Engineer"
   },
@@ -40,7 +40,7 @@
       "task1"
     ],
     "status": "pending",
-    "history": "The detection results have been plotted, highlighting 23 Passenger Vehicle detections from the xView1 dataset using the Swin-L detector. \n\nIf you need any further analysis or actions, please let me know!",
+    "history": "A scatter plot has been created, highlighting 23 detections of Passenger Vehicles using the Swin-L detector on the xView1 dataset images from Greece.\n\nIf you need any further analysis or actions, feel free to ask!",
     "remaining_dependencies": 2,
     "agent": "Machine Learning Engineer"
   },
@@ -53,7 +53,7 @@
       "task2"
     ],
     "status": "pending",
-    "history": "The detection results have been successfully plotted, and there are no further downstream objectives available. \n\nIf you have any other tasks or questions, feel free to ask!",
+    "history": "The detection results have been successfully plotted, and there are no further downstream objectives available. \n\nIf you have any additional tasks or questions, please let me know!",
     "remaining_dependencies": 1,
     "agent": "Data Visualization Expert"
   }

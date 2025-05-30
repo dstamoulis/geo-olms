@@ -1,0 +1,54 @@
+
+{
+    "tasks": {
+        "task0": {
+            "objective": "Figure out which dataset contains images from Greece.",
+            "next": [
+                "task2"
+            ],
+            "prev": [],
+        },
+        "task1": {
+            "objective": "Figure out the time range of the Carnival Festivals last year.",
+            "next": [
+                "task2"
+            ],
+            "prev": [],
+        },
+        "task2": {
+            "objective": "Gather images of Greece between time X and time Y from dataset z.",
+            "next": [
+                "task2"
+            ],
+            "prev": [
+                "task0",
+                "task1"
+            ],
+        },
+        "task3": {
+            "objective": "Set up the Swin-L detector environment and dependencies.",
+            "next": [
+                "task4"
+            ],
+            "prev": [
+                "task2"
+            ],
+        },
+        "task4": {
+            "objective": "Run the Swin-L detector on the fetched images to detect Vehicles.",
+            "next": [
+                "task5"
+            ],
+            "prev": [
+                "task3"
+            ],
+        },
+        "task5": {
+            "objective": "Plot the detection results highlighting the Vehicle category.",
+            "next": [],
+            "prev": [
+                "task4"
+            ]
+        }
+    }
+}

@@ -177,7 +177,7 @@ class AssistantAgent(BaseAgent):
             messages = [{"role": "system", "content": self.system_message}] if self.system_message is not None else []
 
             messages = messages + self.messages.get_client_messages(self.model_client.client_class)
-            self.log(f"Messages sent to model\n{messages}\n")
+            # self.log(f"Messages sent to model\n{messages}\n")
             if self.api == "Responses":
                 chat_response = self.model_client.get_response_Response(messages, tools=self.tool_schemas)
             else:

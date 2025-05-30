@@ -113,7 +113,7 @@ def main(args, workflow=None):
     query = 'Fetch xView1 and FAIR1M images from July 2017. Then run the Swin-L detector on each imagery source. '
     query = 'Fetch xView1 and FAIR1M images from July 2017. Then run the Swin-L detector on each imagery source. Last, from FAIR1M, plot the detections of category Van.'
     query = "Fetch BigEarthNet images from June 2017. Then run the ResNet-32 LCC classifer on the images. Last, plot the LCC classes of category 'Non-irrigated arable land'."
-    query = 'Fetch xView1 images from Greece. Then run the Swin-L detector and plot the detections of category Passenger Vehicle!'
+    query = 'Fetch xView1 images from Greece. Then run the Swin-L detector and plot the detections of category Passenger Vehicle!' # init_2.json
     # query = "Plot on the map the BigEarthNet, xView1 images in Germany from 2nd half of 2017"
     # query = "Plot on the map the xView1 images in Dar es-Salam, Tanzania from Summer 2017! Make sure you consider a very very wide area!"
     # query = "Fetch BigEarthNet in Switzerland for and run the ResNet-32 classifier. Please plot on the map the 'Vineyards' and 'Fruit trees and berry plantations' LCC classes"
@@ -151,9 +151,9 @@ def main(args, workflow=None):
     print(platform.database.images_gdf)
     print(platform.vision.detections_gdf)
 
-    # agent_run.add_task_result(AgentTask(queries=[query], rounds=[{"query": query, "messages": platform.messages.to_list_dict()}]))
-    # agent_run.save_inference_results()
-    # platform.reset()
+    agent_run.add_task_result(AgentTask(queries=[query], rounds=[{"query": query, "messages": platform.messages.to_list_dict()}]))
+    agent_run.save_inference_results()
+    platform.reset()
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='geo-olm agent')

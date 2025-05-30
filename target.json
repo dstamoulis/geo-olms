@@ -8,7 +8,7 @@
     ],
     "prev": [],
     "status": "pending",
-    "history": "I found a total of 24 images from the xView1 dataset specifically for Greece. If you need more details about these images or specific information, please let me know!",
+    "history": "I found a total of 24 images from the xView1 dataset specifically for Greece. If you need further details or specific images, please let me know!",
     "remaining_dependencies": 0,
     "agent": "database_agent"
   },
@@ -23,7 +23,7 @@
       "task0"
     ],
     "status": "pending",
-    "history": "The Swin-L detector has successfully completed its analysis on all 24 xView1 images, detecting passenger vehicles. If you need further details or results from the detection, please let me know!",
+    "history": "The Swin-L detector has successfully completed its analysis on all 24 xView1 images, detecting Passenger Vehicles. If you need further information or results from the detection, please let me know!",
     "remaining_dependencies": 2,
     "agent": "detector_agent"
   },
@@ -36,7 +36,7 @@
       "task1"
     ],
     "status": "pending",
-    "history": "The scatter plot has been added, highlighting 23 detections of passenger vehicles using the Swin-L detector on the xView1 dataset. If you need any further analysis or information, feel free to ask!",
+    "history": "The scatter plot has been added, highlighting 23 detections of Passenger Vehicles using the Swin-L detector on the xView1 dataset. If you need any further analysis or details, feel free to ask!",
     "remaining_dependencies": 1,
     "agent": "map_agent"
   }

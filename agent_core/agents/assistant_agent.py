@@ -202,17 +202,22 @@ class AssistantAgent(BaseAgent):
 
     def run_workflow(self, agents: dict, workflow: dict, ui_mode=False):
         for task_id, task in workflow.items():
-            print(f"\nProcessing task {task_id} with objective: {task['objective']}")
-            handoff_agent = agents[task['agent']]
-            # self.log(f"Processing {task_id}.")
-            # context = get_context(task_id, workflow)
-            # downstream_objectives = get_downstream_objectives(task_id, workflow)
-            # content = format_content(task['objective'], context, downstream_objectives)
-            content = task['objective']
-            text_message = TextMessage(role='user', content=content, source='user')
-            self.messages.add_message(text_message)
-            # print(f"User message:\n{self.messages}")
-            response = handoff_agent.get_response_workflow(task_id, workflow)
+            # TODO: if completed, fetch history from ground truth
+            if task['status'] == 'completed':
+                print(f"Task {task_id} already completed. Skipping.")
+                continue
+            else:
+                print(f"\nProcessing task {task_id} with objective: {task['objective']}")
+                handoff_agent = agents[task['agent']]
+                # self.log(f"Processing {task_id}.")
+                # context = get_context(task_id, workflow)
+                # downstream_objectives = get_downstream_objectives(task_id, workflow)
+                # content = format_content(task['objective'], context, downstream_objectives)
+                content = task['objective']
+                text_message = TextMessage(role='user', content=content, source='user')
+                self.messages.add_message(text_message)
+                # print(f"User message:\n{self.messages}")
+                response = handoff_agent.get_response_workflow(task_id, workflow)
         with open("target.json", "w") as f:
             json.dump(workflow, f, indent=2)
         return response.content if ui_mode else response

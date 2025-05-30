@@ -62,42 +62,50 @@ INIT_TEMPLATE = """{
 """
 
 INIT_WORKFLOW_TEMPLATE = """{
-  "task": "Fetch xView1 images from Athens International Airport, Greece. Consider a wide area. Then run the Swin-L detector and finally please zoom the map there!",
-  "subtasks": [
-    {
-      "id": 0,
-      "objective": "Fetch xView1 images from Athens International Airport, Greece."
-    },
-    {
-      "id": 1,
-      "objective": "Run the Swin-L detector on these images."
-    },
-    {
-      "id": 2,
-      "objective": "Zoom the map onto the airport."
+  {
+    "tasks": {
+        "task0": {
+            "id": "task0",
+            "objective": "Fetch images from the xView1 dataset and filter the images specifically from Greece.",
+            "agent_id": 0,
+            "next": [
+                "task1"
+            ],
+            "prev": [],
+            "status": "pending",
+            "history": "",
+            "remaining_dependencies": 0,
+            "agent": "database_agent"
+        },
+        "task1": {
+            "id": "task1",
+            "objective": "Run the Swin-L detector on xView1 images to detect Passenger Vehicles.",
+            "agent_id": 2,
+            "next": [
+                "task2"
+            ],
+            "prev": [
+                "task0"
+            ],
+            "status": "pending",
+            "history": "",
+            "remaining_dependencies": 2,
+            "agent": "detector_agent"
+        },
+        "task2": {
+            "id": "task2",
+            "objective": "Plot Swin-L xView1 detection results highlighting the Passenger Vehicle category.",
+            "agent_id": 3,
+            "next": [],
+            "prev": [
+                "task1"
+            ],
+            "status": "pending",
+            "history": "",
+            "remaining_dependencies": 1,
+            "agent": "map_agent"
+        }
     }
-  ],
-  "subtask_dependencies": [
-    { "parent": 0, "child": 1 },
-    { "parent": 1, "child": 2 },
-  ],
-  "agents": [
-    {
-      "id": "Agent 0",
-      "role": "database_fetcher",
-      "subtasks": [0]
-    },
-    {
-      "id": "Agent 1",
-      "role": "detector",
-      "subtasks": [1]
-    },
-    {
-      "id": "Agent 2",
-      "role": "map_controller",
-      "subtasks": [2]
-    },
-  ]
 }
 
 """

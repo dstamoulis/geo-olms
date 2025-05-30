@@ -15,12 +15,11 @@ completion = client.chat.completions.create(
             For example:
             {prompt.INIT_WORKFLOW_TEMPLATE}\n
 
-            Provide the output in the following format:
-            {prompt.INIT_TEMPLATE}\n
+            Provide the output in the same format as the example above. Make sure you choose only the agents provided in the example to complete the task.
 
             Here is the task to be executed:
 
-            Fetch xView1 images from Austin International Airport. Consider a wide area. Then run the Swin-L detector and finally please zoom the map there!
+            'Fetch BigEarthNet images from June 2017. Then run the ResNet-32 LCC classifer on the images. Last, plot the LCC classes of category 'Non-irrigated arable land'.'
             '''
        
         }

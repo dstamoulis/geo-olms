@@ -62,62 +62,41 @@ INIT_TEMPLATE = """{
 """
 
 INIT_WORKFLOW_TEMPLATE = """{
-  "task": "Develop an AI Chatbot with Web Integration",
+  "task": "Fetch xView1 images from Athens International Airport, Greece. Consider a wide area. Then run the Swin-L detector and finally please zoom the map there!",
   "subtasks": [
     {
       "id": 0,
-      "objective": "Design the overall system architecture for the AI chatbot and web integration."
+      "objective": "Fetch xView1 images from Athens International Airport, Greece."
     },
     {
       "id": 1,
-      "objective": "Develop the core AI and NLP module that processes user inputs and generates responses."
+      "objective": "Run the Swin-L detector on these images."
     },
     {
       "id": 2,
-      "objective": "Implement the web integration layer and user interface that enables interaction with the chatbot."
-    },
-    {
-      "id": 3,
-      "objective": "Integrate the AI/NLP module with the web interface to ensure smooth data exchange and consistent behavior across the system."
-    },
-    {
-      "id": 4,
-      "objective": "Deploy the integrated system and set up monitoring protocols to ensure reliability and performance."
+      "objective": "Zoom the map onto the airport."
     }
   ],
   "subtask_dependencies": [
     { "parent": 0, "child": 1 },
-    { "parent": 0, "child": 2 },
-    { "parent": 1, "child": 3 },
-    { "parent": 2, "child": 3 },
-    { "parent": 3, "child": 4 }
+    { "parent": 1, "child": 2 },
   ],
   "agents": [
     {
       "id": "Agent 0",
-      "role": "System Architect",
+      "role": "database_fetcher",
       "subtasks": [0]
     },
     {
       "id": "Agent 1",
-      "role": "AI/NLP Developer",
+      "role": "detector",
       "subtasks": [1]
     },
     {
       "id": "Agent 2",
-      "role": "Web Developer",
+      "role": "map_controller",
       "subtasks": [2]
     },
-    {
-      "id": "Agent 3",
-      "role": "Integration Specialist",
-      "subtasks": [3]
-    },
-    {
-      "id": "Agent 4",
-      "role": "Deployment Engineer",
-      "subtasks": [4]
-    }
   ]
 }
 

@@ -92,7 +92,6 @@ def main(args, workflow=None):
         name="orch_agent",
         model_client=model_client,
         messages=messages,
-        toolsets_list=[database, vision, map_tools, data_tools],
         system_message="You are an orchastrating agent handing off tasks to subagents to complete given task!"
     )
     

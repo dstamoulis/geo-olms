@@ -7,6 +7,8 @@ from agent_core.agents.base_agent import BaseAgent
 from agent_core.modules.messages import ChatResponseMessage, TextMessage, ToolCall, ToolCallRequestMessage, ToolResponseMessage
 from agent_core.modules.tool_schema import function_to_tool_json, function_to_tool_json_Response
 
+from collections import deque
+
 class AssistantAgent(BaseAgent):
     def __init__(self, name, model_client, messages, api="ChatCompletion", handoffs=[], tools=None, system_message="", console=None):
         """
@@ -117,8 +119,6 @@ class AssistantAgent(BaseAgent):
         Retrieves the conversation history in API format, then calls the model client to get a response.
         """
         # turn = 0
-        num_init_messages = len(self.messages)
-
         while True:
 
             self.log(f"Requesting response from {self.model_client.client_class} client ({self.model_client.model})...")
@@ -143,7 +143,6 @@ class AssistantAgent(BaseAgent):
             #     print(f"#####\nmessages after tampering: {messages}\n#####")
 
             messages = messages + self.messages.get_client_messages(self.model_client.client_class)
-            self.log(f"=====\nMessages sent to model: {messages}\n=====")
             if self.api == "Responses":
                 chat_response = self.model_client.get_response_Response(messages, tools=self.tool_schemas)
             else:
@@ -199,7 +198,8 @@ class AssistantAgent(BaseAgent):
 
         workflow[task_id]['history'] = chat_response.content
         return chat_response
-
+# ------------------------------------------------------------------------------
+# Main loop for executing GeoFlow
     def run_workflow(self, agents: dict, workflow: dict, ui_mode=False):
         for task_id, task in workflow.items():
             # TODO: if completed, fetch history from ground truth
@@ -215,12 +215,61 @@ class AssistantAgent(BaseAgent):
                 # content = format_content(task['objective'], context, downstream_objectives)
                 content = task['objective']
                 text_message = TextMessage(role='user', content=content, source='user')
+                print(f"\nText message: {text_message}\n")
                 self.messages.add_message(text_message)
+                handoff_agent.messages.add_message(text_message)
                 # print(f"User message:\n{self.messages}")
                 response = handoff_agent.get_response_workflow(task_id, workflow)
+                print(f"\nResponse: {response}\n")
+                self.messages.add_message(response)
         with open("target.json", "w") as f:
             json.dump(workflow, f, indent=2)
         return response.content if ui_mode else response
+# ------------------------------------------------------------------------------
+
+# ------------------------------------------------------------------------------
+# Main loop for executing StateFlow
+    def run_stateflow(self, task_queue: deque, state_queue: deque, ui_mode=False):
+        state = state_queue.popleft()
+        task = task_queue.popleft()
+        while True:
+            content = task['objective']
+            state.messages.add_message(TextMessage(role='user', content=content, source='user'))
+            response = state.get_response()
+
+            # Verify the response
+            verifier_message = format_verifier_message(content, response.content)
+            self.messages.reset_messages()
+            self.messages.add_message(TextMessage(role='user', content=verifier_message, source='verifier'))
+            verification = self.get_response()
+
+            print(f"\nVerification Result: {verification.content}")
+            # Decide the transition to the next state
+            if verification.content == "COMPLETED":
+                print(f"Task {task['id']} completed successfully.\n")
+                if not task_queue:
+                    break
+                state = state_queue.popleft()
+                task = task_queue.popleft()
+            else:
+                # TODO: ERROR state self-evaluation logic
+                continue
+        return response.content if ui_mode else response
+
+def format_verifier_message(objective, response):
+    """
+    Formats the message for the verifier agent to check if the response meets the objective.
+    
+    Args:
+        objective (str): The task objective.
+        response (str): The response to verify.
+    
+    Returns:
+        str: Formatted message for the verifier agent.
+    """
+    return f"[Objective]: {objective}. [Response]: {response}"
+
+# ------------------------------------------------------------------------------
     
 def get_context(task_id: str, workflow: dict):
     context_lines = []

@@ -215,7 +215,7 @@ class AssistantAgent(BaseAgent):
                 # content = format_content(task['objective'], context, downstream_objectives)
                 content = task['objective']
                 text_message = TextMessage(role='user', content=content, source='user')
-                self.messages.add_message(text_message)
+                handoff_agent.messages.add_message(text_message)
                 # print(f"User message:\n{self.messages}")
                 response = handoff_agent.get_response_workflow(task_id, workflow)
         with open("target.json", "w") as f:

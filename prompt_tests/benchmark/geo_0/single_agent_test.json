@@ -1,0 +1,216 @@
+{
+  "tasks": [
+    {
+      "queries": [
+        "Fetch xView1 images from Athens International Airport, Greece. Consider a wide area. Then run the Swin-L detector and finally please zoom the map there!"
+      ],
+      "rounds": [
+        {
+          "query": "Fetch xView1 images from Athens International Airport, Greece. Consider a wide area. Then run the Swin-L detector and finally please zoom the map there!",
+          "messages": [
+            {
+              "msg_class": "TextMessage",
+              "role": "user",
+              "content": "Fetch images from the xView1 dataset and filter the images specifically from Athens International Airport, Greece.",
+              "prompt_tokens": null,
+              "cached_tokens": null,
+              "completion_tokens": null,
+              "total_tokens": null,
+              "time_elapsed": null,
+              "source": "user",
+              "tool_calls": null
+            },
+            {
+              "msg_class": "ToolCallRequestMessage",
+              "role": "assistant",
+              "content": null,
+              "prompt_tokens": 284,
+              "cached_tokens": 0,
+              "completion_tokens": 52,
+              "total_tokens": 336,
+              "time_elapsed": 1.1262,
+              "source": {
+                "client_class": "OpenAIClient",
+                "model": "gpt-4o-mini"
+              },
+              "tool_calls": [
+                {
+                  "type": "ToolCall",
+                  "id": "call_dud7KvfAZ4cps8PdXj8zD4Fa",
+                  "name": "query_images_by_aoi_coords",
+                  "arguments": "{\"dataset\":\"xView1\",\"lat_min\":37.9364,\"lat_max\":37.9885,\"lon_min\":23.7475,\"lon_max\":23.8732}",
+                  "tool_type": "function"
+                }
+              ],
+              "message": "ChatCompletionMessage(content=None, refusal=None, role='assistant', annotations=[], audio=None, function_call=None, tool_calls=[ChatCompletionMessageToolCall(id='call_dud7KvfAZ4cps8PdXj8zD4Fa', function=Function(arguments='{\"dataset\":\"xView1\",\"lat_min\":37.9364,\"lat_max\":37.9885,\"lon_min\":23.7475,\"lon_max\":23.8732}', name='query_images_by_aoi_coords'), type='function')])"
+            },
+            {
+              "msg_class": "ToolResponseMessage",
+              "role": "tool",
+              "content": "The satellite xView1 imagery within the specified AOI is loaded in system memory. Num images: 0.",
+              "prompt_tokens": null,
+              "cached_tokens": null,
+              "completion_tokens": null,
+              "total_tokens": null,
+              "time_elapsed": 0.1934,
+              "source": "query_images_by_aoi_coords",
+              "tool_calls": null,
+              "message": "{'role': 'tool', 'tool_call_id': 'call_dud7KvfAZ4cps8PdXj8zD4Fa', 'content': 'The satellite xView1 imagery within the specified AOI is loaded in system memory. Num images: 0.'}"
+            },
+            {
+              "msg_class": "ChatResponseMessage",
+              "role": "assistant",
+              "content": "It appears that there are no images available from the xView1 dataset for Athens International Airport, Greece. If you have any other locations or datasets in mind, please let me know!",
+              "prompt_tokens": 371,
+              "cached_tokens": 0,
+              "completion_tokens": 38,
+              "total_tokens": 409,
+              "time_elapsed": 0.8829,
+              "source": {
+                "client_class": "OpenAIClient",
+                "model": "gpt-4o-mini"
+              },
+              "tool_calls": null,
+              "message": "ChatCompletionMessage(content='It appears that there are no images available from the xView1 dataset for Athens International Airport, Greece. If you have any other locations or datasets in mind, please let me know!', refusal=None, role='assistant', annotations=[], audio=None, function_call=None, tool_calls=None)"
+            },
+            {
+              "msg_class": "TextMessage",
+              "role": "user",
+              "content": "Run the Swin-L detector on xView1 images to detect relevant objects.",
+              "prompt_tokens": null,
+              "cached_tokens": null,
+              "completion_tokens": null,
+              "total_tokens": null,
+              "time_elapsed": null,
+              "source": "user",
+              "tool_calls": null
+            },
+            {
+              "msg_class": "ToolCallRequestMessage",
+              "role": "assistant",
+              "content": null,
+              "prompt_tokens": 285,
+              "cached_tokens": 0,
+              "completion_tokens": 24,
+              "total_tokens": 309,
+              "time_elapsed": 0.7939,
+              "source": {
+                "client_class": "OpenAIClient",
+                "model": "gpt-4o-mini"
+              },
+              "tool_calls": [
+                {
+                  "type": "ToolCall",
+                  "id": "call_5sacfThXwvtklNl5vEuoYamL",
+                  "name": "run_detector",
+                  "arguments": "{\"dataset\":\"xView1\",\"detector_name\":\"Swin-L\"}",
+                  "tool_type": "function"
+                }
+              ],
+              "message": "ChatCompletionMessage(content=None, refusal=None, role='assistant', annotations=[], audio=None, function_call=None, tool_calls=[ChatCompletionMessageToolCall(id='call_5sacfThXwvtklNl5vEuoYamL', function=Function(arguments='{\"dataset\":\"xView1\",\"detector_name\":\"Swin-L\"}', name='run_detector'), type='function')])"
+            },
+            {
+              "msg_class": "ToolResponseMessage",
+              "role": "tool",
+              "content": "No images found (images GeoDataFrame is empty). No areas with available imagery for the specified user criteria.",
+              "prompt_tokens": null,
+              "cached_tokens": null,
+              "completion_tokens": null,
+              "total_tokens": null,
+              "time_elapsed": 0.0001,
+              "source": "run_detector",
+              "tool_calls": null,
+              "message": "{'role': 'tool', 'tool_call_id': 'call_5sacfThXwvtklNl5vEuoYamL', 'content': 'No images found (images GeoDataFrame is empty). No areas with available imagery for the specified user criteria.'}"
+            },
+            {
+              "msg_class": "ChatResponseMessage",
+              "role": "assistant",
+              "content": "It seems that there are no images available in the xView1 dataset to run the Swin-L detector. If you have another dataset or location in mind, please let me know!",
+              "prompt_tokens": 339,
+              "cached_tokens": 0,
+              "completion_tokens": 38,
+              "total_tokens": 377,
+              "time_elapsed": 1.1144,
+              "source": {
+                "client_class": "OpenAIClient",
+                "model": "gpt-4o-mini"
+              },
+              "tool_calls": null,
+              "message": "ChatCompletionMessage(content='It seems that there are no images available in the xView1 dataset to run the Swin-L detector. If you have another dataset or location in mind, please let me know!', refusal=None, role='assistant', annotations=[], audio=None, function_call=None, tool_calls=None)"
+            },
+            {
+              "msg_class": "TextMessage",
+              "role": "user",
+              "content": "Zoom the map to highlight the area around Athens International Airport using the Swin-L detection results.",
+              "prompt_tokens": null,
+              "cached_tokens": null,
+              "completion_tokens": null,
+              "total_tokens": null,
+              "time_elapsed": null,
+              "source": "user",
+              "tool_calls": null
+            },
+            {
+              "msg_class": "ToolCallRequestMessage",
+              "role": "assistant",
+              "content": null,
+              "prompt_tokens": 605,
+              "cached_tokens": 0,
+              "completion_tokens": 28,
+              "total_tokens": 633,
+              "time_elapsed": 0.9219,
+              "source": {
+                "client_class": "OpenAIClient",
+                "model": "gpt-4o-mini"
+              },
+              "tool_calls": [
+                {
+                  "type": "ToolCall",
+                  "id": "call_XnzezovMDxkJew3WUiUY6gR0",
+                  "name": "zoom_map",
+                  "arguments": "{\"lat\":37.9379,\"lon\":23.8103,\"zoom\":12}",
+                  "tool_type": "function"
+                }
+              ],
+              "message": "ChatCompletionMessage(content=None, refusal=None, role='assistant', annotations=[], audio=None, function_call=None, tool_calls=[ChatCompletionMessageToolCall(id='call_XnzezovMDxkJew3WUiUY6gR0', function=Function(arguments='{\"lat\":37.9379,\"lon\":23.8103,\"zoom\":12}', name='zoom_map'), type='function')])"
+            },
+            {
+              "msg_class": "ToolResponseMessage",
+              "role": "tool",
+              "content": "Zoom updated.",
+              "prompt_tokens": null,
+              "cached_tokens": null,
+              "completion_tokens": null,
+              "total_tokens": null,
+              "time_elapsed": 0.0017,
+              "source": "zoom_map",
+              "tool_calls": null,
+              "message": "{'role': 'tool', 'tool_call_id': 'call_XnzezovMDxkJew3WUiUY6gR0', 'content': 'Zoom updated.'}"
+            },
+            {
+              "msg_class": "ChatResponseMessage",
+              "role": "assistant",
+              "content": "The map has been zoomed in to highlight the area around Athens International Airport. If you need any further actions or visualizations, just let me know!",
+              "prompt_tokens": 644,
+              "cached_tokens": 0,
+              "completion_tokens": 32,
+              "total_tokens": 676,
+              "time_elapsed": 0.8405,
+              "source": {
+                "client_class": "OpenAIClient",
+                "model": "gpt-4o-mini"
+              },
+              "tool_calls": null,
+              "message": "ChatCompletionMessage(content='The map has been zoomed in to highlight the area around Athens International Airport. If you need any further actions or visualizations, just let me know!', refusal=None, role='assistant', annotations=[], audio=None, function_call=None, tool_calls=None)"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "model_client": {
+    "client_class": "OpenAIClient",
+    "model": "gpt-4o-mini",
+    "temperature": 0.1
+  }
+}

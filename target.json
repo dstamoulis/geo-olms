@@ -1,20 +1,20 @@
 {
   "task0": {
     "id": "task0",
-    "objective": "Fetch xView1 images that are specifically located in Greece.",
+    "objective": "Fetch images from the xView1 dataset and filter the images specifically from Athens International Airport, Greece.",
     "agent_id": 0,
     "next": [
       "task1"
     ],
     "prev": [],
     "status": "pending",
-    "history": "I found a total of 24 xView1 images specifically located in Greece. If you need more details about these images or specific information, please let me know!",
+    "history": "It appears that there are no images available from the xView1 dataset for Athens International Airport, Greece. If you have any other locations or datasets in mind, please let me know!",
     "remaining_dependencies": 0,
-    "agent": "Data Acquisition Specialist"
+    "agent": "database_agent"
   },
   "task1": {
     "id": "task1",
-    "objective": "Run the Swin-L detector on the fetched images to identify objects.",
+    "objective": "Run the Swin-L detector on xView1 images to detect relevant objects.",
     "agent_id": 1,
     "next": [
       "task2"
@@ -23,36 +23,21 @@
       "task0"
     ],
     "status": "pending",
-    "history": "The Swin-L detector has successfully completed its analysis on the 24 xView1 images from Greece. If you need further information or specific results from the detection, please let me know!",
+    "history": "It seems that there are no images available in the xView1 dataset to run the Swin-L detector. If you have another dataset or location in mind, please let me know!",
     "remaining_dependencies": 1,
-    "agent": "AI Model Engineer"
+    "agent": "detector_agent"
   },
   "task2": {
     "id": "task2",
-    "objective": "Filter the detection results to focus on the category 'Passenger Vehicle'.",
+    "objective": "Zoom the map to highlight the area around Athens International Airport using the Swin-L detection results.",
     "agent_id": 2,
-    "next": [
-      "task3"
-    ],
+    "next": [],
     "prev": [
       "task1"
     ],
     "status": "pending",
-    "history": "The detection results have been filtered to focus on the category 'Passenger Vehicle'. If you need to see the specific results or any additional information, please let me know!",
+    "history": "The map has been zoomed in to highlight the area around Athens International Airport. If you need any further actions or visualizations, just let me know!",
     "remaining_dependencies": 1,
-    "agent": "Data Analyst"
-  },
-  "task3": {
-    "id": "task3",
-    "objective": "Plot the detection results of Passenger Vehicles on the images.",
-    "agent_id": 3,
-    "next": [],
-    "prev": [
-      "task2"
-    ],
-    "status": "pending",
-    "history": "The detection results for 'Passenger Vehicles' have been plotted on the map, showing a total of 23 detections using the Swin-L detector on the xView1 dataset. If you need any further analysis or details, feel free to ask!",
-    "remaining_dependencies": 1,
-    "agent": "Visualization Expert"
+    "agent": "map_agent"
   }
 }

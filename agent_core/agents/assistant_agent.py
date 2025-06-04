@@ -217,7 +217,7 @@ class AssistantAgent(BaseAgent):
         pattern = r"-\s*(task\d+):\s*([a-zA-Z0-9_]+)" 
         matches = re.findall(pattern, agent_match.content)
         task_agent_map = dict(matches)
-        print(f"---------------- map: {task_agent_map}")
+        # print(f"---------------- map: {task_agent_map}")
 
         for task_id, task in workflow.items():
             # TODO: if completed, fetch history from ground truth

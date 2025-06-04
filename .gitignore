@@ -8,3 +8,4 @@ results/*/
 results/*/*.json
 datasets/gpkgs/
 datasets/gpkgs/*.gpkg
+.env

@@ -1,0 +1,1 @@
+Run the ResNet-32 LCC model on BigEarthNet from 2nd half of April 2018. How many 'Airports' LCC classification results we got?

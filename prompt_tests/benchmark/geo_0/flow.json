@@ -30,7 +30,7 @@
     },
     "task2": {
       "id": "task2",
-      "objective": "Zoom the map to highlight the area around Athens International Airport using detection results.",
+      "objective": "Zoom the map to highlight the area around Athens International Airport using the Swin-L detection results.",
       "agent_id": 2,
       "next": [],
       "prev": [

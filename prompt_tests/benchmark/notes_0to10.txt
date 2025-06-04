@@ -1,0 +1,6 @@
+geo_1: Doesn't make sense for task1.next to have 2 elements (task2, task3)
+geo_2: task1.prev shouldn't contain task0; doesn't make sense for task1.next to have 2 elements (task2, task3)
+geo_5: task0.next should be task2 instead of task1
+geo_8: Which agent should we use to get the coordinates of the capital of UK?
+geo_9: count_agent is not one of our agents
+geo_10: The analysis_agent used to count the results is not one of our agents

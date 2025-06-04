@@ -30,7 +30,7 @@
     },
     "task2": {
       "id": "task2",
-      "objective": "Plot classification results highlighting the 'Vineyards' and 'Fruit trees and berry plantations' classes on the map.",
+      "objective": "Plot ResNet-32 classification results highlighting the 'Vineyards' and 'Fruit trees and berry plantations' classes on the map.",
       "agent_id": 3,
       "next": [],
       "prev": [

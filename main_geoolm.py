@@ -94,15 +94,6 @@ def main(args, workflow=None):
         messages=messages,
         system_message="You are an orchastrating agent handing off tasks to subagents to complete given task!"
     )
-    
-    single_agent = SingleAgent(
-        api=args.api,
-        name="single_agent",
-        model_client=model_client,
-        messages=messages,
-        toolsets_list=[database, vision, map_tools, data_tools],
-        system_message="You are a geospatial agent helping with fetching images from a database!"
-    )
 
     # Solving with an agent!
     # platform = Platform(model_client, messages, database, vision, map_tools, single_agent)

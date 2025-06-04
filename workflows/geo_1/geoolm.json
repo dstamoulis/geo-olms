@@ -1,0 +1,60 @@
+{
+    "tasks": {
+        "task0": {
+            "id": "task0",
+            "objective": "Fetch xView1 images that are specifically located in Greece.",
+            "agent_id": 0,
+            "next": [
+                "task1"
+            ],
+            "prev": [],
+            "status": "pending",
+            "history": "",
+            "remaining_dependencies": 0,
+            "agent": "Data Acquisition Specialist"
+        },
+        "task1": {
+            "id": "task1",
+            "objective": "Run the Swin-L detector on the fetched images to identify objects.",
+            "agent_id": 1,
+            "next": [
+                "task2"
+            ],
+            "prev": [
+                "task0"
+            ],
+            "status": "pending",
+            "history": "",
+            "remaining_dependencies": 1,
+            "agent": "AI Model Engineer"
+        },
+        "task2": {
+            "id": "task2",
+            "objective": "Filter the detection results to focus on the category 'Passenger Vehicle'.",
+            "agent_id": 2,
+            "next": [
+                "task3"
+            ],
+            "prev": [
+                "task1"
+            ],
+            "status": "pending",
+            "history": "",
+            "remaining_dependencies": 1,
+            "agent": "Data Analyst"
+        },
+        "task3": {
+            "id": "task3",
+            "objective": "Plot the detection results of Passenger Vehicles on the images.",
+            "agent_id": 3,
+            "next": [],
+            "prev": [
+                "task2"
+            ],
+            "status": "pending",
+            "history": "",
+            "remaining_dependencies": 1,
+            "agent": "Visualization Expert"
+        }
+    }
+}

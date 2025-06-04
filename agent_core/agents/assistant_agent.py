@@ -2,6 +2,7 @@
 
 import time
 import json
+import re
 
 from agent_core.agents.base_agent import BaseAgent
 from agent_core.modules.messages import ChatResponseMessage, TextMessage, ToolCall, ToolCallRequestMessage, ToolResponseMessage
@@ -201,6 +202,22 @@ class AssistantAgent(BaseAgent):
         return chat_response
 
     def run_workflow(self, agents: dict, workflow: dict, ui_mode=False):
+        agent_calls = ""
+        for task_id, task in workflow.items():
+            # print(f'task_id: {task_id}, task: {task}')
+            agent_calls += f"{task_id}: {task["objective"]}, agent: {task["agent"]}\n"
+        agent_calls += f"Here are the available agents: {agents.keys()}. For each task, match it with one agent only from the available list, and return the one-to-one match in this format: task_num: agent_name"
+        # print(f"************************ agent_calls: {agent_calls}")
+        agent_match = self.model_client.get_response_Response(agent_calls)
+        # agent_match = "\n".join(agent_match.content.strip().splitlines()[:-1])
+
+        # print(f"---------------------Here are the agents we have: {agents.keys()}, Here's the agent_match: {agent_match}")
+        # Find all task-agent matches in the response
+        pattern = r"-\s*(task\d+):\s*([a-zA-Z0-9_]+)" 
+        matches = re.findall(pattern, agent_match.content)
+        task_agent_map = dict(matches)
+        print(f"---------------- map: {task_agent_map}")
+
         for task_id, task in workflow.items():
             # TODO: if completed, fetch history from ground truth
             if task['status'] == 'completed':
@@ -208,7 +225,7 @@ class AssistantAgent(BaseAgent):
                 continue
             else:
                 print(f"\nProcessing task {task_id} with objective: {task['objective']}")
-                handoff_agent = agents[task['agent']]
+                handoff_agent = agents[task_agent_map[task_id]]
                 # self.log(f"Processing {task_id}.")
                 # context = get_context(task_id, workflow)
                 # downstream_objectives = get_downstream_objectives(task_id, workflow)

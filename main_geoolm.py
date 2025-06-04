@@ -110,19 +110,7 @@ def main(args, workflow=None):
     platform = Platform(model_client, messages, database, vision, map_tools, orch_agent)
     agent_run = AgentRun(platform, results_output_file='./results/single_agent_test.json')
 
-    # Preprocess Json to match json agent to native tool calls
-    start_time = time.time()
-    tool_calls = ""
-    print(workflow)
-    for task_id, task in workflow.items():
-        # print(f'task_id: {task_id}, task: {task}')
-        tool_calls += f"{task_id}: {task["objective"]}, agent: {task["agent"]}\n"
-    tool_calls += "For each task, match the agent with function from toolsets_list and return the one-to-one match"
-    # print(f"************************ tool_calls: {tool_calls}")
-    response = platform.agent.run_query(tool_calls)
-    
-    
-    agent_matches = "\n".join(response.content.strip().splitlines()[:-1])
+    # Preprocess Json to match json agent to native tool calls    
     # print(f"-----------------agent_matches: {agent_matches}")
     
     query = 'Fetch xView1 images from Athens International Airport, Greece. Consider a wide area. Then run the Swin-L detector and finally please zoom the map there!'
@@ -153,14 +141,13 @@ def main(args, workflow=None):
     # take back + vague
     # query = "Plot the detected Passenger Vehicle on xView1 images in Turkey. Wait, do Greece instead, and use Swin-L please!"
 
-    
-    # response = platform.agent.run_workflow(
-    #     {"database_agent": database_agent, "map_agent": map_agent, "detector_agent": detector_agent},
-    #     workflow
-    # )
-    query += agent_matches
-    query += "Do tool calls"
-    response = platform.agent.run_query(query)
+    start_time = time.time()
+
+    response = platform.agent.run_workflow(
+        {"database_agent": database_agent, "map_agent": map_agent, "detector_agent": detector_agent},
+        workflow
+    )
+    # response = platform.agent.run_query(query)
     
     end_time = time.time()
     elapsed_time = round(end_time - start_time, 4)

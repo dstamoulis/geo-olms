@@ -212,7 +212,8 @@ class AssistantAgent(BaseAgent):
         # agent_match = "\n".join(agent_match.content.strip().splitlines()[:-1])
 
         # print(f"---------------------Here are the agents we have: {agents.keys()}, Here's the agent_match: {agent_match}")
-        # Find all task-agent matches in the response
+
+        # Convert the LLM response into a dictionary of form: task_id: agent_name
         pattern = r"-\s*(task\d+):\s*([a-zA-Z0-9_]+)" 
         matches = re.findall(pattern, agent_match.content)
         task_agent_map = dict(matches)

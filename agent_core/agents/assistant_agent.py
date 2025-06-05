@@ -209,6 +209,7 @@ class AssistantAgent(BaseAgent):
         agent_calls += f"Here are the available agents: {agents.keys()}. For each task, match it with one agent only from the available list, and return the one-to-one match in this format: task_num: agent_name"
         # print(f"************************ agent_calls: {agent_calls}")
         agent_match = self.model_client.get_response_Response(agent_calls)
+        print(f"---------------------Agent match response: {agent_match.content}")
         # agent_match = "\n".join(agent_match.content.strip().splitlines()[:-1])
 
         # print(f"---------------------Here are the agents we have: {agents.keys()}, Here's the agent_match: {agent_match}")
@@ -227,14 +228,9 @@ class AssistantAgent(BaseAgent):
             else:
                 print(f"\nProcessing task {task_id} with objective: {task['objective']}")
                 handoff_agent = agents[task_agent_map[task_id]]
-                # self.log(f"Processing {task_id}.")
-                # context = get_context(task_id, workflow)
-                # downstream_objectives = get_downstream_objectives(task_id, workflow)
-                # content = format_content(task['objective'], context, downstream_objectives)
                 content = task['objective']
                 text_message = TextMessage(role='user', content=content, source='user')
                 handoff_agent.messages.add_message(text_message)
-                # print(f"User message:\n{self.messages}")
                 response = handoff_agent.get_response_workflow(task_id, workflow)
         with open("target.json", "w") as f:
             json.dump(workflow, f, indent=2)

@@ -92,17 +92,8 @@ def main(args, workflow=None):
         name="orch_agent",
         model_client=model_client,
         messages=messages,
-        toolsets_list=[database, vision, map_tools, data_tools],
+        toolsets_list=[],
         system_message="You are an orchastrating agent handing off tasks to subagents to complete given task!"
-    )
-    
-    single_agent = SingleAgent(
-        api=args.api,
-        name="single_agent",
-        model_client=model_client,
-        messages=messages,
-        toolsets_list=[database, vision, map_tools, data_tools],
-        system_message="You are a geospatial agent helping with fetching images from a database!"
     )
 
     # Solving with an agent!
@@ -110,10 +101,10 @@ def main(args, workflow=None):
     platform = Platform(model_client, messages, database, vision, map_tools, orch_agent)
     agent_run = AgentRun(platform, results_output_file='./results/single_agent_test.json')
     query = 'Fetch xView1 images from Athens International Airport, Greece. Consider a wide area. Then run the Swin-L detector and finally please zoom the map there!'
-    query = 'Fetch xView1 and FAIR1M images from July 2017. Then run the Swin-L detector on each imagery source. '
-    query = 'Fetch xView1 and FAIR1M images from July 2017. Then run the Swin-L detector on each imagery source. Last, from FAIR1M, plot the detections of category Van.'
-    query = "Fetch BigEarthNet images from June 2017. Then run the ResNet-32 LCC classifer on the images. Last, plot the LCC classes of category 'Non-irrigated arable land'."
-    query = 'Fetch xView1 images from Greece. Then run the Swin-L detector and plot the detections of category Passenger Vehicle!' # init_2.json
+    # query = 'Fetch xView1 and FAIR1M images from July 2017. Then run the Swin-L detector on each imagery source. '
+    # query = 'Fetch xView1 and FAIR1M images from July 2017. Then run the Swin-L detector on each imagery source. Last, from FAIR1M, plot the detections of category Van.'
+    # query = "Fetch BigEarthNet images from June 2017. Then run the ResNet-32 LCC classifer on the images. Last, plot the LCC classes of category 'Non-irrigated arable land'."
+    # query = 'Fetch xView1 images from Greece. Then run the Swin-L detector and plot the detections of category Passenger Vehicle!' # init_2.json
     # query = "Plot on the map the BigEarthNet, xView1 images in Germany from 2nd half of 2017"
     # query = "Plot on the map the xView1 images in Dar es-Salam, Tanzania from Summer 2017! Make sure you consider a very very wide area!"
     # query = "Fetch BigEarthNet in Switzerland for and run the ResNet-32 classifier. Please plot on the map the 'Vineyards' and 'Fruit trees and berry plantations' LCC classes"
@@ -159,5 +150,5 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='geo-olm agent')
     parser.add_argument('--api', default='ChatCompletion', help='choose between Responses and ChatCompletion')
     args = parser.parse_args()
-    geo_flow = load_json_file('./workflows/geo_1/init_2.json')['tasks']
+    geo_flow = load_json_file('./prompt_test/benchmark/geo_0/flow.json')['tasks']
     main(args, geo_flow)

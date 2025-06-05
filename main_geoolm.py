@@ -49,7 +49,7 @@ def load_json_file(file_path):
          return None
     
 
-def main(args, workflow=None):
+def main(args, workflow=None, i=11):
     
     model_client = BaseClient.from_cfg({
             "client": "openai",      # Options: "openai", "ollama", "vllm"
@@ -98,7 +98,7 @@ def main(args, workflow=None):
 
     # Solving with an agent!
     platform = Platform(model_client, messages, database, vision, map_tools, orch_agent)
-    agent_run = AgentRun(platform, results_output_file='./results/single_agent_test.json')
+    agent_run = AgentRun(platform, results_output_file=f'./results/geo_{i}_test.json')
     query = 'Fetch xView1 images from Athens International Airport, Greece. Consider a wide area. Then run the Swin-L detector and finally please zoom the map there!'
     query = 'Fetch xView1 and FAIR1M images from July 2017. Then run the Swin-L detector on each imagery source. '
     # query = 'Fetch xView1 and FAIR1M images from July 2017. Then run the Swin-L detector on each imagery source. Last, from FAIR1M, plot the detections of category Van.'
@@ -141,9 +141,10 @@ def main(args, workflow=None):
 
 
 if __name__ == "__main__":
+    i = 14
     parser = argparse.ArgumentParser(description='geo-olm agent')
     parser.add_argument('--api', default='ChatCompletion', help='choose between Responses and ChatCompletion')
     args = parser.parse_args()
 
-    geo_flow = load_json_file(f'./prompt_tests/benchmark/geo_1/flow.json')['tasks']
-    main(args, geo_flow)
+    geo_flow = load_json_file(f'./tests/geo_{i}.json')['tasks']
+    main(args, geo_flow, i)

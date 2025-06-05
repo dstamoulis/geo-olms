@@ -206,19 +206,19 @@ class AssistantAgent(BaseAgent):
         for task_id, task in workflow.items():
             # print(f'task_id: {task_id}, task: {task}')
             agent_calls += f"{task_id}: {task["objective"]}, agent: {task["agent"]}\n"
-        agent_calls += f"Here are the available agents: {agents.keys()}. For each task, match it with one agent only from the available list, and return the one-to-one match in this format: task_num: agent_name"
-        # print(f"************************ agent_calls: {agent_calls}")
+        agent_calls += f"Here is the dict_keys of available agents: {agents.keys()}. For each task, match it with an agent that is strictly in the dict_keys, make a guess if you need. Then just return only the one-to-one result in this format: task_num: agent_name"
+        print(f"************************ agent_calls: \n{agent_calls}")
         agent_match = self.model_client.get_response_Response(agent_calls)
-        print(f"---------------------Agent match response: {agent_match.content}")
+        print(f"---------------------Agent match response: \n{agent_match.content}")
         # agent_match = "\n".join(agent_match.content.strip().splitlines()[:-1])
 
         # print(f"---------------------Here are the agents we have: {agents.keys()}, Here's the agent_match: {agent_match}")
 
         # Convert the LLM response into a dictionary of form: task_id: agent_name
-        pattern = r"-\s*(task\d+):\s*([a-zA-Z0-9_]+)" 
+        pattern = r"\s*(task\d+):\s*([a-zA-Z0-9_]+)" 
         matches = re.findall(pattern, agent_match.content)
         task_agent_map = dict(matches)
-        # print(f"---------------- map: {task_agent_map}")
+        print(f"++++++++++++++++ map: \n{task_agent_map}")
 
         for task_id, task in workflow.items():
             # TODO: if completed, fetch history from ground truth

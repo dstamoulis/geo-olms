@@ -1,0 +1,293 @@
+{
+  "tasks": [
+    {
+      "queries": [
+        "./prompt_tests/benchmark/geo_{i}/query.txt"
+      ],
+      "rounds": [
+        {
+          "query": "./prompt_tests/benchmark/geo_{i}/query.txt",
+          "messages": [
+            {
+              "msg_class": "TextMessage",
+              "role": "user",
+              "content": "Fetch images from the xView1 dataset and filter the images specifically from Ouagadougou, Burkina Faso, for August 2017.",
+              "prompt_tokens": null,
+              "cached_tokens": null,
+              "completion_tokens": null,
+              "total_tokens": null,
+              "time_elapsed": null,
+              "source": "user",
+              "tool_calls": null
+            },
+            {
+              "msg_class": "ToolCallRequestMessage",
+              "role": "assistant",
+              "content": null,
+              "prompt_tokens": 290,
+              "cached_tokens": 0,
+              "completion_tokens": 75,
+              "total_tokens": 365,
+              "time_elapsed": 1.7324,
+              "source": {
+                "client_class": "OpenAIClient",
+                "model": "gpt-4o-mini"
+              },
+              "tool_calls": [
+                {
+                  "type": "ToolCall",
+                  "id": "call_Yz0IMvJngh8taCkq8QEI8A9e",
+                  "name": "query_images_by_aoi_coords",
+                  "arguments": "{\"dataset\":\"xView1\",\"lat_min\":12.3452,\"lat_max\":12.6452,\"lon_min\":-1.5251,\"lon_max\":-1.3251,\"start_date\":\"2017-08-01\",\"end_date\":\"2017-08-31\"}",
+                  "tool_type": "function_call"
+                }
+              ],
+              "message": "[{'arguments': '{\"dataset\":\"xView1\",\"lat_min\":12.3452,\"lat_max\":12.6452,\"lon_min\":-1.5251,\"lon_max\":-1.3251,\"start_date\":\"2017-08-01\",\"end_date\":\"2017-08-31\"}', 'call_id': 'call_Yz0IMvJngh8taCkq8QEI8A9e', 'name': 'query_images_by_aoi_coords', 'type': 'function_call', 'id': 'fc_6841e3040e088198854c775609bee3ab0eafece3e49c0083', 'status': 'completed'}]"
+            },
+            {
+              "msg_class": "ToolResponseMessage",
+              "role": "function_call_output",
+              "content": "The satellite xView1 imagery within the specified AOI is loaded in system memory. Num images: 2.",
+              "prompt_tokens": null,
+              "cached_tokens": null,
+              "completion_tokens": null,
+              "total_tokens": null,
+              "time_elapsed": 0.0952,
+              "source": "query_images_by_aoi_coords",
+              "tool_calls": null,
+              "message": "{'type': 'function_call_output', 'call_id': 'call_Yz0IMvJngh8taCkq8QEI8A9e', 'output': 'The satellite xView1 imagery within the specified AOI is loaded in system memory. Num images: 2.'}"
+            },
+            {
+              "msg_class": "ChatResponseMessage",
+              "role": "assistant",
+              "content": "I found 2 images from the xView1 dataset for Ouagadougou, Burkina Faso, during August 2017. If you need further details or specific information about these images, let me know!",
+              "prompt_tokens": 400,
+              "cached_tokens": 0,
+              "completion_tokens": 44,
+              "total_tokens": 444,
+              "time_elapsed": 1.2225,
+              "source": {
+                "client_class": "OpenAIClient",
+                "model": "gpt-4o-mini"
+              },
+              "tool_calls": null,
+              "message": "[{'id': 'msg_6841e305c74881988b5d509a5118dfd10eafece3e49c0083', 'content': [{'annotations': [], 'text': 'I found 2 images from the xView1 dataset for Ouagadougou, Burkina Faso, during August 2017. If you need further details or specific information about these images, let me know!', 'type': 'output_text'}], 'role': 'assistant', 'status': 'completed', 'type': 'message'}]"
+            },
+            {
+              "msg_class": "TextMessage",
+              "role": "user",
+              "content": "Run a processing algorithm on the filtered xView1 images to prepare them for plotting.",
+              "prompt_tokens": null,
+              "cached_tokens": null,
+              "completion_tokens": null,
+              "total_tokens": null,
+              "time_elapsed": null,
+              "source": "user",
+              "tool_calls": null
+            },
+            {
+              "msg_class": "ToolCallRequestMessage",
+              "role": "assistant",
+              "content": null,
+              "prompt_tokens": 320,
+              "cached_tokens": 0,
+              "completion_tokens": 68,
+              "total_tokens": 388,
+              "time_elapsed": 1.9395,
+              "source": {
+                "client_class": "OpenAIClient",
+                "model": "gpt-4o-mini"
+              },
+              "tool_calls": [
+                {
+                  "type": "ToolCall",
+                  "id": "call_RR7uEBl4CkNq8IfnECoyrihF",
+                  "name": "run_detector",
+                  "arguments": "{\"dataset\":\"xView1\",\"detector_name\":\"object_detection_model\"}",
+                  "tool_type": "function_call"
+                },
+                {
+                  "type": "ToolCall",
+                  "id": "call_oH8yHfCiTHIE86jBLRZB6l5h",
+                  "name": "run_land_coverage_classifier",
+                  "arguments": "{\"dataset\":\"xView1\",\"classifier_name\":\"land_coverage_model\"}",
+                  "tool_type": "function_call"
+                }
+              ],
+              "message": "[{'arguments': '{\"dataset\":\"xView1\",\"detector_name\":\"object_detection_model\"}', 'call_id': 'call_RR7uEBl4CkNq8IfnECoyrihF', 'name': 'run_detector', 'type': 'function_call', 'id': 'fc_6841e307a01c8198b06b49b2d7a451500eafece3e49c0083', 'status': 'completed'}, {'arguments': '{\"dataset\":\"xView1\",\"classifier_name\":\"land_coverage_model\"}', 'call_id': 'call_oH8yHfCiTHIE86jBLRZB6l5h', 'name': 'run_land_coverage_classifier', 'type': 'function_call', 'id': 'fc_6841e307f74c8198b579f9479460c0040eafece3e49c0083', 'status': 'completed'}]"
+            },
+            {
+              "msg_class": "ToolResponseMessage",
+              "role": "function_call_output",
+              "content": "\nError selecting object detector. object_detection_model does not exist in the model-zoo models for this dataset. \nPlease confirm the correct detector name is selected. Available object detectors for xView1 dataset: ['Swin-L', 'YOLO-v8', 'CSWin-L'].\n",
+              "prompt_tokens": null,
+              "cached_tokens": null,
+              "completion_tokens": null,
+              "total_tokens": null,
+              "time_elapsed": 0.0,
+              "source": "run_detector",
+              "tool_calls": null,
+              "message": "{'type': 'function_call_output', 'call_id': 'call_RR7uEBl4CkNq8IfnECoyrihF', 'output': \"\\nError selecting object detector. object_detection_model does not exist in the model-zoo models for this dataset. \\nPlease confirm the correct detector name is selected. Available object detectors for xView1 dataset: ['Swin-L', 'YOLO-v8', 'CSWin-L'].\\n\"}"
+            },
+            {
+              "msg_class": "ToolResponseMessage",
+              "role": "function_call_output",
+              "content": "\nError selecting object detector. xView1 does not exist in the model-zoo models. \nPlease confirm the supported dataset is selected. Available datasets: ['BigEarthNet'].\n",
+              "prompt_tokens": null,
+              "cached_tokens": null,
+              "completion_tokens": null,
+              "total_tokens": null,
+              "time_elapsed": 0.0,
+              "source": "run_land_coverage_classifier",
+              "tool_calls": null,
+              "message": "{'type': 'function_call_output', 'call_id': 'call_oH8yHfCiTHIE86jBLRZB6l5h', 'output': \"\\nError selecting object detector. xView1 does not exist in the model-zoo models. \\nPlease confirm the supported dataset is selected. Available datasets: ['BigEarthNet'].\\n\"}"
+            },
+            {
+              "msg_class": "ToolCallRequestMessage",
+              "role": "assistant",
+              "content": null,
+              "prompt_tokens": 480,
+              "cached_tokens": 0,
+              "completion_tokens": 68,
+              "total_tokens": 548,
+              "time_elapsed": 2.1533,
+              "source": {
+                "client_class": "OpenAIClient",
+                "model": "gpt-4o-mini"
+              },
+              "tool_calls": [
+                {
+                  "type": "ToolCall",
+                  "id": "call_ZV3QaKeK1jDP3MFpDZgmNOqj",
+                  "name": "run_detector",
+                  "arguments": "{\"dataset\":\"xView1\",\"detector_name\":\"Swin-L\"}",
+                  "tool_type": "function_call"
+                },
+                {
+                  "type": "ToolCall",
+                  "id": "call_giv6nANoODFvnSVCJnAlkxZV",
+                  "name": "run_land_coverage_classifier",
+                  "arguments": "{\"dataset\":\"xView1\",\"classifier_name\":\"land_coverage_model\"}",
+                  "tool_type": "function_call"
+                }
+              ],
+              "message": "[{'arguments': '{\"dataset\":\"xView1\",\"detector_name\":\"Swin-L\"}', 'call_id': 'call_ZV3QaKeK1jDP3MFpDZgmNOqj', 'name': 'run_detector', 'type': 'function_call', 'id': 'fc_6841e309794c819889cc362c0b9826ff0eafece3e49c0083', 'status': 'completed'}, {'arguments': '{\"dataset\":\"xView1\",\"classifier_name\":\"land_coverage_model\"}', 'call_id': 'call_giv6nANoODFvnSVCJnAlkxZV', 'name': 'run_land_coverage_classifier', 'type': 'function_call', 'id': 'fc_6841e30a0be88198aedf3750ab1884520eafece3e49c0083', 'status': 'completed'}]"
+            },
+            {
+              "msg_class": "ToolResponseMessage",
+              "role": "function_call_output",
+              "content": "Detection has successfully completed with model Swin-L on 2 xView1 images.",
+              "prompt_tokens": null,
+              "cached_tokens": null,
+              "completion_tokens": null,
+              "total_tokens": null,
+              "time_elapsed": 0.4178,
+              "source": "run_detector",
+              "tool_calls": null,
+              "message": "{'type': 'function_call_output', 'call_id': 'call_ZV3QaKeK1jDP3MFpDZgmNOqj', 'output': 'Detection has successfully completed with model Swin-L on 2 xView1 images.'}"
+            },
+            {
+              "msg_class": "ToolResponseMessage",
+              "role": "function_call_output",
+              "content": "\nError selecting object detector. xView1 does not exist in the model-zoo models. \nPlease confirm the supported dataset is selected. Available datasets: ['BigEarthNet'].\n",
+              "prompt_tokens": null,
+              "cached_tokens": null,
+              "completion_tokens": null,
+              "total_tokens": null,
+              "time_elapsed": 0.0,
+              "source": "run_land_coverage_classifier",
+              "tool_calls": null,
+              "message": "{'type': 'function_call_output', 'call_id': 'call_giv6nANoODFvnSVCJnAlkxZV', 'output': \"\\nError selecting object detector. xView1 does not exist in the model-zoo models. \\nPlease confirm the supported dataset is selected. Available datasets: ['BigEarthNet'].\\n\"}"
+            },
+            {
+              "msg_class": "ChatResponseMessage",
+              "role": "assistant",
+              "content": "The object detection processing has successfully completed using the Swin-L model on the 2 xView1 images. However, the land coverage classification model is not available for the xView1 dataset.\n\nIf you need any specific analysis or further processing on the detected images, please let me know!",
+              "prompt_tokens": 601,
+              "cached_tokens": 0,
+              "completion_tokens": 60,
+              "total_tokens": 661,
+              "time_elapsed": 1.8345,
+              "source": {
+                "client_class": "OpenAIClient",
+                "model": "gpt-4o-mini"
+              },
+              "tool_calls": null,
+              "message": "[{'id': 'msg_6841e30b9dfc8198b17e85828922e4a80eafece3e49c0083', 'content': [{'annotations': [], 'text': 'The object detection processing has successfully completed using the Swin-L model on the 2 xView1 images. However, the land coverage classification model is not available for the xView1 dataset.\\n\\nIf you need any specific analysis or further processing on the detected images, please let me know!', 'type': 'output_text'}], 'role': 'assistant', 'status': 'completed', 'type': 'message'}]"
+            },
+            {
+              "msg_class": "TextMessage",
+              "role": "user",
+              "content": "Plot the processed xView1 images on the map, ensuring accurate representation of the location.",
+              "prompt_tokens": null,
+              "cached_tokens": null,
+              "completion_tokens": null,
+              "total_tokens": null,
+              "time_elapsed": null,
+              "source": "user",
+              "tool_calls": null
+            },
+            {
+              "msg_class": "ToolCallRequestMessage",
+              "role": "assistant",
+              "content": null,
+              "prompt_tokens": 887,
+              "cached_tokens": 0,
+              "completion_tokens": 20,
+              "total_tokens": 907,
+              "time_elapsed": 1.1125,
+              "source": {
+                "client_class": "OpenAIClient",
+                "model": "gpt-4o-mini"
+              },
+              "tool_calls": [
+                {
+                  "type": "ToolCall",
+                  "id": "call_HGfWBI3GDEOCJZ9dnW53Lh2S",
+                  "name": "plot_images_scatter_map",
+                  "arguments": "{\"dataset\":\"xView1\"}",
+                  "tool_type": "function_call"
+                }
+              ],
+              "message": "[{'arguments': '{\"dataset\":\"xView1\"}', 'call_id': 'call_HGfWBI3GDEOCJZ9dnW53Lh2S', 'name': 'plot_images_scatter_map', 'type': 'function_call', 'id': 'fc_6841e30d8ab88198b56cde0c3f1f082a0eafece3e49c0083', 'status': 'completed'}]"
+            },
+            {
+              "msg_class": "ToolResponseMessage",
+              "role": "function_call_output",
+              "content": "Images scatter plot added with 2 xView1 images.",
+              "prompt_tokens": null,
+              "cached_tokens": null,
+              "completion_tokens": null,
+              "total_tokens": null,
+              "time_elapsed": 0.0124,
+              "source": "plot_images_scatter_map",
+              "tool_calls": null,
+              "message": "{'type': 'function_call_output', 'call_id': 'call_HGfWBI3GDEOCJZ9dnW53Lh2S', 'output': 'Images scatter plot added with 2 xView1 images.'}"
+            },
+            {
+              "msg_class": "ChatResponseMessage",
+              "role": "assistant",
+              "content": "The processed xView1 images have been plotted on the map, accurately representing their location in Ouagadougou, Burkina Faso. If you need to zoom in or explore further, just let me know!",
+              "prompt_tokens": 930,
+              "cached_tokens": 808,
+              "completion_tokens": 43,
+              "total_tokens": 973,
+              "time_elapsed": 2.5265,
+              "source": {
+                "client_class": "OpenAIClient",
+                "model": "gpt-4o-mini"
+              },
+              "tool_calls": null,
+              "message": "[{'id': 'msg_6841e30f41b48198bb8c4a47414fa0c00eafece3e49c0083', 'content': [{'annotations': [], 'text': 'The processed xView1 images have been plotted on the map, accurately representing their location in Ouagadougou, Burkina Faso. If you need to zoom in or explore further, just let me know!', 'type': 'output_text'}], 'role': 'assistant', 'status': 'completed', 'type': 'message'}]"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "model_client": {
+    "client_class": "OpenAIClient",
+    "model": "gpt-4o-mini",
+    "temperature": 0.1
+  }
+}

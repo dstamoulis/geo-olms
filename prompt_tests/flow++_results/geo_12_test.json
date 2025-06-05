@@ -1,0 +1,216 @@
+{
+  "tasks": [
+    {
+      "queries": [
+        "./prompt_tests/benchmark/geo_{i}/query.txt"
+      ],
+      "rounds": [
+        {
+          "query": "./prompt_tests/benchmark/geo_{i}/query.txt",
+          "messages": [
+            {
+              "msg_class": "TextMessage",
+              "role": "user",
+              "content": "Fetch images from the xView1 dataset and filter the images specifically from Prague, Czech Republic for Summer 2017.",
+              "prompt_tokens": null,
+              "cached_tokens": null,
+              "completion_tokens": null,
+              "total_tokens": null,
+              "time_elapsed": null,
+              "source": "user",
+              "tool_calls": null
+            },
+            {
+              "msg_class": "ToolCallRequestMessage",
+              "role": "assistant",
+              "content": null,
+              "prompt_tokens": 286,
+              "cached_tokens": 0,
+              "completion_tokens": 73,
+              "total_tokens": 359,
+              "time_elapsed": 1.8533,
+              "source": {
+                "client_class": "OpenAIClient",
+                "model": "gpt-4o-mini"
+              },
+              "tool_calls": [
+                {
+                  "type": "ToolCall",
+                  "id": "call_CyjOFMA2j1qJF3BNWR3LxfUv",
+                  "name": "query_images_by_aoi_coords",
+                  "arguments": "{\"dataset\":\"xView1\",\"lat_min\":50.0607,\"lat_max\":50.1007,\"lon_min\":14.4000,\"lon_max\":14.5000,\"start_date\":\"2017-06-01\",\"end_date\":\"2017-09-01\"}",
+                  "tool_type": "function_call"
+                }
+              ],
+              "message": "[{'arguments': '{\"dataset\":\"xView1\",\"lat_min\":50.0607,\"lat_max\":50.1007,\"lon_min\":14.4000,\"lon_max\":14.5000,\"start_date\":\"2017-06-01\",\"end_date\":\"2017-09-01\"}', 'call_id': 'call_CyjOFMA2j1qJF3BNWR3LxfUv', 'name': 'query_images_by_aoi_coords', 'type': 'function_call', 'id': 'fc_6841f0168798819aa7d4fb9c6118468a0f4653fda76fe85b', 'status': 'completed'}]"
+            },
+            {
+              "msg_class": "ToolResponseMessage",
+              "role": "function_call_output",
+              "content": "The satellite xView1 imagery within the specified AOI is loaded in system memory. Num images: 0.",
+              "prompt_tokens": null,
+              "cached_tokens": null,
+              "completion_tokens": null,
+              "total_tokens": null,
+              "time_elapsed": 0.0912,
+              "source": "query_images_by_aoi_coords",
+              "tool_calls": null,
+              "message": "{'type': 'function_call_output', 'call_id': 'call_CyjOFMA2j1qJF3BNWR3LxfUv', 'output': 'The satellite xView1 imagery within the specified AOI is loaded in system memory. Num images: 0.'}"
+            },
+            {
+              "msg_class": "ChatResponseMessage",
+              "role": "assistant",
+              "content": "It appears that there are no images available from the xView1 dataset for Prague, Czech Republic, during the summer of 2017. If you have another location or time frame in mind, please let me know!",
+              "prompt_tokens": 392,
+              "cached_tokens": 0,
+              "completion_tokens": 46,
+              "total_tokens": 438,
+              "time_elapsed": 1.6539,
+              "source": {
+                "client_class": "OpenAIClient",
+                "model": "gpt-4o-mini"
+              },
+              "tool_calls": null,
+              "message": "[{'id': 'msg_6841f0184f5c819a97e36227259235c60f4653fda76fe85b', 'content': [{'annotations': [], 'text': 'It appears that there are no images available from the xView1 dataset for Prague, Czech Republic, during the summer of 2017. If you have another location or time frame in mind, please let me know!', 'type': 'output_text'}], 'role': 'assistant', 'status': 'completed', 'type': 'message'}]"
+            },
+            {
+              "msg_class": "TextMessage",
+              "role": "user",
+              "content": "Run the Swin-L detector on xView1 images to detect Passenger Cars.",
+              "prompt_tokens": null,
+              "cached_tokens": null,
+              "completion_tokens": null,
+              "total_tokens": null,
+              "time_elapsed": null,
+              "source": "user",
+              "tool_calls": null
+            },
+            {
+              "msg_class": "ToolCallRequestMessage",
+              "role": "assistant",
+              "content": null,
+              "prompt_tokens": 313,
+              "cached_tokens": 0,
+              "completion_tokens": 25,
+              "total_tokens": 338,
+              "time_elapsed": 1.059,
+              "source": {
+                "client_class": "OpenAIClient",
+                "model": "gpt-4o-mini"
+              },
+              "tool_calls": [
+                {
+                  "type": "ToolCall",
+                  "id": "call_prjUoxEMNl906or2PX6PW8if",
+                  "name": "run_detector",
+                  "arguments": "{\"dataset\":\"xView1\",\"detector_name\":\"Swin-L\"}",
+                  "tool_type": "function_call"
+                }
+              ],
+              "message": "[{'arguments': '{\"dataset\":\"xView1\",\"detector_name\":\"Swin-L\"}', 'call_id': 'call_prjUoxEMNl906or2PX6PW8if', 'name': 'run_detector', 'type': 'function_call', 'id': 'fc_6841f019ed18819a850b8923d7ffffe00f4653fda76fe85b', 'status': 'completed'}]"
+            },
+            {
+              "msg_class": "ToolResponseMessage",
+              "role": "function_call_output",
+              "content": "No images found (images GeoDataFrame is empty). No areas with available imagery for the specified user criteria.",
+              "prompt_tokens": null,
+              "cached_tokens": null,
+              "completion_tokens": null,
+              "total_tokens": null,
+              "time_elapsed": 0.0001,
+              "source": "run_detector",
+              "tool_calls": null,
+              "message": "{'type': 'function_call_output', 'call_id': 'call_prjUoxEMNl906or2PX6PW8if', 'output': 'No images found (images GeoDataFrame is empty). No areas with available imagery for the specified user criteria.'}"
+            },
+            {
+              "msg_class": "ChatResponseMessage",
+              "role": "assistant",
+              "content": "It seems there are no images available in the xView1 dataset to run the Swin-L detector for detecting passenger cars. If you have a different dataset or criteria in mind, please let me know!",
+              "prompt_tokens": 368,
+              "cached_tokens": 0,
+              "completion_tokens": 43,
+              "total_tokens": 411,
+              "time_elapsed": 1.4221,
+              "source": {
+                "client_class": "OpenAIClient",
+                "model": "gpt-4o-mini"
+              },
+              "tool_calls": null,
+              "message": "[{'id': 'msg_6841f01b0f28819a911a0f89557920a00f4653fda76fe85b', 'content': [{'annotations': [], 'text': 'It seems there are no images available in the xView1 dataset to run the Swin-L detector for detecting passenger cars. If you have a different dataset or criteria in mind, please let me know!', 'type': 'output_text'}], 'role': 'assistant', 'status': 'completed', 'type': 'message'}]"
+            },
+            {
+              "msg_class": "TextMessage",
+              "role": "user",
+              "content": "Count the number of detected Passenger Cars from the Swin-L detection results.",
+              "prompt_tokens": null,
+              "cached_tokens": null,
+              "completion_tokens": null,
+              "total_tokens": null,
+              "time_elapsed": null,
+              "source": "user",
+              "tool_calls": null
+            },
+            {
+              "msg_class": "ToolCallRequestMessage",
+              "role": "assistant",
+              "content": null,
+              "prompt_tokens": 634,
+              "cached_tokens": 0,
+              "completion_tokens": 40,
+              "total_tokens": 674,
+              "time_elapsed": 1.1715,
+              "source": {
+                "client_class": "OpenAIClient",
+                "model": "gpt-4o-mini"
+              },
+              "tool_calls": [
+                {
+                  "type": "ToolCall",
+                  "id": "call_kIUYgNJjc4HDmXMfJAEguPvN",
+                  "name": "plot_detections_catergory_scatter_map",
+                  "arguments": "{\"dataset\":\"xView1\",\"detector_name\":\"Swin-L\",\"category_name\":\"Passenger Car\"}",
+                  "tool_type": "function_call"
+                }
+              ],
+              "message": "[{'arguments': '{\"dataset\":\"xView1\",\"detector_name\":\"Swin-L\",\"category_name\":\"Passenger Car\"}', 'call_id': 'call_kIUYgNJjc4HDmXMfJAEguPvN', 'name': 'plot_detections_catergory_scatter_map', 'type': 'function_call', 'id': 'fc_6841f01c7d68819a90960cbed9b5ec250f4653fda76fe85b', 'status': 'completed'}]"
+            },
+            {
+              "msg_class": "ToolResponseMessage",
+              "role": "function_call_output",
+              "content": "No detections (detections GeoDataFrame is None) for . Make sure to load the underlying imagery first for the specified user criteria and/or run detection with the proper detector model.",
+              "prompt_tokens": null,
+              "cached_tokens": null,
+              "completion_tokens": null,
+              "total_tokens": null,
+              "time_elapsed": 0.0001,
+              "source": "plot_detections_catergory_scatter_map",
+              "tool_calls": null,
+              "message": "{'type': 'function_call_output', 'call_id': 'call_kIUYgNJjc4HDmXMfJAEguPvN', 'output': 'No detections (detections GeoDataFrame is None) for . Make sure to load the underlying imagery first for the specified user criteria and/or run detection with the proper detector model.'}"
+            },
+            {
+              "msg_class": "ChatResponseMessage",
+              "role": "assistant",
+              "content": "It appears that there are no detection results available for passenger cars from the Swin-L detector, likely due to the absence of images in the xView1 dataset. If you have another dataset or specific criteria in mind, please let me know!",
+              "prompt_tokens": 728,
+              "cached_tokens": 0,
+              "completion_tokens": 51,
+              "total_tokens": 779,
+              "time_elapsed": 1.5082,
+              "source": {
+                "client_class": "OpenAIClient",
+                "model": "gpt-4o-mini"
+              },
+              "tool_calls": null,
+              "message": "[{'id': 'msg_6841f01d8940819a94dde93dd0cb6cde0f4653fda76fe85b', 'content': [{'annotations': [], 'text': 'It appears that there are no detection results available for passenger cars from the Swin-L detector, likely due to the absence of images in the xView1 dataset. If you have another dataset or specific criteria in mind, please let me know!', 'type': 'output_text'}], 'role': 'assistant', 'status': 'completed', 'type': 'message'}]"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "model_client": {
+    "client_class": "OpenAIClient",
+    "model": "gpt-4o-mini",
+    "temperature": 0.1
+  }
+}

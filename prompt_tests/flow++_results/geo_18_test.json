@@ -1,0 +1,236 @@
+{
+  "tasks": [
+    {
+      "queries": [
+        "./prompt_tests/benchmark/geo_{i}/query.txt"
+      ],
+      "rounds": [
+        {
+          "query": "./prompt_tests/benchmark/geo_{i}/query.txt",
+          "messages": [
+            {
+              "msg_class": "TextMessage",
+              "role": "user",
+              "content": "Fetch images from the xView1 dataset and filter the images specifically from Kaohsiung, Taiwan, dated June 2017.",
+              "prompt_tokens": null,
+              "cached_tokens": null,
+              "completion_tokens": null,
+              "total_tokens": null,
+              "time_elapsed": null,
+              "source": "user",
+              "tool_calls": null
+            },
+            {
+              "msg_class": "ToolCallRequestMessage",
+              "role": "assistant",
+              "content": null,
+              "prompt_tokens": 289,
+              "cached_tokens": 0,
+              "completion_tokens": 69,
+              "total_tokens": 358,
+              "time_elapsed": 2.0577,
+              "source": {
+                "client_class": "OpenAIClient",
+                "model": "gpt-4o-mini"
+              },
+              "tool_calls": [
+                {
+                  "type": "ToolCall",
+                  "id": "call_RrygHwCllnNhISpbLkExXQDY",
+                  "name": "query_images_by_aoi_coords",
+                  "arguments": "{\"dataset\":\"xView1\",\"lat_min\":22.5,\"lat_max\":22.7,\"lon_min\":120.25,\"lon_max\":120.35,\"start_date\":\"2017-06-01\",\"end_date\":\"2017-06-30\"}",
+                  "tool_type": "function_call"
+                }
+              ],
+              "message": "[{'arguments': '{\"dataset\":\"xView1\",\"lat_min\":22.5,\"lat_max\":22.7,\"lon_min\":120.25,\"lon_max\":120.35,\"start_date\":\"2017-06-01\",\"end_date\":\"2017-06-30\"}', 'call_id': 'call_RrygHwCllnNhISpbLkExXQDY', 'name': 'query_images_by_aoi_coords', 'type': 'function_call', 'id': 'fc_6841f25582b4819ab595f003bb893017044c4c3dbf8d340d', 'status': 'completed'}]"
+            },
+            {
+              "msg_class": "ToolResponseMessage",
+              "role": "function_call_output",
+              "content": "The satellite xView1 imagery within the specified AOI is loaded in system memory. Num images: 6.",
+              "prompt_tokens": null,
+              "cached_tokens": null,
+              "completion_tokens": null,
+              "total_tokens": null,
+              "time_elapsed": 0.0925,
+              "source": "query_images_by_aoi_coords",
+              "tool_calls": null,
+              "message": "{'type': 'function_call_output', 'call_id': 'call_RrygHwCllnNhISpbLkExXQDY', 'output': 'The satellite xView1 imagery within the specified AOI is loaded in system memory. Num images: 6.'}"
+            },
+            {
+              "msg_class": "ChatResponseMessage",
+              "role": "assistant",
+              "content": "I found 6 images from the xView1 dataset for Kaohsiung, Taiwan, dated June 2017. If you need further details or specific images, let me know!",
+              "prompt_tokens": 393,
+              "cached_tokens": 0,
+              "completion_tokens": 40,
+              "total_tokens": 433,
+              "time_elapsed": 1.6336,
+              "source": {
+                "client_class": "OpenAIClient",
+                "model": "gpt-4o-mini"
+              },
+              "tool_calls": null,
+              "message": "[{'id': 'msg_6841f25785c0819ab85cb844820de9b1044c4c3dbf8d340d', 'content': [{'annotations': [], 'text': 'I found 6 images from the xView1 dataset for Kaohsiung, Taiwan, dated June 2017. If you need further details or specific images, let me know!', 'type': 'output_text'}], 'role': 'assistant', 'status': 'completed', 'type': 'message'}]"
+            },
+            {
+              "msg_class": "TextMessage",
+              "role": "user",
+              "content": "Process and organize the xView1 images for scatter plotting.",
+              "prompt_tokens": null,
+              "cached_tokens": null,
+              "completion_tokens": null,
+              "total_tokens": null,
+              "time_elapsed": null,
+              "source": "user",
+              "tool_calls": null
+            },
+            {
+              "msg_class": "ToolCallRequestMessage",
+              "role": "assistant",
+              "content": null,
+              "prompt_tokens": 304,
+              "cached_tokens": 0,
+              "completion_tokens": 66,
+              "total_tokens": 370,
+              "time_elapsed": 2.5445,
+              "source": {
+                "client_class": "OpenAIClient",
+                "model": "gpt-4o-mini"
+              },
+              "tool_calls": [
+                {
+                  "type": "ToolCall",
+                  "id": "call_FZ13UtB9TU2FSjtFYvOA818d",
+                  "name": "run_detector",
+                  "arguments": "{\"dataset\":\"xView1\",\"detector_name\":\"scatter_plot_detector\"}",
+                  "tool_type": "function_call"
+                },
+                {
+                  "type": "ToolCall",
+                  "id": "call_QhAG9vlsT9hr1IzNypOPJQPb",
+                  "name": "run_land_coverage_classifier",
+                  "arguments": "{\"dataset\":\"xView1\",\"classifier_name\":\"scatter_plot_classifier\"}",
+                  "tool_type": "function_call"
+                }
+              ],
+              "message": "[{'arguments': '{\"dataset\":\"xView1\",\"detector_name\":\"scatter_plot_detector\"}', 'call_id': 'call_FZ13UtB9TU2FSjtFYvOA818d', 'name': 'run_detector', 'type': 'function_call', 'id': 'fc_6841f2594678819aac960d71b9597032044c4c3dbf8d340d', 'status': 'completed'}, {'arguments': '{\"dataset\":\"xView1\",\"classifier_name\":\"scatter_plot_classifier\"}', 'call_id': 'call_QhAG9vlsT9hr1IzNypOPJQPb', 'name': 'run_land_coverage_classifier', 'type': 'function_call', 'id': 'fc_6841f25a3964819aa70fe173648bd13a044c4c3dbf8d340d', 'status': 'completed'}]"
+            },
+            {
+              "msg_class": "ToolResponseMessage",
+              "role": "function_call_output",
+              "content": "\nError selecting object detector. scatter_plot_detector does not exist in the model-zoo models for this dataset. \nPlease confirm the correct detector name is selected. Available object detectors for xView1 dataset: ['Swin-L', 'YOLO-v8', 'CSWin-L'].\n",
+              "prompt_tokens": null,
+              "cached_tokens": null,
+              "completion_tokens": null,
+              "total_tokens": null,
+              "time_elapsed": 0.0,
+              "source": "run_detector",
+              "tool_calls": null,
+              "message": "{'type': 'function_call_output', 'call_id': 'call_FZ13UtB9TU2FSjtFYvOA818d', 'output': \"\\nError selecting object detector. scatter_plot_detector does not exist in the model-zoo models for this dataset. \\nPlease confirm the correct detector name is selected. Available object detectors for xView1 dataset: ['Swin-L', 'YOLO-v8', 'CSWin-L'].\\n\"}"
+            },
+            {
+              "msg_class": "ToolResponseMessage",
+              "role": "function_call_output",
+              "content": "\nError selecting object detector. xView1 does not exist in the model-zoo models. \nPlease confirm the supported dataset is selected. Available datasets: ['BigEarthNet'].\n",
+              "prompt_tokens": null,
+              "cached_tokens": null,
+              "completion_tokens": null,
+              "total_tokens": null,
+              "time_elapsed": 0.0,
+              "source": "run_land_coverage_classifier",
+              "tool_calls": null,
+              "message": "{'type': 'function_call_output', 'call_id': 'call_QhAG9vlsT9hr1IzNypOPJQPb', 'output': \"\\nError selecting object detector. xView1 does not exist in the model-zoo models. \\nPlease confirm the supported dataset is selected. Available datasets: ['BigEarthNet'].\\n\"}"
+            },
+            {
+              "msg_class": "ChatResponseMessage",
+              "role": "assistant",
+              "content": "It seems there was an issue with the processing tools for the xView1 dataset. The available models do not support the specific operations I attempted.\n\nIf you have a different analysis or processing request in mind, please let me know!",
+              "prompt_tokens": 464,
+              "cached_tokens": 0,
+              "completion_tokens": 48,
+              "total_tokens": 512,
+              "time_elapsed": 1.3296,
+              "source": {
+                "client_class": "OpenAIClient",
+                "model": "gpt-4o-mini"
+              },
+              "tool_calls": null,
+              "message": "[{'id': 'msg_6841f25b5f40819ab2d5ddd9b71c1ee5044c4c3dbf8d340d', 'content': [{'annotations': [], 'text': 'It seems there was an issue with the processing tools for the xView1 dataset. The available models do not support the specific operations I attempted.\\n\\nIf you have a different analysis or processing request in mind, please let me know!', 'type': 'output_text'}], 'role': 'assistant', 'status': 'completed', 'type': 'message'}]"
+            },
+            {
+              "msg_class": "TextMessage",
+              "role": "user",
+              "content": "Generate a scatter plot visualizing the xView1 images for Kaohsiung, Taiwan.",
+              "prompt_tokens": null,
+              "cached_tokens": null,
+              "completion_tokens": null,
+              "total_tokens": null,
+              "time_elapsed": null,
+              "source": "user",
+              "tool_calls": null
+            },
+            {
+              "msg_class": "ToolCallRequestMessage",
+              "role": "assistant",
+              "content": null,
+              "prompt_tokens": 739,
+              "cached_tokens": 0,
+              "completion_tokens": 20,
+              "total_tokens": 759,
+              "time_elapsed": 2.0287,
+              "source": {
+                "client_class": "OpenAIClient",
+                "model": "gpt-4o-mini"
+              },
+              "tool_calls": [
+                {
+                  "type": "ToolCall",
+                  "id": "call_mtpEp0czIRYlRc4z1WQsAtAE",
+                  "name": "plot_images_scatter_map",
+                  "arguments": "{\"dataset\":\"xView1\"}",
+                  "tool_type": "function_call"
+                }
+              ],
+              "message": "[{'arguments': '{\"dataset\":\"xView1\"}', 'call_id': 'call_mtpEp0czIRYlRc4z1WQsAtAE', 'name': 'plot_images_scatter_map', 'type': 'function_call', 'id': 'fc_6841f25df32c819a9af4e88c605855ad044c4c3dbf8d340d', 'status': 'completed'}]"
+            },
+            {
+              "msg_class": "ToolResponseMessage",
+              "role": "function_call_output",
+              "content": "Images scatter plot added with 6 xView1 images.",
+              "prompt_tokens": null,
+              "cached_tokens": null,
+              "completion_tokens": null,
+              "total_tokens": null,
+              "time_elapsed": 0.0144,
+              "source": "plot_images_scatter_map",
+              "tool_calls": null,
+              "message": "{'type': 'function_call_output', 'call_id': 'call_mtpEp0czIRYlRc4z1WQsAtAE', 'output': 'Images scatter plot added with 6 xView1 images.'}"
+            },
+            {
+              "msg_class": "ChatResponseMessage",
+              "role": "assistant",
+              "content": "The scatter plot visualizing the 6 xView1 images for Kaohsiung, Taiwan, has been generated. If you need any further analysis or details, feel free to ask!",
+              "prompt_tokens": 782,
+              "cached_tokens": 0,
+              "completion_tokens": 40,
+              "total_tokens": 822,
+              "time_elapsed": 1.6463,
+              "source": {
+                "client_class": "OpenAIClient",
+                "model": "gpt-4o-mini"
+              },
+              "tool_calls": null,
+              "message": "[{'id': 'msg_6841f25ef108819ab9b3cb389c1beb58044c4c3dbf8d340d', 'content': [{'annotations': [], 'text': 'The scatter plot visualizing the 6 xView1 images for Kaohsiung, Taiwan, has been generated. If you need any further analysis or details, feel free to ask!', 'type': 'output_text'}], 'role': 'assistant', 'status': 'completed', 'type': 'message'}]"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "model_client": {
+    "client_class": "OpenAIClient",
+    "model": "gpt-4o-mini",
+    "temperature": 0.1
+  }
+}

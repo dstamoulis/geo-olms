@@ -1,0 +1,216 @@
+{
+  "tasks": [
+    {
+      "queries": [
+        "./prompt_tests/benchmark/geo_{i}/query.txt"
+      ],
+      "rounds": [
+        {
+          "query": "./prompt_tests/benchmark/geo_{i}/query.txt",
+          "messages": [
+            {
+              "msg_class": "TextMessage",
+              "role": "user",
+              "content": "Fetch images from the xView1 dataset and filter the images specifically from Athens International Airport, Greece.",
+              "prompt_tokens": null,
+              "cached_tokens": null,
+              "completion_tokens": null,
+              "total_tokens": null,
+              "time_elapsed": null,
+              "source": "user",
+              "tool_calls": null
+            },
+            {
+              "msg_class": "ToolCallRequestMessage",
+              "role": "assistant",
+              "content": null,
+              "prompt_tokens": 282,
+              "cached_tokens": 0,
+              "completion_tokens": 53,
+              "total_tokens": 335,
+              "time_elapsed": 1.8284,
+              "source": {
+                "client_class": "OpenAIClient",
+                "model": "gpt-4o-mini"
+              },
+              "tool_calls": [
+                {
+                  "type": "ToolCall",
+                  "id": "call_X1bwGIbyUUmio3vpith6Ikl0",
+                  "name": "query_images_by_aoi_coords",
+                  "arguments": "{\"dataset\":\"xView1\",\"lat_min\":37.9332,\"lat_max\":37.9732,\"lon_min\":23.8463,\"lon_max\":23.9463}",
+                  "tool_type": "function_call"
+                }
+              ],
+              "message": "[{'arguments': '{\"dataset\":\"xView1\",\"lat_min\":37.9332,\"lat_max\":37.9732,\"lon_min\":23.8463,\"lon_max\":23.9463}', 'call_id': 'call_X1bwGIbyUUmio3vpith6Ikl0', 'name': 'query_images_by_aoi_coords', 'type': 'function_call', 'id': 'fc_6841f404fe04819a853bca52891004a809e00fd1f5ea170f', 'status': 'completed'}]"
+            },
+            {
+              "msg_class": "ToolResponseMessage",
+              "role": "function_call_output",
+              "content": "The satellite xView1 imagery within the specified AOI is loaded in system memory. Num images: 4.",
+              "prompt_tokens": null,
+              "cached_tokens": null,
+              "completion_tokens": null,
+              "total_tokens": null,
+              "time_elapsed": 0.1169,
+              "source": "query_images_by_aoi_coords",
+              "tool_calls": null,
+              "message": "{'type': 'function_call_output', 'call_id': 'call_X1bwGIbyUUmio3vpith6Ikl0', 'output': 'The satellite xView1 imagery within the specified AOI is loaded in system memory. Num images: 4.'}"
+            },
+            {
+              "msg_class": "ChatResponseMessage",
+              "role": "assistant",
+              "content": "I found 4 images from the xView1 dataset specifically for Athens International Airport, Greece. If you need further details or specific images, let me know!",
+              "prompt_tokens": 370,
+              "cached_tokens": 0,
+              "completion_tokens": 34,
+              "total_tokens": 404,
+              "time_elapsed": 1.4265,
+              "source": {
+                "client_class": "OpenAIClient",
+                "model": "gpt-4o-mini"
+              },
+              "tool_calls": null,
+              "message": "[{'id': 'msg_6841f4069d3c819aa336417f351b09c509e00fd1f5ea170f', 'content': [{'annotations': [], 'text': 'I found 4 images from the xView1 dataset specifically for Athens International Airport, Greece. If you need further details or specific images, let me know!', 'type': 'output_text'}], 'role': 'assistant', 'status': 'completed', 'type': 'message'}]"
+            },
+            {
+              "msg_class": "TextMessage",
+              "role": "user",
+              "content": "Run the Swin-L detector on xView1 images to detect relevant objects.",
+              "prompt_tokens": null,
+              "cached_tokens": null,
+              "completion_tokens": null,
+              "total_tokens": null,
+              "time_elapsed": null,
+              "source": "user",
+              "tool_calls": null
+            },
+            {
+              "msg_class": "ToolCallRequestMessage",
+              "role": "assistant",
+              "content": null,
+              "prompt_tokens": 279,
+              "cached_tokens": 0,
+              "completion_tokens": 25,
+              "total_tokens": 304,
+              "time_elapsed": 1.0812,
+              "source": {
+                "client_class": "OpenAIClient",
+                "model": "gpt-4o-mini"
+              },
+              "tool_calls": [
+                {
+                  "type": "ToolCall",
+                  "id": "call_81hQ94MjG0Srm7otcvWWXKMU",
+                  "name": "run_detector",
+                  "arguments": "{\"dataset\":\"xView1\",\"detector_name\":\"Swin-L\"}",
+                  "tool_type": "function_call"
+                }
+              ],
+              "message": "[{'arguments': '{\"dataset\":\"xView1\",\"detector_name\":\"Swin-L\"}', 'call_id': 'call_81hQ94MjG0Srm7otcvWWXKMU', 'name': 'run_detector', 'type': 'function_call', 'id': 'fc_6841f4082010819aaf3c15ecbf6c426809e00fd1f5ea170f', 'status': 'completed'}]"
+            },
+            {
+              "msg_class": "ToolResponseMessage",
+              "role": "function_call_output",
+              "content": "Detection has successfully completed with model Swin-L on 4 xView1 images.",
+              "prompt_tokens": null,
+              "cached_tokens": null,
+              "completion_tokens": null,
+              "total_tokens": null,
+              "time_elapsed": 0.5145,
+              "source": "run_detector",
+              "tool_calls": null,
+              "message": "{'type': 'function_call_output', 'call_id': 'call_81hQ94MjG0Srm7otcvWWXKMU', 'output': 'Detection has successfully completed with model Swin-L on 4 xView1 images.'}"
+            },
+            {
+              "msg_class": "ChatResponseMessage",
+              "role": "assistant",
+              "content": "The Swin-L detector has successfully processed the 4 xView1 images, detecting relevant objects. If you need details on the detected objects or any further analysis, just let me know!",
+              "prompt_tokens": 329,
+              "cached_tokens": 0,
+              "completion_tokens": 40,
+              "total_tokens": 369,
+              "time_elapsed": 1.311,
+              "source": {
+                "client_class": "OpenAIClient",
+                "model": "gpt-4o-mini"
+              },
+              "tool_calls": null,
+              "message": "[{'id': 'msg_6841f4098a50819a8207d8af58b8a3e209e00fd1f5ea170f', 'content': [{'annotations': [], 'text': 'The Swin-L detector has successfully processed the 4 xView1 images, detecting relevant objects. If you need details on the detected objects or any further analysis, just let me know!', 'type': 'output_text'}], 'role': 'assistant', 'status': 'completed', 'type': 'message'}]"
+            },
+            {
+              "msg_class": "TextMessage",
+              "role": "user",
+              "content": "Zoom the map to highlight the area around Athens International Airport using the Swin-L detection results.",
+              "prompt_tokens": null,
+              "cached_tokens": null,
+              "completion_tokens": null,
+              "total_tokens": null,
+              "time_elapsed": null,
+              "source": "user",
+              "tool_calls": null
+            },
+            {
+              "msg_class": "ToolCallRequestMessage",
+              "role": "assistant",
+              "content": null,
+              "prompt_tokens": 596,
+              "cached_tokens": 0,
+              "completion_tokens": 29,
+              "total_tokens": 625,
+              "time_elapsed": 1.3337,
+              "source": {
+                "client_class": "OpenAIClient",
+                "model": "gpt-4o-mini"
+              },
+              "tool_calls": [
+                {
+                  "type": "ToolCall",
+                  "id": "call_PuUsNDguiqy3ui3Dh3viDIzY",
+                  "name": "zoom_map",
+                  "arguments": "{\"lat\":37.9497,\"lon\":23.8953,\"zoom\":12}",
+                  "tool_type": "function_call"
+                }
+              ],
+              "message": "[{'arguments': '{\"lat\":37.9497,\"lon\":23.8953,\"zoom\":12}', 'call_id': 'call_PuUsNDguiqy3ui3Dh3viDIzY', 'name': 'zoom_map', 'type': 'function_call', 'id': 'fc_6841f40b253c819abd68e7568ed8826009e00fd1f5ea170f', 'status': 'completed'}]"
+            },
+            {
+              "msg_class": "ToolResponseMessage",
+              "role": "function_call_output",
+              "content": "Zoom updated.",
+              "prompt_tokens": null,
+              "cached_tokens": null,
+              "completion_tokens": null,
+              "total_tokens": null,
+              "time_elapsed": 0.0016,
+              "source": "zoom_map",
+              "tool_calls": null,
+              "message": "{'type': 'function_call_output', 'call_id': 'call_PuUsNDguiqy3ui3Dh3viDIzY', 'output': 'Zoom updated.'}"
+            },
+            {
+              "msg_class": "ChatResponseMessage",
+              "role": "assistant",
+              "content": "The map has been zoomed in to highlight the area around Athens International Airport. If you need to visualize the detection results or any specific details, just let me know!",
+              "prompt_tokens": 636,
+              "cached_tokens": 0,
+              "completion_tokens": 36,
+              "total_tokens": 672,
+              "time_elapsed": 1.2993,
+              "source": {
+                "client_class": "OpenAIClient",
+                "model": "gpt-4o-mini"
+              },
+              "tool_calls": null,
+              "message": "[{'id': 'msg_6841f40c4c70819aaaef5baddd3ab3b409e00fd1f5ea170f', 'content': [{'annotations': [], 'text': 'The map has been zoomed in to highlight the area around Athens International Airport. If you need to visualize the detection results or any specific details, just let me know!', 'type': 'output_text'}], 'role': 'assistant', 'status': 'completed', 'type': 'message'}]"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "model_client": {
+    "client_class": "OpenAIClient",
+    "model": "gpt-4o-mini",
+    "temperature": 0.1
+  }
+}

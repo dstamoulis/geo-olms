@@ -1,0 +1,346 @@
+{
+  "tasks": [
+    {
+      "queries": [
+        "./prompt_tests/benchmark/geo_{i}/query.txt"
+      ],
+      "rounds": [
+        {
+          "query": "./prompt_tests/benchmark/geo_{i}/query.txt",
+          "messages": [
+            {
+              "msg_class": "TextMessage",
+              "role": "user",
+              "content": "Fetch xView1 images from July 2017.",
+              "prompt_tokens": null,
+              "cached_tokens": null,
+              "completion_tokens": null,
+              "total_tokens": null,
+              "time_elapsed": null,
+              "source": "user",
+              "tool_calls": null
+            },
+            {
+              "msg_class": "ToolCallRequestMessage",
+              "role": "assistant",
+              "content": null,
+              "prompt_tokens": 273,
+              "cached_tokens": 0,
+              "completion_tokens": 38,
+              "total_tokens": 311,
+              "time_elapsed": 1.9671,
+              "source": {
+                "client_class": "OpenAIClient",
+                "model": "gpt-4o-mini"
+              },
+              "tool_calls": [
+                {
+                  "type": "ToolCall",
+                  "id": "call_1JWbrb3Nu120OAiTiRs8D9qp",
+                  "name": "query_dataset_images",
+                  "arguments": "{\"dataset\":\"xView1\",\"start_date\":\"2017-07-01\",\"end_date\":\"2017-07-31\"}",
+                  "tool_type": "function_call"
+                }
+              ],
+              "message": "[{'arguments': '{\"dataset\":\"xView1\",\"start_date\":\"2017-07-01\",\"end_date\":\"2017-07-31\"}', 'call_id': 'call_1JWbrb3Nu120OAiTiRs8D9qp', 'name': 'query_dataset_images', 'type': 'function_call', 'id': 'fc_6841e78d5b08819ba6b2dc57be66c8450a12746708b3d77e', 'status': 'completed'}]"
+            },
+            {
+              "msg_class": "ToolResponseMessage",
+              "role": "function_call_output",
+              "content": "The satellite xView1 imagery is loaded. Num images: 279.",
+              "prompt_tokens": null,
+              "cached_tokens": null,
+              "completion_tokens": null,
+              "total_tokens": null,
+              "time_elapsed": 0.0887,
+              "source": "query_dataset_images",
+              "tool_calls": null,
+              "message": "{'type': 'function_call_output', 'call_id': 'call_1JWbrb3Nu120OAiTiRs8D9qp', 'output': 'The satellite xView1 imagery is loaded. Num images: 279.'}"
+            },
+            {
+              "msg_class": "ChatResponseMessage",
+              "role": "assistant",
+              "content": "I found a total of 279 xView1 images from July 2017. If you need specific details or further actions regarding these images, let me know!",
+              "prompt_tokens": 335,
+              "cached_tokens": 0,
+              "completion_tokens": 35,
+              "total_tokens": 370,
+              "time_elapsed": 1.0204,
+              "source": {
+                "client_class": "OpenAIClient",
+                "model": "gpt-4o-mini"
+              },
+              "tool_calls": null,
+              "message": "[{'id': 'msg_6841e78edcf4819ba9ef1dfaa0e329e20a12746708b3d77e', 'content': [{'annotations': [], 'text': 'I found a total of 279 xView1 images from July 2017. If you need specific details or further actions regarding these images, let me know!', 'type': 'output_text'}], 'role': 'assistant', 'status': 'completed', 'type': 'message'}]"
+            },
+            {
+              "msg_class": "TextMessage",
+              "role": "user",
+              "content": "Fetch FAIR1M images from July 2017.",
+              "prompt_tokens": null,
+              "cached_tokens": null,
+              "completion_tokens": null,
+              "total_tokens": null,
+              "time_elapsed": null,
+              "source": "user",
+              "tool_calls": null
+            },
+            {
+              "msg_class": "ToolCallRequestMessage",
+              "role": "assistant",
+              "content": null,
+              "prompt_tokens": 387,
+              "cached_tokens": 0,
+              "completion_tokens": 39,
+              "total_tokens": 426,
+              "time_elapsed": 1.2984,
+              "source": {
+                "client_class": "OpenAIClient",
+                "model": "gpt-4o-mini"
+              },
+              "tool_calls": [
+                {
+                  "type": "ToolCall",
+                  "id": "call_3etqEWM4jBjArpp5oP5NRiWQ",
+                  "name": "query_dataset_images",
+                  "arguments": "{\"dataset\":\"FAIR1M\",\"start_date\":\"2017-07-01\",\"end_date\":\"2017-07-31\"}",
+                  "tool_type": "function_call"
+                }
+              ],
+              "message": "[{'arguments': '{\"dataset\":\"FAIR1M\",\"start_date\":\"2017-07-01\",\"end_date\":\"2017-07-31\"}', 'call_id': 'call_3etqEWM4jBjArpp5oP5NRiWQ', 'name': 'query_dataset_images', 'type': 'function_call', 'id': 'fc_6841e7901c4c819bb05a1633e0cd18ea0a12746708b3d77e', 'status': 'completed'}]"
+            },
+            {
+              "msg_class": "ToolResponseMessage",
+              "role": "function_call_output",
+              "content": "The satellite FAIR1M imagery is loaded. Num images: 708.",
+              "prompt_tokens": null,
+              "cached_tokens": null,
+              "completion_tokens": null,
+              "total_tokens": null,
+              "time_elapsed": 0.0264,
+              "source": "query_dataset_images",
+              "tool_calls": null,
+              "message": "{'type': 'function_call_output', 'call_id': 'call_3etqEWM4jBjArpp5oP5NRiWQ', 'output': 'The satellite FAIR1M imagery is loaded. Num images: 708.'}"
+            },
+            {
+              "msg_class": "ChatResponseMessage",
+              "role": "assistant",
+              "content": "I found a total of 708 FAIR1M images from July 2017. If you need more information or specific actions regarding these images, just let me know!",
+              "prompt_tokens": 450,
+              "cached_tokens": 0,
+              "completion_tokens": 36,
+              "total_tokens": 486,
+              "time_elapsed": 1.2889,
+              "source": {
+                "client_class": "OpenAIClient",
+                "model": "gpt-4o-mini"
+              },
+              "tool_calls": null,
+              "message": "[{'id': 'msg_6841e7915658819b999eb8590fbc20290a12746708b3d77e', 'content': [{'annotations': [], 'text': 'I found a total of 708 FAIR1M images from July 2017. If you need more information or specific actions regarding these images, just let me know!', 'type': 'output_text'}], 'role': 'assistant', 'status': 'completed', 'type': 'message'}]"
+            },
+            {
+              "msg_class": "TextMessage",
+              "role": "user",
+              "content": "Run the Swin-L detector on xView1 images.",
+              "prompt_tokens": null,
+              "cached_tokens": null,
+              "completion_tokens": null,
+              "total_tokens": null,
+              "time_elapsed": null,
+              "source": "user",
+              "tool_calls": null
+            },
+            {
+              "msg_class": "ToolCallRequestMessage",
+              "role": "assistant",
+              "content": null,
+              "prompt_tokens": 357,
+              "cached_tokens": 0,
+              "completion_tokens": 25,
+              "total_tokens": 382,
+              "time_elapsed": 1.4256,
+              "source": {
+                "client_class": "OpenAIClient",
+                "model": "gpt-4o-mini"
+              },
+              "tool_calls": [
+                {
+                  "type": "ToolCall",
+                  "id": "call_kW6p5CSzPrMgG5iojiF6kwr2",
+                  "name": "run_detector",
+                  "arguments": "{\"dataset\":\"xView1\",\"detector_name\":\"Swin-L\"}",
+                  "tool_type": "function_call"
+                }
+              ],
+              "message": "[{'arguments': '{\"dataset\":\"xView1\",\"detector_name\":\"Swin-L\"}', 'call_id': 'call_kW6p5CSzPrMgG5iojiF6kwr2', 'name': 'run_detector', 'type': 'function_call', 'id': 'fc_6841e792e04c819b99312135e7436f160a12746708b3d77e', 'status': 'completed'}]"
+            },
+            {
+              "msg_class": "ToolResponseMessage",
+              "role": "function_call_output",
+              "content": "Detection has successfully completed with model Swin-L on 279 xView1 images.",
+              "prompt_tokens": null,
+              "cached_tokens": null,
+              "completion_tokens": null,
+              "total_tokens": null,
+              "time_elapsed": 2.2381,
+              "source": "run_detector",
+              "tool_calls": null,
+              "message": "{'type': 'function_call_output', 'call_id': 'call_kW6p5CSzPrMgG5iojiF6kwr2', 'output': 'Detection has successfully completed with model Swin-L on 279 xView1 images.'}"
+            },
+            {
+              "msg_class": "ChatResponseMessage",
+              "role": "assistant",
+              "content": "The Swin-L detector has successfully processed all 279 xView1 images. If you need further analysis or specific results from the detection, feel free to ask!",
+              "prompt_tokens": 407,
+              "cached_tokens": 0,
+              "completion_tokens": 35,
+              "total_tokens": 442,
+              "time_elapsed": 1.4466,
+              "source": {
+                "client_class": "OpenAIClient",
+                "model": "gpt-4o-mini"
+              },
+              "tool_calls": null,
+              "message": "[{'id': 'msg_6841e7965868819b977a60bcbc7382020a12746708b3d77e', 'content': [{'annotations': [], 'text': 'The Swin-L detector has successfully processed all 279 xView1 images. If you need further analysis or specific results from the detection, feel free to ask!', 'type': 'output_text'}], 'role': 'assistant', 'status': 'completed', 'type': 'message'}]"
+            },
+            {
+              "msg_class": "TextMessage",
+              "role": "user",
+              "content": "Run the Swin-L detector on FAIR1M images.",
+              "prompt_tokens": null,
+              "cached_tokens": null,
+              "completion_tokens": null,
+              "total_tokens": null,
+              "time_elapsed": null,
+              "source": "user",
+              "tool_calls": null
+            },
+            {
+              "msg_class": "ToolCallRequestMessage",
+              "role": "assistant",
+              "content": null,
+              "prompt_tokens": 460,
+              "cached_tokens": 0,
+              "completion_tokens": 26,
+              "total_tokens": 486,
+              "time_elapsed": 1.0922,
+              "source": {
+                "client_class": "OpenAIClient",
+                "model": "gpt-4o-mini"
+              },
+              "tool_calls": [
+                {
+                  "type": "ToolCall",
+                  "id": "call_z7YodQtbl0SQVuve6EnnUgJ0",
+                  "name": "run_detector",
+                  "arguments": "{\"dataset\":\"FAIR1M\",\"detector_name\":\"Swin-L\"}",
+                  "tool_type": "function_call"
+                }
+              ],
+              "message": "[{'arguments': '{\"dataset\":\"FAIR1M\",\"detector_name\":\"Swin-L\"}', 'call_id': 'call_z7YodQtbl0SQVuve6EnnUgJ0', 'name': 'run_detector', 'type': 'function_call', 'id': 'fc_6841e797d4ac819bb461901f64a5ab9a0a12746708b3d77e', 'status': 'completed'}]"
+            },
+            {
+              "msg_class": "ToolResponseMessage",
+              "role": "function_call_output",
+              "content": "Detection has successfully completed with model Swin-L on 708 FAIR1M images.",
+              "prompt_tokens": null,
+              "cached_tokens": null,
+              "completion_tokens": null,
+              "total_tokens": null,
+              "time_elapsed": 0.3058,
+              "source": "run_detector",
+              "tool_calls": null,
+              "message": "{'type': 'function_call_output', 'call_id': 'call_z7YodQtbl0SQVuve6EnnUgJ0', 'output': 'Detection has successfully completed with model Swin-L on 708 FAIR1M images.'}"
+            },
+            {
+              "msg_class": "ChatResponseMessage",
+              "role": "assistant",
+              "content": "The Swin-L detector has successfully processed all 708 FAIR1M images. If you need any specific results or further actions, just let me know!",
+              "prompt_tokens": 511,
+              "cached_tokens": 0,
+              "completion_tokens": 33,
+              "total_tokens": 544,
+              "time_elapsed": 2.2998,
+              "source": {
+                "client_class": "OpenAIClient",
+                "model": "gpt-4o-mini"
+              },
+              "tool_calls": null,
+              "message": "[{'id': 'msg_6841e79a4aac819bb2f5da4198ce7f500a12746708b3d77e', 'content': [{'annotations': [], 'text': 'The Swin-L detector has successfully processed all 708 FAIR1M images. If you need any specific results or further actions, just let me know!', 'type': 'output_text'}], 'role': 'assistant', 'status': 'completed', 'type': 'message'}]"
+            },
+            {
+              "msg_class": "TextMessage",
+              "role": "user",
+              "content": "Plot detections of the Van category from FAIR1M images.",
+              "prompt_tokens": null,
+              "cached_tokens": null,
+              "completion_tokens": null,
+              "total_tokens": null,
+              "time_elapsed": null,
+              "source": "user",
+              "tool_calls": null
+            },
+            {
+              "msg_class": "ToolCallRequestMessage",
+              "role": "assistant",
+              "content": null,
+              "prompt_tokens": 765,
+              "cached_tokens": 0,
+              "completion_tokens": 40,
+              "total_tokens": 805,
+              "time_elapsed": 1.6724,
+              "source": {
+                "client_class": "OpenAIClient",
+                "model": "gpt-4o-mini"
+              },
+              "tool_calls": [
+                {
+                  "type": "ToolCall",
+                  "id": "call_toaw8GXH5DqUuLlMdhJg6TBo",
+                  "name": "plot_detections_catergory_scatter_map",
+                  "arguments": "{\"dataset\":\"FAIR1M\",\"detector_name\":\"Swin-L\",\"category_name\":\"Van\"}",
+                  "tool_type": "function_call"
+                }
+              ],
+              "message": "[{'arguments': '{\"dataset\":\"FAIR1M\",\"detector_name\":\"Swin-L\",\"category_name\":\"Van\"}', 'call_id': 'call_toaw8GXH5DqUuLlMdhJg6TBo', 'name': 'plot_detections_catergory_scatter_map', 'type': 'function_call', 'id': 'fc_6841e79bda54819b879bb83bd39a801d0a12746708b3d77e', 'status': 'completed'}]"
+            },
+            {
+              "msg_class": "ToolResponseMessage",
+              "role": "function_call_output",
+              "content": "Scatter plot added with 5711 Van detections with detector Swin-L for dataset FAIR1M.",
+              "prompt_tokens": null,
+              "cached_tokens": null,
+              "completion_tokens": null,
+              "total_tokens": null,
+              "time_elapsed": 0.2144,
+              "source": "plot_detections_catergory_scatter_map",
+              "tool_calls": null,
+              "message": "{'type': 'function_call_output', 'call_id': 'call_toaw8GXH5DqUuLlMdhJg6TBo', 'output': 'Scatter plot added with 5711 Van detections with detector Swin-L for dataset FAIR1M.'}"
+            },
+            {
+              "msg_class": "ChatResponseMessage",
+              "role": "assistant",
+              "content": "The scatter plot has been created, showing 5,711 detections of the \"Van\" category from the FAIR1M images using the Swin-L detector. If you need further analysis or additional plots, let me know!",
+              "prompt_tokens": 843,
+              "cached_tokens": 0,
+              "completion_tokens": 48,
+              "total_tokens": 891,
+              "time_elapsed": 1.8623,
+              "source": {
+                "client_class": "OpenAIClient",
+                "model": "gpt-4o-mini"
+              },
+              "tool_calls": null,
+              "message": "[{'id': 'msg_6841e79db3f4819b92f4ceb9f3c759b80a12746708b3d77e', 'content': [{'annotations': [], 'text': 'The scatter plot has been created, showing 5,711 detections of the \"Van\" category from the FAIR1M images using the Swin-L detector. If you need further analysis or additional plots, let me know!', 'type': 'output_text'}], 'role': 'assistant', 'status': 'completed', 'type': 'message'}]"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "model_client": {
+    "client_class": "OpenAIClient",
+    "model": "gpt-4o-mini",
+    "temperature": 0.1
+  }
+}

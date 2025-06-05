@@ -1,0 +1,321 @@
+{
+  "tasks": [
+    {
+      "queries": [
+        "./prompt_tests/benchmark/geo_{i}/query.txt"
+      ],
+      "rounds": [
+        {
+          "query": "./prompt_tests/benchmark/geo_{i}/query.txt",
+          "messages": [
+            {
+              "msg_class": "TextMessage",
+              "role": "user",
+              "content": "Fetch images from the FAIR1M dataset filtered for Greece from the 2nd half of 2012.",
+              "prompt_tokens": null,
+              "cached_tokens": null,
+              "completion_tokens": null,
+              "total_tokens": null,
+              "time_elapsed": null,
+              "source": "user",
+              "tool_calls": null
+            },
+            {
+              "msg_class": "ToolCallRequestMessage",
+              "role": "assistant",
+              "content": null,
+              "prompt_tokens": 284,
+              "cached_tokens": 0,
+              "completion_tokens": 70,
+              "total_tokens": 354,
+              "time_elapsed": 2.0356,
+              "source": {
+                "client_class": "OpenAIClient",
+                "model": "gpt-4o-mini"
+              },
+              "tool_calls": [
+                {
+                  "type": "ToolCall",
+                  "id": "call_p0P50RGGHh0qMKQHSLAzABTz",
+                  "name": "query_images_by_aoi_coords",
+                  "arguments": "{\"dataset\":\"FAIR1M\",\"lat_min\":34.0,\"lat_max\":42.0,\"lon_min\":19.0,\"lon_max\":28.0,\"start_date\":\"2012-07-01\",\"end_date\":\"2012-12-31\"}",
+                  "tool_type": "function_call"
+                }
+              ],
+              "message": "[{'arguments': '{\"dataset\":\"FAIR1M\",\"lat_min\":34.0,\"lat_max\":42.0,\"lon_min\":19.0,\"lon_max\":28.0,\"start_date\":\"2012-07-01\",\"end_date\":\"2012-12-31\"}', 'call_id': 'call_p0P50RGGHh0qMKQHSLAzABTz', 'name': 'query_images_by_aoi_coords', 'type': 'function_call', 'id': 'fc_6841ef61c3c881988d924e94927a16270d9a7eea819a4f0b', 'status': 'completed'}]"
+            },
+            {
+              "msg_class": "ToolResponseMessage",
+              "role": "function_call_output",
+              "content": "No images found (images GeoDataFrame is empty). No areas with available imagery for the specified user criteria.",
+              "prompt_tokens": null,
+              "cached_tokens": null,
+              "completion_tokens": null,
+              "total_tokens": null,
+              "time_elapsed": 0.0884,
+              "source": "query_images_by_aoi_coords",
+              "tool_calls": null,
+              "message": "{'type': 'function_call_output', 'call_id': 'call_p0P50RGGHh0qMKQHSLAzABTz', 'output': 'No images found (images GeoDataFrame is empty). No areas with available imagery for the specified user criteria.'}"
+            },
+            {
+              "msg_class": "ChatResponseMessage",
+              "role": "assistant",
+              "content": "It appears that there are no images available from the FAIR1M dataset for Greece during the second half of 2012. If you have any other specific requests or need images from a different time period or dataset, please let me know!",
+              "prompt_tokens": 388,
+              "cached_tokens": 0,
+              "completion_tokens": 50,
+              "total_tokens": 438,
+              "time_elapsed": 1.3342,
+              "source": {
+                "client_class": "OpenAIClient",
+                "model": "gpt-4o-mini"
+              },
+              "tool_calls": null,
+              "message": "[{'id': 'msg_6841ef6376508198914895cf3248cd710d9a7eea819a4f0b', 'content': [{'annotations': [], 'text': 'It appears that there are no images available from the FAIR1M dataset for Greece during the second half of 2012. If you have any other specific requests or need images from a different time period or dataset, please let me know!', 'type': 'output_text'}], 'role': 'assistant', 'status': 'completed', 'type': 'message'}]"
+            },
+            {
+              "msg_class": "TextMessage",
+              "role": "user",
+              "content": "Fetch images from the BigEarthNet dataset filtered for Greece from the 2nd half of 2012.",
+              "prompt_tokens": null,
+              "cached_tokens": null,
+              "completion_tokens": null,
+              "total_tokens": null,
+              "time_elapsed": null,
+              "source": "user",
+              "tool_calls": null
+            },
+            {
+              "msg_class": "ToolCallRequestMessage",
+              "role": "assistant",
+              "content": null,
+              "prompt_tokens": 466,
+              "cached_tokens": 0,
+              "completion_tokens": 69,
+              "total_tokens": 535,
+              "time_elapsed": 1.687,
+              "source": {
+                "client_class": "OpenAIClient",
+                "model": "gpt-4o-mini"
+              },
+              "tool_calls": [
+                {
+                  "type": "ToolCall",
+                  "id": "call_h5ZWj55BUpJXu4jMadl3w8SQ",
+                  "name": "query_images_by_aoi_coords",
+                  "arguments": "{\"dataset\":\"BigEarthNet\",\"lat_min\":34.0,\"lat_max\":42.0,\"lon_min\":19.0,\"lon_max\":28.0,\"start_date\":\"2012-07-01\",\"end_date\":\"2012-12-31\"}",
+                  "tool_type": "function_call"
+                }
+              ],
+              "message": "[{'arguments': '{\"dataset\":\"BigEarthNet\",\"lat_min\":34.0,\"lat_max\":42.0,\"lon_min\":19.0,\"lon_max\":28.0,\"start_date\":\"2012-07-01\",\"end_date\":\"2012-12-31\"}', 'call_id': 'call_h5ZWj55BUpJXu4jMadl3w8SQ', 'name': 'query_images_by_aoi_coords', 'type': 'function_call', 'id': 'fc_6841ef6505cc8198b59a94aa6fe7cd020d9a7eea819a4f0b', 'status': 'completed'}]"
+            },
+            {
+              "msg_class": "ToolResponseMessage",
+              "role": "function_call_output",
+              "content": "No images found (images GeoDataFrame is empty). No areas with available imagery for the specified user criteria.",
+              "prompt_tokens": null,
+              "cached_tokens": null,
+              "completion_tokens": null,
+              "total_tokens": null,
+              "time_elapsed": 0.4962,
+              "source": "query_images_by_aoi_coords",
+              "tool_calls": null,
+              "message": "{'type': 'function_call_output', 'call_id': 'call_h5ZWj55BUpJXu4jMadl3w8SQ', 'output': 'No images found (images GeoDataFrame is empty). No areas with available imagery for the specified user criteria.'}"
+            },
+            {
+              "msg_class": "ChatResponseMessage",
+              "role": "assistant",
+              "content": "It seems there are no images available from the BigEarthNet dataset for Greece during the second half of 2012 either. If you would like to explore other datasets, time periods, or locations, please let me know!",
+              "prompt_tokens": 569,
+              "cached_tokens": 0,
+              "completion_tokens": 47,
+              "total_tokens": 616,
+              "time_elapsed": 1.3119,
+              "source": {
+                "client_class": "OpenAIClient",
+                "model": "gpt-4o-mini"
+              },
+              "tool_calls": null,
+              "message": "[{'id': 'msg_6841ef6702a88198a9006595a268f8620d9a7eea819a4f0b', 'content': [{'annotations': [], 'text': 'It seems there are no images available from the BigEarthNet dataset for Greece during the second half of 2012 either. If you would like to explore other datasets, time periods, or locations, please let me know!', 'type': 'output_text'}], 'role': 'assistant', 'status': 'completed', 'type': 'message'}]"
+            },
+            {
+              "msg_class": "TextMessage",
+              "role": "user",
+              "content": "Fetch images from the xView1 dataset filtered for Greece from the 2nd half of 2012.",
+              "prompt_tokens": null,
+              "cached_tokens": null,
+              "completion_tokens": null,
+              "total_tokens": null,
+              "time_elapsed": null,
+              "source": "user",
+              "tool_calls": null
+            },
+            {
+              "msg_class": "ToolCallRequestMessage",
+              "role": "assistant",
+              "content": null,
+              "prompt_tokens": 644,
+              "cached_tokens": 0,
+              "completion_tokens": 69,
+              "total_tokens": 713,
+              "time_elapsed": 2.7453,
+              "source": {
+                "client_class": "OpenAIClient",
+                "model": "gpt-4o-mini"
+              },
+              "tool_calls": [
+                {
+                  "type": "ToolCall",
+                  "id": "call_ipaLloscyZNf2LjEhib7f6OA",
+                  "name": "query_images_by_aoi_coords",
+                  "arguments": "{\"dataset\":\"xView1\",\"lat_min\":34.0,\"lat_max\":42.0,\"lon_min\":19.0,\"lon_max\":28.0,\"start_date\":\"2012-07-01\",\"end_date\":\"2012-12-31\"}",
+                  "tool_type": "function_call"
+                }
+              ],
+              "message": "[{'arguments': '{\"dataset\":\"xView1\",\"lat_min\":34.0,\"lat_max\":42.0,\"lon_min\":19.0,\"lon_max\":28.0,\"start_date\":\"2012-07-01\",\"end_date\":\"2012-12-31\"}', 'call_id': 'call_ipaLloscyZNf2LjEhib7f6OA', 'name': 'query_images_by_aoi_coords', 'type': 'function_call', 'id': 'fc_6841ef68697c819894678f207de21e6a0d9a7eea819a4f0b', 'status': 'completed'}]"
+            },
+            {
+              "msg_class": "ToolResponseMessage",
+              "role": "function_call_output",
+              "content": "No images found (images GeoDataFrame is empty). No areas with available imagery for the specified user criteria.",
+              "prompt_tokens": null,
+              "cached_tokens": null,
+              "completion_tokens": null,
+              "total_tokens": null,
+              "time_elapsed": 0.0103,
+              "source": "query_images_by_aoi_coords",
+              "tool_calls": null,
+              "message": "{'type': 'function_call_output', 'call_id': 'call_ipaLloscyZNf2LjEhib7f6OA', 'output': 'No images found (images GeoDataFrame is empty). No areas with available imagery for the specified user criteria.'}"
+            },
+            {
+              "msg_class": "ChatResponseMessage",
+              "role": "assistant",
+              "content": "Unfortunately, there are no images available from the xView1 dataset for Greece during the second half of 2012. If you have other datasets, time frames, or locations in mind, feel free to let me know!",
+              "prompt_tokens": 747,
+              "cached_tokens": 0,
+              "completion_tokens": 47,
+              "total_tokens": 794,
+              "time_elapsed": 1.5127,
+              "source": {
+                "client_class": "OpenAIClient",
+                "model": "gpt-4o-mini"
+              },
+              "tool_calls": null,
+              "message": "[{'id': 'msg_6841ef6b21d08198ab8308b469ba88d90d9a7eea819a4f0b', 'content': [{'annotations': [], 'text': 'Unfortunately, there are no images available from the xView1 dataset for Greece during the second half of 2012. If you have other datasets, time frames, or locations in mind, feel free to let me know!', 'type': 'output_text'}], 'role': 'assistant', 'status': 'completed', 'type': 'message'}]"
+            },
+            {
+              "msg_class": "TextMessage",
+              "role": "user",
+              "content": "Plot the fetched images from FAIR1M, BigEarthNet, and xView1 on the map.",
+              "prompt_tokens": null,
+              "cached_tokens": null,
+              "completion_tokens": null,
+              "total_tokens": null,
+              "time_elapsed": null,
+              "source": "user",
+              "tool_calls": null
+            },
+            {
+              "msg_class": "ToolCallRequestMessage",
+              "role": "assistant",
+              "content": null,
+              "prompt_tokens": 876,
+              "cached_tokens": 0,
+              "completion_tokens": 75,
+              "total_tokens": 951,
+              "time_elapsed": 2.1543,
+              "source": {
+                "client_class": "OpenAIClient",
+                "model": "gpt-4o-mini"
+              },
+              "tool_calls": [
+                {
+                  "type": "ToolCall",
+                  "id": "call_3qL0JNvceTUNoGk9j5Esyqb7",
+                  "name": "plot_images_scatter_map",
+                  "arguments": "{\"dataset\":\"FAIR1M\"}",
+                  "tool_type": "function_call"
+                },
+                {
+                  "type": "ToolCall",
+                  "id": "call_KSY1K7T8b8q3qq3wTa2VzVv9",
+                  "name": "plot_images_scatter_map",
+                  "arguments": "{\"dataset\":\"BigEarthNet\"}",
+                  "tool_type": "function_call"
+                },
+                {
+                  "type": "ToolCall",
+                  "id": "call_RSjISjUDaqZ1mEV8J737zXEh",
+                  "name": "plot_images_scatter_map",
+                  "arguments": "{\"dataset\":\"xView1\"}",
+                  "tool_type": "function_call"
+                }
+              ],
+              "message": "[{'arguments': '{\"dataset\":\"FAIR1M\"}', 'call_id': 'call_3qL0JNvceTUNoGk9j5Esyqb7', 'name': 'plot_images_scatter_map', 'type': 'function_call', 'id': 'fc_6841ef6ce76481988dc7f78ce8ad5f270d9a7eea819a4f0b', 'status': 'completed'}, {'arguments': '{\"dataset\":\"BigEarthNet\"}', 'call_id': 'call_KSY1K7T8b8q3qq3wTa2VzVv9', 'name': 'plot_images_scatter_map', 'type': 'function_call', 'id': 'fc_6841ef6d515481988ef0162bba93e9d80d9a7eea819a4f0b', 'status': 'completed'}, {'arguments': '{\"dataset\":\"xView1\"}', 'call_id': 'call_RSjISjUDaqZ1mEV8J737zXEh', 'name': 'plot_images_scatter_map', 'type': 'function_call', 'id': 'fc_6841ef6da6948198a0324011d2ead71b0d9a7eea819a4f0b', 'status': 'completed'}]"
+            },
+            {
+              "msg_class": "ToolResponseMessage",
+              "role": "function_call_output",
+              "content": "No images loaded (images GeoDataFrame is None). Make sure to query images first for the specified user criteria.",
+              "prompt_tokens": null,
+              "cached_tokens": null,
+              "completion_tokens": null,
+              "total_tokens": null,
+              "time_elapsed": 0.0,
+              "source": "plot_images_scatter_map",
+              "tool_calls": null,
+              "message": "{'type': 'function_call_output', 'call_id': 'call_3qL0JNvceTUNoGk9j5Esyqb7', 'output': 'No images loaded (images GeoDataFrame is None). Make sure to query images first for the specified user criteria.'}"
+            },
+            {
+              "msg_class": "ToolResponseMessage",
+              "role": "function_call_output",
+              "content": "No images loaded (images GeoDataFrame is None). Make sure to query images first for the specified user criteria.",
+              "prompt_tokens": null,
+              "cached_tokens": null,
+              "completion_tokens": null,
+              "total_tokens": null,
+              "time_elapsed": 0.0,
+              "source": "plot_images_scatter_map",
+              "tool_calls": null,
+              "message": "{'type': 'function_call_output', 'call_id': 'call_KSY1K7T8b8q3qq3wTa2VzVv9', 'output': 'No images loaded (images GeoDataFrame is None). Make sure to query images first for the specified user criteria.'}"
+            },
+            {
+              "msg_class": "ToolResponseMessage",
+              "role": "function_call_output",
+              "content": "No images loaded (images GeoDataFrame is None). Make sure to query images first for the specified user criteria.",
+              "prompt_tokens": null,
+              "cached_tokens": null,
+              "completion_tokens": null,
+              "total_tokens": null,
+              "time_elapsed": 0.0,
+              "source": "plot_images_scatter_map",
+              "tool_calls": null,
+              "message": "{'type': 'function_call_output', 'call_id': 'call_RSjISjUDaqZ1mEV8J737zXEh', 'output': 'No images loaded (images GeoDataFrame is None). Make sure to query images first for the specified user criteria.'}"
+            },
+            {
+              "msg_class": "ChatResponseMessage",
+              "role": "assistant",
+              "content": "Since there were no images found in the FAIR1M, BigEarthNet, or xView1 datasets for Greece during the second half of 2012, I cannot plot any images on the map. \n\nIf you have other datasets, time periods, or locations you'd like to explore, please let me know!",
+              "prompt_tokens": 1030,
+              "cached_tokens": 808,
+              "completion_tokens": 65,
+              "total_tokens": 1095,
+              "time_elapsed": 1.719,
+              "source": {
+                "client_class": "OpenAIClient",
+                "model": "gpt-4o-mini"
+              },
+              "tool_calls": null,
+              "message": "[{'id': 'msg_6841ef6ebfa48198923d549384b4c6d40d9a7eea819a4f0b', 'content': [{'annotations': [], 'text': \"Since there were no images found in the FAIR1M, BigEarthNet, or xView1 datasets for Greece during the second half of 2012, I cannot plot any images on the map. \\n\\nIf you have other datasets, time periods, or locations you'd like to explore, please let me know!\", 'type': 'output_text'}], 'role': 'assistant', 'status': 'completed', 'type': 'message'}]"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "model_client": {
+    "client_class": "OpenAIClient",
+    "model": "gpt-4o-mini",
+    "temperature": 0.1
+  }
+}

@@ -209,16 +209,11 @@ class AssistantAgent(BaseAgent):
             else:
                 print(f"\nProcessing task {task_id} with objective: {task['objective']}")
                 handoff_agent = agents[task['agent']]
-                # self.log(f"Processing {task_id}.")
-                # context = get_context(task_id, workflow)
-                # downstream_objectives = get_downstream_objectives(task_id, workflow)
-                # content = format_content(task['objective'], context, downstream_objectives)
                 content = task['objective']
                 text_message = TextMessage(role='user', content=content, source='user')
                 print(f"\nText message: {text_message}\n")
                 self.messages.add_message(text_message)
                 handoff_agent.messages.add_message(text_message)
-                # print(f"User message:\n{self.messages}")
                 response = handoff_agent.get_response_workflow(task_id, workflow)
                 print(f"\nResponse: {response}\n")
                 self.messages.add_message(response)

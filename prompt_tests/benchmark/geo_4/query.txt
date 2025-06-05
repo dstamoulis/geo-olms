@@ -1,0 +1,1 @@
+Fetch xView1 images from Greece. Then run the Swin-L detector and plot the detections of category Passenger Vehicle!

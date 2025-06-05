@@ -51,8 +51,8 @@ def load_json_file(file_path):
          return None
     
 
-def main(args, workflow=None):
-    
+def main(args, workflow=None, query="No query provided"):
+
     model_client = BaseClient.from_cfg({
             "client": "openai",      # Options: "openai", "ollama", "vllm"
             "model": "gpt-4o-mini",    # Model name, e.g., "gpt-4o-mini" or "llama3.3:70b" for ollama
@@ -104,7 +104,6 @@ def main(args, workflow=None):
         "In the above case, you will return \"COMPLETED\"." \
     )
 
-    # Solving with an agent!
     # process tasks for StateFlow
     task_queue = deque()
     for task in workflow.values():
@@ -112,6 +111,8 @@ def main(args, workflow=None):
     state_queue = deque([database_agent, detector_agent, map_agent])
 
     platform = Platform(model_client, messages, database, vision, map_tools, verifier_agent)
+    agent_run = AgentRun(platform, results_output_file='./results/single_agent_test.json')
+
     start_time = time.time()
     response = platform.agent.run_stateflow(
         task_queue=task_queue,
@@ -125,13 +126,18 @@ def main(args, workflow=None):
     print(platform.database.images_gdf)
     print(platform.vision.detections_gdf)
 
-    # agent_run.add_task_result(AgentTask(queries=[query], rounds=[{"query": query, "messages": platform.messages.to_list_dict()}]))
-    # agent_run.save_inference_results()
-    # platform.reset()
+    agent_run.add_task_result(AgentTask(queries=[query], rounds=[{"query": query, "messages": platform.messages.to_list_dict()}]))
+    agent_run.save_inference_results()
+    platform.reset()
 
 if __name__ == "__main__":
+    i = 0
     parser = argparse.ArgumentParser(description='geo-olm agent')
     parser.add_argument('--api', default='ChatCompletion', help='choose between Responses and ChatCompletion')
     args = parser.parse_args()
-    geo_flow = load_json_file('./workflows/geo_1/init_2.json')['tasks']
-    main(args, geo_flow)
+
+    geo_path = f'./prompt_tests/benchmark/geo_{i}'
+    geo_flow = load_json_file(geo_path + '/flow.json')['tasks']
+    with open(geo_path + f"/query.txt", "r") as f:
+        query = f.read()
+    main(args, geo_flow, query)

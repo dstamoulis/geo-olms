@@ -1,0 +1,1 @@
+First, let's load the xView1 images from Signapore for Summer 2017, but please make sure you consider a wide area. Then run the Swin-L detector. Based on the detection counts, which category showed up with more objects in that area: 'Oil Tanker', 'Ferry', or 'Sailboat'? Thanks in advance for the help!

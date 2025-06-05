@@ -50,7 +50,7 @@ def load_json_file(file_path):
          return None
     
 
-def main(args, workflow=None, i=11):
+def main(args, workflow=None, query="No query provided"):
     
     model_client = BaseClient.from_cfg({
             "client": "openai",      # Options: "openai", "ollama", "vllm"
@@ -100,34 +100,12 @@ def main(args, workflow=None, i=11):
     # Solving with an agent!
     platform = Platform(model_client, messages, database, vision, map_tools, orch_agent)
     agent_run = AgentRun(platform, results_output_file=f'./results/geo_{i}_test.json')
-    query = 'Fetch xView1 images from Athens International Airport, Greece. Consider a wide area. Then run the Swin-L detector and finally please zoom the map there!'
-    query = 'Fetch xView1 and FAIR1M images from July 2017. Then run the Swin-L detector on each imagery source. '
-    query = 'Fetch xView1 and FAIR1M images from July 2017. Then run the Swin-L detector on each imagery source. Last, from FAIR1M, plot the detections of category Van.'
-    # query = "Fetch BigEarthNet images from June 2017. Then run the ResNet-32 LCC classifer on the images. Last, plot the LCC classes of category 'Non-irrigated arable land'."
-    # query = 'Fetch xView1 images from Greece. Then run the Swin-L detector and plot the detections of category Passenger Vehicle!' # init_2.json
-    # query = "Plot on the map the BigEarthNet, xView1 images in Germany from 2nd half of 2017"
-    # query = "Plot on the map the xView1 images in Dar es-Salam, Tanzania from Summer 2017! Make sure you consider a very very wide area!"
-    # query = "Fetch BigEarthNet in Switzerland for and run the ResNet-32 classifier. Please plot on the map the 'Vineyards' and 'Fruit trees and berry plantations' LCC classes"
-    # query = "Zoom the map to the capital of UK please"
-    # query = "Tell me a joke please"
-    # query = "Fetch xView1 images from Athens International Airport, Greece."
-    query = "Zoom the map to the capital of UK please. What is the name of the capital?"
-    # query = "Fetch xView1 images from Greece. How many images we got?"
-    # query = "Run the YOLO-v6 LCC model on BigEarthNet from April 2018. How many 'Airports' LCC classification results we got?"
-    # query = "Plot on the map the FAIR1M, BigEarthNet, and xView1 images in Greece from 2nd half of 2012"
-    # query = "Let's start by getting the xView1 images from Prague, Czech Republic for Summer 2017. Consider a wide area. Then run the Swin-L detector. Last, can you please tell me how many 'Passenger Car' you got?"
-    # query = "Where is 39.3434\u00b0 N, 117.3616\u00b0 E? I want to see it on the map; please zoom there!"
-    # query = "First, let's load the xView1 images from Signapore for Summer 2017, but please make sure you consider a wide area. Then run the Swin-L detector. Based on the detection counts, which category showed up with more objects in that area: 'Oil Tanker', 'Ferry', or 'Sailboat'? Thanks in advance for the help!"
-    # query = "Fetch xView1 images from Turkey. How many images are there?"
 
     start_time = time.time()
-
     response = platform.agent.run_flowPP(
         {"database_agent": database_agent, "map_agent": map_agent, "detector_agent": detector_agent},
         workflow
     )
-    # response = platform.agent.run_query(query)
-    
     end_time = time.time()
     elapsed_time = round(end_time - start_time, 4)
     print("===elapsed time: ", elapsed_time, " s===")
@@ -142,10 +120,13 @@ def main(args, workflow=None, i=11):
 
 
 if __name__ == "__main__":
-    i = 2
+    i = 0
     parser = argparse.ArgumentParser(description='geo-olm agent')
     parser.add_argument('--api', default='ChatCompletion', help='choose between Responses and ChatCompletion')
     args = parser.parse_args()
 
-    geo_flow = load_json_file(f'./tests/geo_{i}.json')['tasks']
-    main(args, geo_flow, i)
+    geo_path = f'./prompt_tests/benchmark/geo_{i}'
+    geo_flow = load_json_file(geo_path + '/flow.json')['tasks']
+    with open(geo_path + f"/query.txt", "r") as f:
+        query = f.read()
+    main(args, geo_flow, query)

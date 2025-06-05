@@ -99,7 +99,7 @@ def main(args, workflow=None):
     # Solving with an agent!
     # platform = Platform(model_client, messages, database, vision, map_tools, single_agent)
     platform = Platform(model_client, messages, database, vision, map_tools, orch_agent)
-    agent_run = AgentRun(platform, results_output_file='./results/single_agent_test.json')
+    agent_run = AgentRun(platform, results_output_file='./results/geo_17_main.json')
     query = 'Fetch xView1 images from Athens International Airport, Greece. Consider a wide area. Then run the Swin-L detector and finally please zoom the map there!'
     # query = 'Fetch xView1 and FAIR1M images from July 2017. Then run the Swin-L detector on each imagery source. '
     # query = 'Fetch xView1 and FAIR1M images from July 2017. Then run the Swin-L detector on each imagery source. Last, from FAIR1M, plot the detections of category Van.'
@@ -150,5 +150,5 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='geo-olm agent')
     parser.add_argument('--api', default='ChatCompletion', help='choose between Responses and ChatCompletion')
     args = parser.parse_args()
-    geo_flow = load_json_file('./prompt_test/benchmark/geo_0/flow.json')['tasks']
+    geo_flow = load_json_file('./tests/geo_11.json')['tasks']
     main(args, geo_flow)

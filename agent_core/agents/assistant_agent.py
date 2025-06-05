@@ -206,7 +206,7 @@ class AssistantAgent(BaseAgent):
         for task_id, task in workflow.items():
             # print(f'task_id: {task_id}, task: {task}')
             agent_calls += f"{task_id}: {task["objective"]}, agent: {task["agent"]}\n"
-        agent_calls += f"Here is the dict_keys of available agents: {agents.keys()}. For each task, match it with an agent that is strictly in the dict_keys, make a guess if you need. Then just return only the one-to-one result in this format: task_num: agent_name"
+        agent_calls += f"Here is the list of available agents: {list(agents.keys())}. For each task, match it with an agent that is strictly in the list, make a guess if you need but make sure it's in the list. Then just return only the one-to-one result in this format: task_num: agent_name"
         print(f"************************ agent_calls: \n{agent_calls}")
         agent_match = self.model_client.get_response_Response(agent_calls)
         print(f"---------------------Agent match response: \n{agent_match.content}")

@@ -141,7 +141,7 @@ def main(args, workflow=None, i=11):
 
 
 if __name__ == "__main__":
-    i = 14
+    i = 17
     parser = argparse.ArgumentParser(description='geo-olm agent')
     parser.add_argument('--api', default='ChatCompletion', help='choose between Responses and ChatCompletion')
     args = parser.parse_args()

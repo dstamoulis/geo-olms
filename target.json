@@ -1,43 +1,56 @@
 {
   "task0": {
     "id": "task0",
-    "objective": "Fetch images from the xView1 dataset for Singapore during Summer 2017, focusing on a wide area.",
+    "objective": "Fetch images from the FAIR1M dataset filtered for Greece from the 2nd half of 2012.",
     "agent_id": 0,
     "next": [
       "task1"
     ],
     "prev": [],
     "status": "pending",
-    "history": "I found a total of 748 images from the xView1 dataset for Singapore during Summer 2017. If you need specific details or further analysis on these images, let me know!",
+    "history": "It appears that there are no images available from the FAIR1M dataset for Greece during the second half of 2012. If you have another dataset or a different time frame in mind, please let me know!",
     "remaining_dependencies": 0,
     "agent": "database_agent"
   },
   "task1": {
     "id": "task1",
-    "objective": "Run the Swin-L detector on the xView1 images to detect Oil Tankers, Ferries, and Sailboats.",
+    "objective": "Fetch images from the BigEarthNet dataset filtered for Greece from the 2nd half of 2012.",
     "agent_id": 1,
     "next": [
       "task2"
     ],
-    "prev": [
-      "task0"
-    ],
+    "prev": [],
     "status": "pending",
-    "history": "The Swin-L detector has successfully processed all 748 xView1 images, detecting Oil Tankers, Ferries, and Sailboats. If you need specific results or further analysis, just let me know!",
-    "remaining_dependencies": 1,
-    "agent": "detector_agent"
+    "history": "It seems there are also no images available from the BigEarthNet dataset for Greece during the second half of 2012. If you would like to explore a different dataset or time period, please let me know!",
+    "remaining_dependencies": 0,
+    "agent": "database_agent"
   },
   "task2": {
     "id": "task2",
-    "objective": "Analyze detection counts from the Swin-L detector to determine which category (Oil Tanker, Ferry, Sailboat) has the highest count in the analyzed area.",
+    "objective": "Fetch images from the xView1 dataset filtered for Greece from the 2nd half of 2012.",
     "agent_id": 2,
+    "next": [
+      "task3"
+    ],
+    "prev": [],
+    "status": "pending",
+    "history": "There are no images available from the xView1 dataset for Greece during the second half of 2012 either. If you have another dataset or a different time frame in mind, please let me know!",
+    "remaining_dependencies": 0,
+    "agent": "database_agent"
+  },
+  "task3": {
+    "id": "task3",
+    "objective": "Plot the fetched images from FAIR1M, BigEarthNet, and xView1 on the map.",
+    "agent_id": 3,
     "next": [],
     "prev": [
-      "task1"
+      "task0",
+      "task1",
+      "task2"
     ],
     "status": "pending",
-    "history": "The detection counts for Oil Tankers, Ferries, and Sailboats have been analyzed. Here are the results:\n\n- **Oil Tankers:** [Count]\n- **Ferries:** [Count]\n- **Sailboats:** [Count]\n\nPlease provide the specific counts for each category, and I can help determine which has the highest count.",
-    "remaining_dependencies": 1,
-    "agent": "analysis_agent"
+    "history": "Since there were no images found in the FAIR1M, BigEarthNet, or xView1 datasets for Greece during the second half of 2012, I cannot plot any images on the map. \n\nIf you have another dataset, time frame, or area in mind, please let me know!",
+    "remaining_dependencies": 3,
+    "agent": "map_agent"
   }
 }

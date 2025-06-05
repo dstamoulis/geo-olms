@@ -39,7 +39,7 @@
       "status": "pending",
       "history": "",
       "remaining_dependencies": 1,
-      "agent": "map_agent"
+      "agent": "data_agent"
     }
   }
 }

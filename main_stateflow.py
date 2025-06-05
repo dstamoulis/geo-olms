@@ -131,7 +131,7 @@ def main(args, workflow=None, query="No query provided"):
     platform.reset()
 
 if __name__ == "__main__":
-    i = 0
+    i = 8
     parser = argparse.ArgumentParser(description='geo-olm agent')
     parser.add_argument('--api', default='ChatCompletion', help='choose between Responses and ChatCompletion')
     args = parser.parse_args()

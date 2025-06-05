@@ -88,13 +88,13 @@ def main(args, workflow=None, query="No query provided"):
         toolsets_list=[vision],
         system_message="You are the detector agent!"
     )
-    data_agnet = SingleAgent(
+    data_agent = SingleAgent(
         api=args.api,
-        name="detector_agent",
+        name="data_agent",
         model_client=model_client,
         messages=messages,
         toolsets_list=[data_tools],
-        system_message="You are the detector agent!"
+        system_message="You are the data agent!"
     )
     orch_agent = SingleAgent(
         api=args.api,
@@ -115,16 +115,16 @@ def main(args, workflow=None, query="No query provided"):
     )
 
     # Solving with an agent!
-    # platform = Platform(model_client, messages, database, vision, map_tools, orch_agent)
-    platform = Platform(model_client, messages, database, vision, map_tools, single_agent)
+    platform = Platform(model_client, messages, database, vision, map_tools, orch_agent)
+    # platform = Platform(model_client, messages, database, vision, map_tools, single_agent)
     agent_run = AgentRun(platform, results_output_file='./results/single_agent_test.json')
     
     start_time = time.time()
-    response = platform.agent.run_query(query)
-    # response = platform.agent.run_workflow(
-    #     {"database_agent": database_agent, "map_agent": map_agent, "detector_agent": detector_agent},
-    #     workflow
-    # )
+    # response = platform.agent.run_query(query)
+    response = platform.agent.run_workflow(
+        {"database_agent": database_agent, "map_agent": map_agent, "detector_agent": detector_agent, "data_agent": data_agent},
+        workflow
+    )
     end_time = time.time()
     elapsed_time = round(end_time - start_time, 4)
     print("===elapsed time: ", elapsed_time, " s===")
@@ -138,7 +138,7 @@ def main(args, workflow=None, query="No query provided"):
     platform.reset()
 
 if __name__ == "__main__":
-    i = 8
+    i = 20
     parser = argparse.ArgumentParser(description='geo-olm agent')
     parser.add_argument('--api', default='ChatCompletion', help='choose between Responses and ChatCompletion')
     args = parser.parse_args()

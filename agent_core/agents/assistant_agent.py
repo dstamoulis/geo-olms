@@ -253,7 +253,7 @@ class AssistantAgent(BaseAgent):
         return response.content if ui_mode else response
     
     # ------------------------------------------------------------------------------
-    # Main loop for executing GeoFlow
+    # Main loop for executing Flow++
     def run_flowPP(self, agents: dict, workflow: dict, ui_mode=False):
         agent_calls = ""
         for task_id, task in workflow.items():

@@ -1,43 +1,57 @@
 {
   "task0": {
     "id": "task0",
-    "objective": "Fetch images from the xView1 dataset and filter the images specifically from Athens International Airport, Greece.",
+    "objective": "Fetch xView1 images from July 2017.",
     "agent_id": 0,
     "next": [
       "task1"
     ],
     "prev": [],
     "status": "pending",
-    "history": "There are no images available from the xView1 dataset for Athens International Airport, Greece, within the specified coordinates. If you have a different area of interest or dataset in mind, please let me know!",
+    "history": "I found a total of 279 xView1 images from July 2017. If you need more specific information or details about these images, please let me know!",
     "remaining_dependencies": 0,
     "agent": "database_agent"
   },
   "task1": {
     "id": "task1",
-    "objective": "Run the Swin-L detector on xView1 images to detect relevant objects.",
+    "objective": "Fetch FAIR1M images from July 2017.",
     "agent_id": 1,
     "next": [
-      "task2"
+      "task2",
+      "task3"
     ],
     "prev": [
       "task0"
     ],
     "status": "pending",
-    "history": "It appears that there are no images available in the xView1 dataset to run the Swin-L detector. If you have another dataset or area of interest in mind, please let me know!",
+    "history": "I found a total of 708 FAIR1M images from July 2017. If you need further details or specific information about these images, feel free to ask!",
     "remaining_dependencies": 1,
-    "agent": "detector_agent"
+    "agent": "database_agent"
   },
   "task2": {
     "id": "task2",
-    "objective": "Zoom the map to highlight the area around Athens International Airport using the Swin-L detection results.",
+    "objective": "Run the Swin-L detector on xView1 images.",
     "agent_id": 2,
+    "next": [],
+    "prev": [
+      "task0"
+    ],
+    "status": "pending",
+    "history": "The Swin-L detector has successfully completed its analysis on all 279 xView1 images. If you need any further information or results from the detection, please let me know!",
+    "remaining_dependencies": 1,
+    "agent": "detector_agent"
+  },
+  "task3": {
+    "id": "task3",
+    "objective": "Run the Swin-L detector on FAIR1M images.",
+    "agent_id": 3,
     "next": [],
     "prev": [
       "task1"
     ],
     "status": "pending",
-    "history": "The map has been zoomed in to highlight the area around Athens International Airport. If you need any further actions or visualizations, feel free to ask!",
+    "history": "The Swin-L detector has successfully completed its analysis on all 708 FAIR1M images. If you need any further information or results from the detection, please let me know!",
     "remaining_dependencies": 1,
-    "agent": "map_agent"
+    "agent": "detector_agent"
   }
 }

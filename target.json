@@ -1,43 +1,13 @@
 {
   "task0": {
     "id": "task0",
-    "objective": "Fetch images from the xView1 dataset and filter the images specifically from Athens International Airport, Greece.",
+    "objective": "Zoom the map to the capital of UK.",
     "agent_id": 0,
-    "next": [
-      "task1"
-    ],
+    "next": [],
     "prev": [],
     "status": "pending",
-    "history": "There are no images available from the xView1 dataset for Athens International Airport, Greece, within the specified coordinates. If you have a different area of interest or dataset in mind, please let me know!",
+    "history": "The map has been zoomed in to the capital of the UK, London.",
     "remaining_dependencies": 0,
-    "agent": "database_agent"
-  },
-  "task1": {
-    "id": "task1",
-    "objective": "Run the Swin-L detector on xView1 images to detect relevant objects.",
-    "agent_id": 1,
-    "next": [
-      "task2"
-    ],
-    "prev": [
-      "task0"
-    ],
-    "status": "pending",
-    "history": "It appears that there are no images available in the xView1 dataset to run the Swin-L detector. If you have another dataset or area of interest in mind, please let me know!",
-    "remaining_dependencies": 1,
-    "agent": "detector_agent"
-  },
-  "task2": {
-    "id": "task2",
-    "objective": "Zoom the map to highlight the area around Athens International Airport using the Swin-L detection results.",
-    "agent_id": 2,
-    "next": [],
-    "prev": [
-      "task1"
-    ],
-    "status": "pending",
-    "history": "The map has been zoomed in to highlight the area around Athens International Airport. If you need any further actions or visualizations, feel free to ask!",
-    "remaining_dependencies": 1,
     "agent": "map_agent"
   }
 }

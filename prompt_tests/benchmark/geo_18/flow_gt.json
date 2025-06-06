@@ -1,0 +1,46 @@
+{
+    "query": "Scatter plot the xView1 images in Kaohsiung, Taiwan from June 2017. I want to make sure that you consider a wide area",
+    "tasks": {
+        "task0": {
+            "id": "task0",
+            "objective": "Fetch images from the xView1 dataset and filter the images specifically from Kaohsiung, Taiwan, dated June 2017.",
+            "agent_id": 0,
+            "next": [
+                "task1"
+            ],
+            "prev": [],
+            "status": "pending",
+            "history": "",
+            "remaining_dependencies": 0,
+            "agent": "database_agent"
+        },
+        "task1": {
+            "id": "task1",
+            "objective": "Process and organize the xView1 images for scatter plotting.",
+            "agent_id": 1,
+            "next": [
+                "task2"
+            ],
+            "prev": [
+                "task0"
+            ],
+            "status": "pending",
+            "history": "",
+            "remaining_dependencies": 1,
+            "agent": "data_processing_agent"
+        },
+        "task2": {
+            "id": "task2",
+            "objective": "Generate a scatter plot visualizing the xView1 images for Kaohsiung, Taiwan.",
+            "agent_id": 2,
+            "next": [],
+            "prev": [
+                "task1"
+            ],
+            "status": "pending",
+            "history": "",
+            "remaining_dependencies": 1,
+            "agent": "visualization_agent"
+        }
+    }
+}

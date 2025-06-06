@@ -22,9 +22,6 @@ import json
 import time
 
 
-# ------------------------------
-# Added
-# ------------------------------
 def load_json_file(file_path):
     """
     Loads JSON data from a file.
@@ -48,15 +45,37 @@ def load_json_file(file_path):
     except Exception as e:
          print(f"An unexpected error occurred: {e}")
          return None
+
+
+def add_query_to_flowJSON(num_files):
+
+    from collections import OrderedDict
+    for i in range(0, num_files):
+        # Load the JSON file
+        geo_path = f'./prompt_tests/benchmark/geo_{i}'
+        with open(geo_path + f"/flow.json", "r") as f:
+            data = json.load(f)
+
+        with open(geo_path + f"/query.txt", "r") as f:
+            query = f.read()
+
+        # Add or update the 'query' field
+        new_data = OrderedDict()
+        new_data["query"] = query  # Replace with your actual query value
+        new_data["tasks"] = data.get("tasks", {})
+
+        # Save it back to the same file (or a new one)
+        with open(geo_path + "/flow_gt.json", "w") as f:
+            json.dump(new_data, f, indent=4)
     
 
 def main(args, workflow=None, query="No query provided"):
     
     model_client = BaseClient.from_cfg({
-            "client": "openai",      # Options: "openai", "ollama", "vllm"
-            "model": "gpt-4o-mini",    # Model name, e.g., "gpt-4o-mini" or "llama3.3:70b" for ollama
-            "temperature": 0.1,        # Default temperature setting
-        })
+        "client": "openai",      # Options: "openai", "ollama", "vllm"
+        "model": "gpt-4o-mini",    # Model name, e.g., "gpt-4o-mini" or "llama3.3:70b" for ollama
+        "temperature": 0.1,        # Default temperature setting
+    })
     messages = Messages()
     database = Database()    
     vision = Vision(database)    
@@ -138,7 +157,7 @@ def main(args, workflow=None, query="No query provided"):
     platform.reset()
 
 if __name__ == "__main__":
-    i = 20
+    i = 0
     parser = argparse.ArgumentParser(description='geo-olm agent')
     parser.add_argument('--api', default='ChatCompletion', help='choose between Responses and ChatCompletion')
     args = parser.parse_args()

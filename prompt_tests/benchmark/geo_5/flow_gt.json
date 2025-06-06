@@ -1,0 +1,45 @@
+{
+    "query": "Plot on the map the BigEarthNet, xView1 images in Germany from 2nd half of 2017",
+    "tasks": {
+        "task0": {
+            "id": "task0",
+            "objective": "Fetch images from the BigEarthNet dataset for Germany, specifically from the 2nd half of 2017.",
+            "agent_id": 0,
+            "next": [
+                "task1"
+            ],
+            "prev": [],
+            "status": "pending",
+            "history": "",
+            "remaining_dependencies": 0,
+            "agent": "database_agent"
+        },
+        "task1": {
+            "id": "task1",
+            "objective": "Fetch images from the xView1 dataset for Germany, specifically from the 2nd half of 2017.",
+            "agent_id": 1,
+            "next": [
+                "task2"
+            ],
+            "prev": [],
+            "status": "pending",
+            "history": "",
+            "remaining_dependencies": 0,
+            "agent": "database_agent"
+        },
+        "task2": {
+            "id": "task2",
+            "objective": "Plot the BigEarthNet and xView1 images on the map for Germany.",
+            "agent_id": 2,
+            "next": [],
+            "prev": [
+                "task0",
+                "task1"
+            ],
+            "status": "pending",
+            "history": "",
+            "remaining_dependencies": 2,
+            "agent": "map_agent"
+        }
+    }
+}

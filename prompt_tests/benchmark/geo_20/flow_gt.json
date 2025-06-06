@@ -1,0 +1,46 @@
+{
+    "query": "Run the ResNet-32 LCC model on BigEarthNet from 2nd half of April 2018. How many 'Airports' LCC classification results we got?",
+    "tasks": {
+        "task0": {
+            "id": "task0",
+            "objective": "Fetch images from the BigEarthNet dataset for the 2nd half of April 2018 and filter for relevant data.",
+            "agent_id": 0,
+            "next": [
+                "task1"
+            ],
+            "prev": [],
+            "status": "pending",
+            "history": "",
+            "remaining_dependencies": 0,
+            "agent": "database_agent"
+        },
+        "task1": {
+            "id": "task1",
+            "objective": "Run the ResNet-32 LCC model on the filtered BigEarthNet images to classify 'Airports'.",
+            "agent_id": 1,
+            "next": [
+                "task2"
+            ],
+            "prev": [
+                "task0"
+            ],
+            "status": "pending",
+            "history": "",
+            "remaining_dependencies": 1,
+            "agent": "detector_agent"
+        },
+        "task2": {
+            "id": "task2",
+            "objective": "Count the number of 'Airports' LCC classification results obtained from the ResNet-32 model.",
+            "agent_id": 2,
+            "next": [],
+            "prev": [
+                "task1"
+            ],
+            "status": "pending",
+            "history": "",
+            "remaining_dependencies": 1,
+            "agent": "data_agent"
+        }
+    }
+}

@@ -1,0 +1,58 @@
+{
+  "tasks": {
+    "task0": {
+      "id": "task0",
+      "objective": "Fetch images from the BigEarthNet dataset and filter the images specifically from Switzerland.",
+      "agent_id": 0,
+      "next": [
+        "task1",
+        "task2"
+      ],
+      "prev": [],
+      "status": "pending",
+      "history": "",
+      "remaining_dependencies": 0,
+      "agent": "database_agent"
+    },
+    "task1": {
+      "id": "task1",
+      "objective": "Run the ResNet-32 classifier on the fetched BigEarthNet images to identify the 'Vineyards' LCC class.",
+      "agent_id": 1,
+      "next": [],
+      "prev": [
+        "task0"
+      ],
+      "status": "pending",
+      "history": "",
+      "remaining_dependencies": 1,
+      "agent": "detector_agent"
+    },
+    "task2": {
+      "id": "task2",
+      "objective": "Run the ResNet-32 classifier on the fetched BigEarthNet images to identify the 'Fruit trees and berry plantations' LCC class.",
+      "agent_id": 2,
+      "next": [],
+      "prev": [
+        "task0"
+      ],
+      "status": "pending",
+      "history": "",
+      "remaining_dependencies": 1,
+      "agent": "detector_agent"
+    },
+    "task3": {
+      "id": "task3",
+      "objective": "Plot the results of 'Vineyards' and 'Fruit trees and berry plantations' on a map.",
+      "agent_id": 3,
+      "next": [],
+      "prev": [
+        "task1",
+        "task2"
+      ],
+      "status": "pending",
+      "history": "",
+      "remaining_dependencies": 2,
+      "agent": "map_agent"
+    }
+  }
+}

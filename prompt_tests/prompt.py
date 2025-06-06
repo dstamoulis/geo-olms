@@ -66,51 +66,53 @@ INIT_TEMPLATE = """{
 
 """
 
-INIT_WORKFLOW_TEMPLATE = """{
-  {
-    "tasks": {
-        "task0": {
-            "id": "task0",
-            "objective": "Fetch images from the xView1 dataset and filter the images specifically from Greece.",
-            "agent_id": 0,
-            "next": [
-                "task1"
-            ],
-            "prev": [],
-            "status": "pending",
-            "history": "",
-            "remaining_dependencies": 0,
-            "agent": "database_agent"
-        },
-        "task1": {
-            "id": "task1",
-            "objective": "Run the Swin-L detector on xView1 images to detect Passenger Vehicles.",
-            "agent_id": 2,
-            "next": [
-                "task2"
-            ],
-            "prev": [
-                "task0"
-            ],
-            "status": "pending",
-            "history": "",
-            "remaining_dependencies": 2,
-            "agent": "detector_agent"
-        },
-        "task2": {
-            "id": "task2",
-            "objective": "Plot Swin-L xView1 detection results highlighting the Passenger Vehicle category.",
-            "agent_id": 3,
-            "next": [],
-            "prev": [
-                "task1"
-            ],
-            "status": "pending",
-            "history": "",
-            "remaining_dependencies": 1,
-            "agent": "map_agent"
-        }
+INIT_WORKFLOW_TEMPLATE = """"
+For query: "Fetch BigEarthNet in Switzerland for and run the ResNet-32 classifier. Please plot on the map the 'Vineyards' and 'Fruit trees and berry plantations' LCC classes!"
+The result should be in the following format:
+{
+  tasks": {
+    "task0": {
+      "id": "task0",
+      "objective": "Fetch images from the BigEarthNet dataset and filter the images specifically from Switzerland.",
+      "agent_id": 0,
+      "next": [
+        "task1"
+      ],
+      "prev": [],
+      "status": "pending",
+      "history": "",
+      "remaining_dependencies": 0,
+      "agent": "database_agent"
+    },
+    "task1": {
+      "id": "task1",
+      "objective": "Run the ResNet-32 classifier on BigEarthNet images to detect 'Vineyards' and 'Fruit trees and berry plantations'.",
+      "agent_id": 2,
+      "next": [
+        "task2"
+      ],
+      "prev": [
+        "task0"
+      ],
+      "status": "pending",
+      "history": "",
+      "remaining_dependencies": 1,
+      "agent": "detector_agent"
+    },
+    "task2": {
+      "id": "task2",
+      "objective": "Plot ResNet-32 classification results highlighting the 'Vineyards' and 'Fruit trees and berry plantations' classes on the map.",
+      "agent_id": 3,
+      "next": [],
+      "prev": [
+        "task1"
+      ],
+      "status": "pending",
+      "history": "",
+      "remaining_dependencies": 1,
+      "agent": "map_agent"
     }
+  }
 }
 
 """

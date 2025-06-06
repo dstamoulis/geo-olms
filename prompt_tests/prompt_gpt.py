@@ -2,6 +2,14 @@ from openai import OpenAI
 client = OpenAI()
 import prompt
 import json
+import argparse
+import sys
+import os
+from collections import OrderedDict
+
+parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+sys.path.insert(0, parent_dir)
+import utils
 
 def strip_json_code_block(raw_content):
     # Remove leading/trailing whitespace
@@ -19,13 +27,13 @@ def strip_json_code_block(raw_content):
 def generate_workflow(query):
     completion = client.chat.completions.create(
         model="gpt-4o-mini",
+        # Removed {prompt.TASK_EXECUTION_PROMPT}\n
         messages=[
             {
                 "role": "user",
                 "content": 
                 f'''
                 {prompt.INIT_WORKFLOW_PROMPT}\n
-                {prompt.TASK_EXECUTION_PROMPT}\n
 
                 For example:
                 {prompt.INIT_WORKFLOW_TEMPLATE}\n
@@ -72,17 +80,22 @@ queries = [
 ]
 
 if __name__ == "__main__":
-    i = 8
-    query = queries[i]
+
+    parser = argparse.ArgumentParser(description='geo-olm agent')
+    parser.add_argument('--exp_id', default=0, help='run ID to choose')
+    args = parser.parse_args()
+
+    geo_path = f'./prompt_tests/benchmark/geo_{args.exp_id}'
+    query = utils.load_json_file(geo_path + '/flow_gt.json')['query']
 
     response = generate_workflow(query)
-
-    # # Save the query
-    # with open(f"prompt_tests/benchmark/geo_{i}/query.txt", "w") as f:
-    #     f.write(query)
 
     # Save the generated GeoFlow JSON
     cleaned_json_str = strip_json_code_block(response)
     parsed_json = json.loads(cleaned_json_str)
-    with open(f"prompt_tests/benchmark/geo_{i}/flow_expr.json", "w") as f:
-        json.dump(parsed_json, f, indent=2)
+
+    new_data = OrderedDict()
+    new_data["query"] = query  # Replace with actual query
+    new_data["tasks"] = parsed_json.get("tasks", {})
+    with open(f"prompt_tests/benchmark/geo_{args.exp_id}/flow_exp_2.json", "w") as f:
+        json.dump(new_data, f, indent=2)

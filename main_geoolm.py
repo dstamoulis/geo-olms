@@ -21,41 +21,16 @@ import argparse
 import json
 import time
 
-
-# ------------------------------
-# Added
-# ------------------------------
-def load_json_file(file_path):
-    """
-    Loads JSON data from a file.
-
-    Args:
-        file_path (str): The path to the JSON file.
-
-    Returns:
-        dict or list: The loaded JSON data as a Python dictionary or list, or None if an error occurs.
-    """
-    try:
-        with open(file_path, 'r') as file:
-            data = json.load(file)
-            return data
-    except FileNotFoundError:
-        print(f"Error: File not found: {file_path}")
-        return None
-    except json.JSONDecodeError:
-        print(f"Error: Invalid JSON format in: {file_path}")
-        return None
-    except Exception as e:
-         print(f"An unexpected error occurred: {e}")
-         return None
+from utils import load_json_file, get_results_path
     
 
 def main(args, workflow=None, query="No query provided"):
-    
+
+    results_output_file = get_results_path(args)    
     model_client = BaseClient.from_cfg({
-            "client": "openai",      # Options: "openai", "ollama", "vllm"
-            "model": "gpt-4o-mini",    # Model name, e.g., "gpt-4o-mini" or "llama3.3:70b" for ollama
-            "temperature": 0.1,        # Default temperature setting
+            "client": args.client,      # Options: "openai", "ollama", "vllm"
+            "model": args.model,    # Model name, e.g., "gpt-4o-mini" or "llama3.3:70b" for ollama
+            "temperature": args.temp,        # Default temperature setting
         })
     messages = Messages()
     database = Database()    
@@ -99,7 +74,7 @@ def main(args, workflow=None, query="No query provided"):
 
     # Solving with an agent!
     platform = Platform(model_client, messages, database, vision, map_tools, orch_agent)
-    agent_run = AgentRun(platform, results_output_file=f'./results/geo_{i}_test.json')
+    agent_run = AgentRun(platform, results_output_file=results_output_file)
 
     start_time = time.time()
     response = platform.agent.run_flowPP(
@@ -120,12 +95,17 @@ def main(args, workflow=None, query="No query provided"):
 
 
 if __name__ == "__main__":
-    i = 0
+    
     parser = argparse.ArgumentParser(description='geo-olm agent')
     parser.add_argument('--api', default='ChatCompletion', help='choose between Responses and ChatCompletion')
+    parser.add_argument('--exp_id', default=0, help='run ID to choose')
+    parser.add_argument('--client', default='openai', help='client to use')
+    parser.add_argument('--model', default= "gpt-4o-mini", help='model LLM to use')
+    parser.add_argument('--temp', default= 0.1, help='model LLM to use')
+    parser.add_argument('--agent', default= 'geoflow', help='agent to use')
     args = parser.parse_args()
 
-    geo_path = f'./prompt_tests/benchmark/geo_{i}'
+    geo_path = f'./prompt_tests/benchmark/geo_{args.exp_id}'
     geo_flow = load_json_file(geo_path + '/flow.json')['tasks']
     with open(geo_path + f"/query.txt", "r") as f:
         query = f.read()

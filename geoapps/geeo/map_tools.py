@@ -4,7 +4,7 @@ from agent_core.modules.toolset import agent_tool
 
 from geoapps.geeo.constants import (
     DETS_NONE_MSG, DETS_EMPTY_MSG, DATASET_ERROR_MSG,
-    DATASETS_INFO, GPKG_FOLDER,  IMGS_NONE_MSG,
+    DATASETS_INFO, GPKG_FOLDER,  IMGS_NONE_MSG, IMGS_EMPTY_MSG,
     DATASET_CATEGORY_ERROR_MSG, DATASETS_CATEGORIES,
     LCC_NONE_MSG, LCC_EMPTY_MSG, 
 )

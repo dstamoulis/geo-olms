@@ -1,46 +1,16 @@
 {
-    "query": "Where is 39.3434\u00b0 N, 117.3616\u00b0 E? I want to see it on the map; please zoom there!",
-    "tasks": {
-        "task0": {
-            "id": "task0",
-            "objective": "Fetch the geographical information for the coordinates 39.3434\u00b0 N, 117.3616\u00b0 E.",
-            "agent_id": 0,
-            "next": [
-                "task1"
-            ],
-            "prev": [],
-            "status": "pending",
-            "history": "",
-            "remaining_dependencies": 0,
-            "agent": "database_agent"
-        },
-        "task1": {
-            "id": "task1",
-            "objective": "Retrieve a map image centered at the location identified by the geographical information.",
-            "agent_id": 1,
-            "next": [
-                "task2"
-            ],
-            "prev": [
-                "task0"
-            ],
-            "status": "pending",
-            "history": "",
-            "remaining_dependencies": 1,
-            "agent": "map_agent"
-        },
-        "task2": {
-            "id": "task2",
-            "objective": "Zoom into the retrieved map image to highlight the specified location clearly.",
-            "agent_id": 2,
-            "next": [],
-            "prev": [
-                "task1"
-            ],
-            "status": "pending",
-            "history": "",
-            "remaining_dependencies": 1,
-            "agent": "map_agent"
-        }
+  "query": "Where is 39.3434\u00b0 N, 117.3616\u00b0 E? I want to see it on the map; please zoom there!",
+  "tasks": {
+    "task0": {
+      "id": "task0",
+      "objective": "Zoom the map to 39.3434\u00b0 N, 117.3616\u00b0 E.",
+      "agent_id": 0,
+      "next": [],
+      "prev": [],
+      "status": "pending",
+      "history": "",
+      "remaining_dependencies": 0,
+      "agent": "map_agent"
     }
+  }
 }

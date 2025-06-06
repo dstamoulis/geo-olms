@@ -1,46 +1,31 @@
 {
-    "query": "Plot on the map the xView1 images in (wider area around) Ouagadougou, Burkina Faso, for August 2017",
-    "tasks": {
-        "task0": {
-            "id": "task0",
-            "objective": "Fetch images from the xView1 dataset and filter the images specifically from Ouagadougou, Burkina Faso, for August 2017.",
-            "agent_id": 0,
-            "next": [
-                "task1"
-            ],
-            "prev": [],
-            "status": "pending",
-            "history": "",
-            "remaining_dependencies": 0,
-            "agent": "database_agent"
-        },
-        "task1": {
-            "id": "task1",
-            "objective": "Run a processing algorithm on the filtered xView1 images to prepare them for plotting.",
-            "agent_id": 2,
-            "next": [
-                "task2"
-            ],
-            "prev": [
-                "task0"
-            ],
-            "status": "pending",
-            "history": "",
-            "remaining_dependencies": 1,
-            "agent": "detector_agent"
-        },
-        "task2": {
-            "id": "task2",
-            "objective": "Plot the processed xView1 images on the map, ensuring accurate representation of the location.",
-            "agent_id": 3,
-            "next": [],
-            "prev": [
-                "task1"
-            ],
-            "status": "pending",
-            "history": "",
-            "remaining_dependencies": 1,
-            "agent": "map_agent"
-        }
+  "query": "Plot on the map the xView1 images in (wider area around) Ouagadougou, Burkina Faso, for August 2017",
+  "tasks": {
+    "task0": {
+      "id": "task0",
+      "objective": "Fetch images from the xView1 dataset and filter the images specifically from Ouagadougou, Burkina Faso, for August 2017.",
+      "agent_id": 0,
+      "next": [
+        "task1"
+      ],
+      "prev": [],
+      "status": "pending",
+      "history": "",
+      "remaining_dependencies": 0,
+      "agent": "database_agent"
+    },
+    "task1": {
+      "id": "task1",
+      "objective": "Plot the processed xView1 images on the map, ensuring accurate representation of the location.",
+      "agent_id": 1,
+      "next": [],
+      "prev": [
+        "task0"
+      ],
+      "status": "pending",
+      "history": "",
+      "remaining_dependencies": 1,
+      "agent": "map_agent"
     }
+  }
 }

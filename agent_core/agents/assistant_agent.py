@@ -202,7 +202,7 @@ class AssistantAgent(BaseAgent):
     
     # ------------------------------------------------------------------------------
     # Main loop for executing GeoFlow
-    def run_workflow(self, agents: dict, workflow: dict, ui_mode=False):
+    def run_workflow(self, agents: dict, workflow: dict, ui_mode=False, log_target=False):
         for task_id, task in workflow.items():
             # TODO: if completed, fetch history from ground truth
             if task['status'] == 'completed':
@@ -219,8 +219,9 @@ class AssistantAgent(BaseAgent):
                 response = handoff_agent.get_response_workflow(task_id, workflow)
                 print(f"\nResponse: {response}\n")
                 self.messages.add_message(response)
-        with open("target.json", "w") as f:
-            json.dump(workflow, f, indent=2)
+        if log_target:
+            with open("target.json", "w") as f:
+                json.dump(workflow, f, indent=2)
         return response.content if ui_mode else response
 
     # ------------------------------------------------------------------------------
@@ -254,11 +255,11 @@ class AssistantAgent(BaseAgent):
     
     # ------------------------------------------------------------------------------
     # Main loop for executing Flow++
-    def run_flowPP(self, agents: dict, workflow: dict, ui_mode=False):
+    def run_flowPP(self, agents: dict, workflow: dict, ui_mode=False, log_target=False):
         agent_calls = ""
         for task_id, task in workflow.items():
             # print(f'task_id: {task_id}, task: {task}')
-            agent_calls += f"{task_id}: {task["objective"]}, agent: {task["agent"]}\n"
+            agent_calls += f"{task_id}: {task['objective']}, agent: {task['agent']}\n"
         agent_calls += f"Here is the dict_keys of available agents: {agents.keys()}. For each task, match it with an agent that is strictly in the dict_keys, make a guess if you need. Then just return only the one-to-one result in this format: task_num: agent_name"
         print(f"************************ agent_calls: \n{agent_calls}")
         agent_match = self.model_client.get_response_Response(agent_calls)
@@ -282,8 +283,10 @@ class AssistantAgent(BaseAgent):
                 text_message = TextMessage(role='user', content=content, source='user')
                 handoff_agent.messages.add_message(text_message)
                 response = handoff_agent.get_response_workflow(task_id, workflow)
-        with open("target.json", "w") as f:
-            json.dump(workflow, f, indent=2)
+
+        if log_target:
+            with open("target.json", "w") as f:
+                json.dump(workflow, f, indent=2)
         return response.content if ui_mode else response
 
 # ------------------------------------------------------------------------------
@@ -325,6 +328,8 @@ def get_downstream_objectives(task_id: str, workflow: dict):
     return downstream_objectives if downstream_objectives else ["No downstream objectives available."]
 
 def format_content(objective, context, downstream_objectives):
-    return f"\n**Objective**\n{objective}\n\
-            **Context from upstream tasks**\n{context if context else "No context available."}\n\
-            **Downstream objectives**\n{downstream_objectives if downstream_objectives else 'No downstream objectives available.'}\n"
+    return (
+        f"\n**Objective**\n{objective}\n"
+        f"**Context from upstream tasks**\n{context if context else 'No context available.'}\n"
+        f"**Downstream objectives**\n{downstream_objectives if downstream_objectives else 'No downstream objectives available.'}\n"
+    )

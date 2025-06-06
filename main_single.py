@@ -20,13 +20,14 @@ import argparse
 
 import json
 import time
+import os
 
 from utils import load_json_file, get_results_path
 
 
 def main(args, workflow=None, query="No query provided"):
 
-    results_output_file = get_results_path(args)    
+    results_output_file = get_results_path(args)
     model_client = BaseClient.from_cfg({
             "client": args.client,      # Options: "openai", "ollama", "vllm"
             "model": args.model,    # Model name, e.g., "gpt-4o-mini" or "llama3.3:70b" for ollama
@@ -37,48 +38,6 @@ def main(args, workflow=None, query="No query provided"):
     vision = Vision(database)    
     map_tools = MapTools(database, vision, map_style="open-street-map")
     data_tools = DataTools(database, vision)
-
-    # Subagents
-    database_agent = SingleAgent(
-        api=args.api,
-        name="database_agent",
-        model_client=model_client,
-        messages=messages,
-        toolsets_list=[database],
-        system_message="Expert in fetching images from a database!"
-    )
-    map_agent = SingleAgent(
-        api=args.api,
-        name="map_agent",
-        model_client=model_client,
-        messages=messages,
-        toolsets_list=[map_tools],
-        system_message="Expert in performing all kinds of operations on a map!"
-    )
-    detector_agent = SingleAgent(
-        api=args.api,
-        name="detector_agent",
-        model_client=model_client,
-        messages=messages,
-        toolsets_list=[vision],
-        system_message="Expert in processing images fetched from a database, such as object detection!"
-    )
-    data_agent = SingleAgent(
-        api=args.api,
-        name="data_agent",
-        model_client=model_client,
-        messages=messages,
-        toolsets_list=[data_tools],
-        system_message="Expert in all kinds of image analyzing tasks!"
-    )
-    orch_agent = SingleAgent(
-        api=args.api,
-        name="orch_agent",
-        model_client=model_client,
-        messages=messages,
-        toolsets_list=[],
-        system_message="You are an orchastrating agent handing off tasks to subagents most suited for given a given task!"
-    )
     
     single_agent = SingleAgent(
         api=args.api,
@@ -90,16 +49,11 @@ def main(args, workflow=None, query="No query provided"):
     )
 
     # Solving with an agent!
-    platform = Platform(model_client, messages, database, vision, map_tools, orch_agent)
-    # platform = Platform(model_client, messages, database, vision, map_tools, single_agent)
+    platform = Platform(model_client, messages, database, vision, map_tools, single_agent)
     agent_run = AgentRun(platform, results_output_file=results_output_file)
     
     start_time = time.time()
-    # response = platform.agent.run_query(query)
-    response = platform.agent.run_workflow(
-        {"database_agent": database_agent, "map_agent": map_agent, "detector_agent": detector_agent, "data_agent": data_agent},
-        workflow
-    )
+    response = platform.agent.run_query(query)
     end_time = time.time()
     elapsed_time = round(end_time - start_time, 4)
     print("===elapsed time: ", elapsed_time, " s===")
@@ -114,14 +68,14 @@ def main(args, workflow=None, query="No query provided"):
 
 
 if __name__ == "__main__":
-    
+
     parser = argparse.ArgumentParser(description='geo-olm agent')
     parser.add_argument('--api', default='ChatCompletion', help='choose between Responses and ChatCompletion')
     parser.add_argument('--exp_id', default=0, help='run ID to choose')
     parser.add_argument('--client', default='openai', help='client to use')
     parser.add_argument('--model', default= "gpt-4o-mini", help='model LLM to use')
     parser.add_argument('--temp', default= 0.1, help='model LLM to use')
-    parser.add_argument('--agent', default= 'geoflow', help='agent to use')
+    parser.add_argument('--agent', default= 'single_agent', help='agent to use')
     args = parser.parse_args()
 
     geo_path = f'./prompt_tests/benchmark/geo_{args.exp_id}'

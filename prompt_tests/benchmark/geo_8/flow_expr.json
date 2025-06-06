@@ -1,30 +1,31 @@
 {
-  "tasks": {
-    "task0": {
-      "id": "task0",
-      "objective": "Fetch the map data for the capital of the UK.",
-      "agent_id": 0,
-      "next": [
-        "task1"
-      ],
-      "prev": [],
-      "status": "pending",
-      "history": "",
-      "remaining_dependencies": 0,
-      "agent": "database_agent"
-    },
-    "task1": {
-      "id": "task1",
-      "objective": "Zoom the fetched map data to display the capital of the UK clearly.",
-      "agent_id": 1,
-      "next": [],
-      "prev": [
-        "task0"
-      ],
-      "status": "pending",
-      "history": "",
-      "remaining_dependencies": 1,
-      "agent": "map_agent"
+    "query": "Zoom the map to the capital of UK please",
+    "tasks": {
+        "task0": {
+            "id": "task0",
+            "objective": "Fetch the map data for the capital of the UK.",
+            "agent_id": 0,
+            "next": [
+                "task1"
+            ],
+            "prev": [],
+            "status": "pending",
+            "history": "",
+            "remaining_dependencies": 0,
+            "agent": "database_agent"
+        },
+        "task1": {
+            "id": "task1",
+            "objective": "Zoom the fetched map data to display the capital of the UK clearly.",
+            "agent_id": 1,
+            "next": [],
+            "prev": [
+                "task0"
+            ],
+            "status": "pending",
+            "history": "",
+            "remaining_dependencies": 1,
+            "agent": "map_agent"
+        }
     }
-  }
 }

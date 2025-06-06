@@ -1,45 +1,46 @@
 {
-  "tasks": {
-    "task0": {
-      "id": "task0",
-      "objective": "Fetch images from the xView1 dataset and filter the images specifically from Prague, Czech Republic for Summer 2017.",
-      "agent_id": 0,
-      "next": [
-        "task1"
-      ],
-      "prev": [],
-      "status": "pending",
-      "history": "",
-      "remaining_dependencies": 0,
-      "agent": "database_agent"
-    },
-    "task1": {
-      "id": "task1",
-      "objective": "Run the Swin-L detector on xView1 images to detect Passenger Cars.",
-      "agent_id": 1,
-      "next": [
-        "task2"
-      ],
-      "prev": [
-        "task0"
-      ],
-      "status": "pending",
-      "history": "",
-      "remaining_dependencies": 1,
-      "agent": "detector_agent"
-    },
-    "task2": {
-      "id": "task2",
-      "objective": "Count the number of detected 'Passenger Cars' from the detection results.",
-      "agent_id": 2,
-      "next": [],
-      "prev": [
-        "task1"
-      ],
-      "status": "pending",
-      "history": "",
-      "remaining_dependencies": 1,
-      "agent": "data_agent"
+    "query": "Let's start by getting the xView1 images from Prague, Czech Republic for Summer 2017. Consider a wide area. Then run the Swin-L detector. Last, can you please tell me how many 'Passenger Car' you got?",
+    "tasks": {
+        "task0": {
+            "id": "task0",
+            "objective": "Fetch images from the xView1 dataset and filter the images specifically from Prague, Czech Republic for Summer 2017.",
+            "agent_id": 0,
+            "next": [
+                "task1"
+            ],
+            "prev": [],
+            "status": "pending",
+            "history": "",
+            "remaining_dependencies": 0,
+            "agent": "database_agent"
+        },
+        "task1": {
+            "id": "task1",
+            "objective": "Run the Swin-L detector on xView1 images to detect Passenger Cars.",
+            "agent_id": 1,
+            "next": [
+                "task2"
+            ],
+            "prev": [
+                "task0"
+            ],
+            "status": "pending",
+            "history": "",
+            "remaining_dependencies": 1,
+            "agent": "detector_agent"
+        },
+        "task2": {
+            "id": "task2",
+            "objective": "Count the number of detected 'Passenger Cars' from the detection results.",
+            "agent_id": 2,
+            "next": [],
+            "prev": [
+                "task1"
+            ],
+            "status": "pending",
+            "history": "",
+            "remaining_dependencies": 1,
+            "agent": "data_agent"
+        }
     }
-  }
 }

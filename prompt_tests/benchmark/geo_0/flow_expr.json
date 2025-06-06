@@ -1,45 +1,46 @@
 {
-  "tasks": {
-    "task0": {
-      "id": "task0",
-      "objective": "Fetch images from the xView1 dataset specifically from Athens International Airport, Greece, considering a wide area.",
-      "agent_id": 0,
-      "next": [
-        "task1"
-      ],
-      "prev": [],
-      "status": "pending",
-      "history": "",
-      "remaining_dependencies": 0,
-      "agent": "database_agent"
-    },
-    "task1": {
-      "id": "task1",
-      "objective": "Run the Swin-L detector on fetched images from Athens International Airport to identify relevant objects.",
-      "agent_id": 1,
-      "next": [
-        "task2"
-      ],
-      "prev": [
-        "task0"
-      ],
-      "status": "pending",
-      "history": "",
-      "remaining_dependencies": 1,
-      "agent": "detector_agent"
-    },
-    "task2": {
-      "id": "task2",
-      "objective": "Zoom the map to the location of Athens International Airport, highlighting detection results.",
-      "agent_id": 2,
-      "next": [],
-      "prev": [
-        "task1"
-      ],
-      "status": "pending",
-      "history": "",
-      "remaining_dependencies": 1,
-      "agent": "map_agent"
+    "query": "Fetch xView1 images from Athens International Airport, Greece. Consider a wide area. Then run the Swin-L detector and finally please zoom the map there!",
+    "tasks": {
+        "task0": {
+            "id": "task0",
+            "objective": "Fetch images from the xView1 dataset specifically from Athens International Airport, Greece, considering a wide area.",
+            "agent_id": 0,
+            "next": [
+                "task1"
+            ],
+            "prev": [],
+            "status": "pending",
+            "history": "",
+            "remaining_dependencies": 0,
+            "agent": "database_agent"
+        },
+        "task1": {
+            "id": "task1",
+            "objective": "Run the Swin-L detector on fetched images from Athens International Airport to identify relevant objects.",
+            "agent_id": 1,
+            "next": [
+                "task2"
+            ],
+            "prev": [
+                "task0"
+            ],
+            "status": "pending",
+            "history": "",
+            "remaining_dependencies": 1,
+            "agent": "detector_agent"
+        },
+        "task2": {
+            "id": "task2",
+            "objective": "Zoom the map to the location of Athens International Airport, highlighting detection results.",
+            "agent_id": 2,
+            "next": [],
+            "prev": [
+                "task1"
+            ],
+            "status": "pending",
+            "history": "",
+            "remaining_dependencies": 1,
+            "agent": "map_agent"
+        }
     }
-  }
 }

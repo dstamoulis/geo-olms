@@ -125,7 +125,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     geo_path = f'./prompt_tests/benchmark/geo_{args.exp_id}'
-    geo_flow = load_json_file(geo_path + '/flow.json')['tasks']
+    geo_flow = load_json_file(geo_path + '/flow_gt.json')['tasks']
     with open(geo_path + f"/query.txt", "r") as f:
         query = f.read()
     main(args, geo_flow, query)

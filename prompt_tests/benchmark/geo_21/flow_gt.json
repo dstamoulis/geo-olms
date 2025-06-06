@@ -41,7 +41,7 @@
       "status": "pending",
       "history": "",
       "remaining_dependencies": 2,
-      "agent": "detector_agent"
+      "agent": "data_agent"
     }
   }
 }

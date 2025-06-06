@@ -16,31 +16,16 @@
     },
     "task1": {
       "id": "task1",
-      "objective": "Process and organize the xView1 images for scatter plotting.",
+      "objective": "Generate a scatter plot visualizing the xView1 images for Kaohsiung, Taiwan.",
       "agent_id": 1,
-      "next": [
-        "task2"
-      ],
+      "next": [],
       "prev": [
         "task0"
       ],
       "status": "pending",
       "history": "",
       "remaining_dependencies": 1,
-      "agent": "data_processing_agent"
-    },
-    "task2": {
-      "id": "task2",
-      "objective": "Generate a scatter plot visualizing the xView1 images for Kaohsiung, Taiwan.",
-      "agent_id": 2,
-      "next": [],
-      "prev": [
-        "task1"
-      ],
-      "status": "pending",
-      "history": "",
-      "remaining_dependencies": 1,
-      "agent": "visualization_agent"
+      "agent": "map_agent"
     }
   }
 }

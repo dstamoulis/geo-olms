@@ -10,3 +10,6 @@ datasets/gpkgs/
 datasets/gpkgs/*.gpkg
 target.json
 *.pyc
+*/*.pyc
+*/*/*.pyc
+*/*/*/*.pyc

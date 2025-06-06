@@ -108,8 +108,7 @@ def main(args, workflow=None, query="No query provided"):
     print(platform.database.images_gdf)
     print(platform.vision.detections_gdf)
 
-    agent_run.add_task_result(AgentTask(queries=[query], rounds=[{"query": query, "messages": platform.messages.to_list_dict()}]))
-    agent_run.save_inference_results()
+    agent_run.save_agent_run_result(AgentTask(query= query, messages= platform.messages.to_list_dict()))
     platform.reset()
 
 

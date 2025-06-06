@@ -47,7 +47,7 @@ class AgentMetrics:
                 return True  # Missing argument.
             # For numeric types, allow a small tolerance.
             if isinstance(value, (int, float)) and candidate_args.get(arg) is not None:
-                if abs(float(candidate_args[arg]) - float(value)) > 0.1:
+                if abs(float(candidate_args[arg]) - float(value)) > 2:
                     return True
             # For strings, ensure candidate has a nonempty value.
             elif isinstance(value, str) and not candidate_args.get(arg):

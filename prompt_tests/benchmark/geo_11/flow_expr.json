@@ -1,0 +1,58 @@
+{
+  "tasks": {
+    "task0": {
+      "id": "task0",
+      "objective": "Fetch images from the FAIR1M dataset and filter the images from Greece from the 2nd half of 2012.",
+      "agent_id": 0,
+      "next": [
+        "task1"
+      ],
+      "prev": [],
+      "status": "pending",
+      "history": "",
+      "remaining_dependencies": 0,
+      "agent": "database_agent"
+    },
+    "task1": {
+      "id": "task1",
+      "objective": "Fetch images from the BigEarthNet dataset and filter the images from Greece from the 2nd half of 2012.",
+      "agent_id": 1,
+      "next": [
+        "task2"
+      ],
+      "prev": [],
+      "status": "pending",
+      "history": "",
+      "remaining_dependencies": 0,
+      "agent": "database_agent"
+    },
+    "task2": {
+      "id": "task2",
+      "objective": "Fetch images from the xView1 dataset and filter the images from Greece from the 2nd half of 2012.",
+      "agent_id": 2,
+      "next": [
+        "task3"
+      ],
+      "prev": [],
+      "status": "pending",
+      "history": "",
+      "remaining_dependencies": 0,
+      "agent": "database_agent"
+    },
+    "task3": {
+      "id": "task3",
+      "objective": "Plot the fetched images from FAIR1M, BigEarthNet, and xView1 on the map.",
+      "agent_id": 3,
+      "next": [],
+      "prev": [
+        "task0",
+        "task1",
+        "task2"
+      ],
+      "status": "pending",
+      "history": "",
+      "remaining_dependencies": 3,
+      "agent": "map_agent"
+    }
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "tasks": {
+    "task0": {
+      "id": "task0",
+      "objective": "Fetch BigEarthNet images from June 2017.",
+      "agent_id": 0,
+      "next": [
+        "task1"
+      ],
+      "prev": [],
+      "status": "pending",
+      "history": "",
+      "remaining_dependencies": 0,
+      "agent": "database_agent"
+    },
+    "task1": {
+      "id": "task1",
+      "objective": "Run the ResNet-32 LCC classifier on the fetched images.",
+      "agent_id": 1,
+      "next": [
+        "task2"
+      ],
+      "prev": [
+        "task0"
+      ],
+      "status": "pending",
+      "history": "",
+      "remaining_dependencies": 1,
+      "agent": "detector_agent"
+    },
+    "task2": {
+      "id": "task2",
+      "objective": "Plot the LCC classes of the category 'Non-irrigated arable land'.",
+      "agent_id": 2,
+      "next": [],
+      "prev": [
+        "task1"
+      ],
+      "status": "pending",
+      "history": "",
+      "remaining_dependencies": 1,
+      "agent": "map_agent"
+    }
+  }
+}

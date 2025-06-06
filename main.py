@@ -70,7 +70,7 @@ def main(args, workflow=None, query="No query provided"):
         model_client=model_client,
         messages=messages,
         toolsets_list=[database],
-        system_message="You are the database agent!"
+        system_message="Expert in fetching images from a database!"
     )
     map_agent = SingleAgent(
         api=args.api,
@@ -78,7 +78,7 @@ def main(args, workflow=None, query="No query provided"):
         model_client=model_client,
         messages=messages,
         toolsets_list=[map_tools],
-        system_message="You are the map agent!"
+        system_message="Expert in performing all kinds of operations on a map!"
     )
     detector_agent = SingleAgent(
         api=args.api,
@@ -86,7 +86,7 @@ def main(args, workflow=None, query="No query provided"):
         model_client=model_client,
         messages=messages,
         toolsets_list=[vision],
-        system_message="You are the detector agent!"
+        system_message="Expert in processing images fetched from a database, such as object detection!"
     )
     data_agent = SingleAgent(
         api=args.api,
@@ -94,7 +94,7 @@ def main(args, workflow=None, query="No query provided"):
         model_client=model_client,
         messages=messages,
         toolsets_list=[data_tools],
-        system_message="You are the data agent!"
+        system_message="Expert in all kinds of image analyzing tasks!"
     )
     orch_agent = SingleAgent(
         api=args.api,
@@ -102,7 +102,7 @@ def main(args, workflow=None, query="No query provided"):
         model_client=model_client,
         messages=messages,
         toolsets_list=[],
-        system_message="You are an orchastrating agent handing off tasks to subagents to complete given task!"
+        system_message="You are an orchastrating agent handing off tasks to subagents most suited for given a given task!"
     )
     
     single_agent = SingleAgent(

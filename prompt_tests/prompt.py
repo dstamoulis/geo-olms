@@ -1,4 +1,9 @@
-
+AGENT_LIST= """
+database_agent: Expert in fetching images from a database!
+map_agent: Expert in performing all kinds of operations on a map!
+detector_agent: Expert in processing images fetched from a database, such as object detection!
+data_agent: Expert in all kinds of image analyzing tasks!
+"""
 
 INIT_TEMPLATE = """{
   "subtasks": [

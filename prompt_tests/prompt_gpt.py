@@ -16,6 +16,35 @@ def strip_json_code_block(raw_content):
             return "\n".join(lines[1:-1])
     return raw_content
 
+def generate_workflow(query):
+    completion = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[
+            {
+                "role": "user",
+                "content": 
+                f'''
+                {prompt.INIT_WORKFLOW_PROMPT}\n
+                {prompt.TASK_EXECUTION_PROMPT}\n
+
+                For example:
+                {prompt.INIT_WORKFLOW_TEMPLATE}\n
+
+                Available Agents:
+                {prompt.AGENT_LIST}
+
+                Provide the output in the same format as the example above. Make sure you choose only the agents provided in the \"Available Agents\" to complete the task.
+
+                Here is the task to be executed:
+
+                '{query}'
+                '''
+        
+            }
+        ]
+    )
+    return completion.choices[0].message.content
+
 # Benchmark queries
 queries = [
     'Fetch xView1 images from Athens International Airport, Greece. Consider a wide area. Then run the Swin-L detector and finally please zoom the map there!',
@@ -42,38 +71,18 @@ queries = [
     "Which country has more xView1 images, Greece or Turkey?"
 ]
 
-# Generate GeoFlow from given query
-for i, query in enumerate(queries):
-    completion = client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=[
-            {
-                "role": "user",
-                "content": 
-                f'''
-                {prompt.INIT_WORKFLOW_PROMPT}\n
-                {prompt.TASK_EXECUTION_PROMPT}\n
+if __name__ == "__main__":
+    i = 8
+    query = queries[i]
 
-                For example:
-                {prompt.INIT_WORKFLOW_TEMPLATE}\n
+    response = generate_workflow(query)
 
-                Provide the output in the same format as the example above. Make sure you choose only the agents provided in the example to complete the task.
+    # # Save the query
+    # with open(f"prompt_tests/benchmark/geo_{i}/query.txt", "w") as f:
+    #     f.write(query)
 
-                Here is the task to be executed:
-
-                '{query}'
-                '''
-        
-            }
-        ]
-    )
-
-    # Save the query and generated GeoFlow JSON
-    with open(f"prompt_tests/benchmark/geo_{i}/query.txt", "w") as f:
-        f.write(query)
-    cleaned_json_str = strip_json_code_block(completion.choices[0].message.content)
+    # Save the generated GeoFlow JSON
+    cleaned_json_str = strip_json_code_block(response)
     parsed_json = json.loads(cleaned_json_str)
-    with open(f"prompt_tests/benchmark/geo_{i}/flow.json", "w") as f:
+    with open(f"prompt_tests/benchmark/geo_{i}/flow_expr.json", "w") as f:
         json.dump(parsed_json, f, indent=2)
-
-# print(completion.choices[0].message.content)

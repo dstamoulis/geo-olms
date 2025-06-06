@@ -62,8 +62,7 @@ def main(args, workflow=None, query="No query provided"):
     print(platform.database.images_gdf)
     print(platform.vision.detections_gdf)
 
-    agent_run.add_task_result(AgentTask(queries=[query], rounds=[{"query": query, "messages": platform.messages.to_list_dict()}]))
-    agent_run.save_inference_results()
+    agent_run.save_agent_run_result(AgentTask(query= query, messages= platform.messages.to_list_dict()))
     platform.reset()
 
 
@@ -78,8 +77,5 @@ if __name__ == "__main__":
     parser.add_argument('--agent', default= 'single_agent', help='agent to use')
     args = parser.parse_args()
 
-    geo_path = f'./prompt_tests/benchmark/geo_{args.exp_id}'
-    geo_flow = load_json_file(geo_path + '/flow_gt.json')['tasks']
-    with open(geo_path + f"/query.txt", "r") as f:
-        query = f.read()
-    main(args, geo_flow, query)
+    geo_flow = load_json_file(f'./prompt_tests/benchmark/geo_{args.exp_id}/flow_gt.json')
+    main(args, geo_flow['tasks'], geo_flow["query"])

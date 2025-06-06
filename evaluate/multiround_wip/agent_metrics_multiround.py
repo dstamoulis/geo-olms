@@ -2,7 +2,6 @@ import json
 from collections import defaultdict
 import numpy as np
 
-
 class AgentMetrics:
     def __init__(self, gts_file, agent_results_file):
         """

@@ -115,17 +115,36 @@ def main(args, workflow=None, query="No query provided"):
 
 if __name__ == "__main__":
     
-    parser = argparse.ArgumentParser(description='geo-olm agent')
-    parser.add_argument('--api', default='ChatCompletion', help='choose between Responses and ChatCompletion')
-    parser.add_argument('--exp_id', default=0, help='run ID to choose')
-    parser.add_argument('--client', default='openai', help='client to use')
-    parser.add_argument('--model', default= "gpt-4o-mini", help='model LLM to use')
-    parser.add_argument('--temp', default= 0.1, help='model LLM to use')
-    parser.add_argument('--agent', default= 'geoflow', help='agent to use')
-    args = parser.parse_args()
+    # parser = argparse.ArgumentParser(description='geo-olm agent')
+    # parser.add_argument('--api', default='ChatCompletion', help='choose between Responses and ChatCompletion')
+    # parser.add_argument('--exp_id', default=0, help='run ID to choose')
+    # parser.add_argument('--client', default='openai', help='client to use')
+    # parser.add_argument('--model', default= "gpt-4o-mini", help='model LLM to use')
+    # parser.add_argument('--temp', default= 0.1, help='model LLM to use')
+    # parser.add_argument('--agent', default= 'geoflow', help='agent to use')
+    # args = parser.parse_args()
 
-    geo_path = f'./prompt_tests/benchmark/geo_{args.exp_id}'
-    geo_flow = load_json_file(geo_path + '/flow_gt.json')['tasks']
-    with open(geo_path + f"/query.txt", "r") as f:
-        query = f.read()
-    main(args, geo_flow, query)
+    # geo_path = f'./prompt_tests/benchmark/geo_{args.exp_id}'
+    # geo_flow = load_json_file(geo_path + '/flow_gt.json')['tasks']
+    # with open(geo_path + f"/query.txt", "r") as f:
+    #     query = f.read()
+    # main(args, geo_flow, query)
+    from collections import OrderedDict
+
+    # Load the original JSON file
+    for exp_id in range(0, 22):
+        geo_path = f'./prompt_tests/benchmark/geo_{exp_id}'
+        with open(geo_path + f"/flow_expr.json", "r") as f:
+            data = json.load(f)
+        
+        with open(geo_path + f"/query.txt", "r") as f:
+            query = f.read()
+
+        # Create a new OrderedDict with 'query' first
+        new_data = OrderedDict()
+        new_data["query"] = query
+        new_data["tasks"] = data.get("tasks", {})
+
+        # Save the modified JSON
+        with open(geo_path + "/flow_expr.json", "w") as f:
+            json.dump(new_data, f, indent=4)

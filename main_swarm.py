@@ -36,7 +36,6 @@ def main():
         detector=detector, 
         map_ops=map_ops,
         triage=triage,
-        
     )
 
     # Solving with an agent!

@@ -21,6 +21,8 @@ class AgentRun:
         self.agent_run_result = task_result.to_dict()
         if hasattr(self.platform.model_client, "to_dict"):
             self.agent_run_result["model_client"] = self.platform.model_client.to_dict()
+        # if self.platform.database.images_gdf:
+        #     ... save
 
     def save_agent_run_result(self, task_result):
         """

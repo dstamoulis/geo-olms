@@ -2,21 +2,22 @@ from evaluate.agent_metrics import AgentMetrics
 
 def main():
 
-    gts_file = './results/geeo25_minival.json' 
-    agent_results_file =  './results/geeo25_minival.json' 
+    gts_prefix = "results/openai/gpt_4o_mini/single_agent/openai_gpt_4o_mini_0_1_single_agent"
+    results_prefix = "results/openai/gpt_4o_mini/geoflow/openai_gpt_4o_mini_0_1_geoflow"
+    agent_metrics = AgentMetrics(gts_prefix, results_prefix)
 
-    gts_file = 'results/openai/gpt_4o_mini/single_agent/openai_gpt_4o_mini_0_1_single_agent_0.json'
-    agent_results_file = 'results/openai/gpt_4o_mini/geoflow/openai_gpt_4o_mini_0_1_geoflow_0.json'
+    runs_from, runs_to = 0, 6
+    runs_id = [i for i in range(runs_from, runs_to)]
 
-    agent_metrics = AgentMetrics(gts_file, agent_results_file)
-    overall_correctness, error_details = agent_metrics.correctness()
-    metrics = agent_metrics.system_metrics()
-    # summary = agent_metrics.eval_all()
+    for run_id in runs_id:
+        gts_file = f"{gts_prefix}_{run_id}.json"
+        results_file = f"{results_prefix}_{run_id}.json"
+        agent_metrics.evaluate_run(gts_file, results_file)
 
-    print("Overall Correctness:", overall_correctness)
-    print("Error Types:", error_details)
-    print("System Metrics:", metrics)
-    # print("Full Summary:", summary)
+    agent_metrics.print_avg_llm_metrics()
+    agent_metrics.print_error_counts()
+    agent_metrics.print_overall_correctness()
+
 
 if __name__ == "__main__":
     main()

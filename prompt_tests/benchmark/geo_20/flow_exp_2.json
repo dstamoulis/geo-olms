@@ -1,9 +1,9 @@
 {
-  "query": "Fetch BigEarthNet in Switzerland for and run the ResNet-32 classifier. Please plot on the map the 'Vineyards' and 'Fruit trees and berry plantations' LCC classes",
+  "query": "Run the ResNet-32 LCC model on BigEarthNet from 2nd half of April 2018. How many 'Airports' LCC classification results we got?",
   "tasks": {
     "task0": {
       "id": "task0",
-      "objective": "Fetch images from the BigEarthNet dataset and filter the images specifically from Switzerland.",
+      "objective": "Fetch images from the BigEarthNet dataset taken in the 2nd half of April 2018.",
       "agent_id": 0,
       "next": [
         "task1"
@@ -16,7 +16,7 @@
     },
     "task1": {
       "id": "task1",
-      "objective": "Run the ResNet-32 classifier on the fetched BigEarthNet images to detect 'Vineyards' and 'Fruit trees and berry plantations'.",
+      "objective": "Run the ResNet-32 classifier on the fetched BigEarthNet images to detect 'Airports'.",
       "agent_id": 1,
       "next": [
         "task2"
@@ -31,7 +31,7 @@
     },
     "task2": {
       "id": "task2",
-      "objective": "Plot the results of the ResNet-32 classification, highlighting 'Vineyards' and 'Fruit trees and berry plantations' on the map.",
+      "objective": "Count the number of 'Airports' classification results from the ResNet-32 output.",
       "agent_id": 2,
       "next": [],
       "prev": [
@@ -40,7 +40,7 @@
       "status": "pending",
       "history": "",
       "remaining_dependencies": 1,
-      "agent": "map_agent"
+      "agent": "data_agent"
     }
   }
 }

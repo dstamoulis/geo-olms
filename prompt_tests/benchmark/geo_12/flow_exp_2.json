@@ -1,9 +1,9 @@
 {
-  "query": "Fetch BigEarthNet in Switzerland for and run the ResNet-32 classifier. Please plot on the map the 'Vineyards' and 'Fruit trees and berry plantations' LCC classes",
+  "query": "Let's start by getting the xView1 images from Prague, Czech Republic for Summer 2017. Consider a wide area. Then run the Swin-L detector. Last, can you please tell me how many 'Passenger Car' you got?",
   "tasks": {
     "task0": {
       "id": "task0",
-      "objective": "Fetch images from the BigEarthNet dataset and filter the images specifically from Switzerland.",
+      "objective": "Fetch images from the xView1 dataset specifically from Prague, Czech Republic for Summer 2017, considering a wide area.",
       "agent_id": 0,
       "next": [
         "task1"
@@ -16,7 +16,7 @@
     },
     "task1": {
       "id": "task1",
-      "objective": "Run the ResNet-32 classifier on the fetched BigEarthNet images to detect 'Vineyards' and 'Fruit trees and berry plantations'.",
+      "objective": "Run the Swin-L detector on the fetched xView1 images to detect 'Passenger Car'.",
       "agent_id": 1,
       "next": [
         "task2"
@@ -31,7 +31,7 @@
     },
     "task2": {
       "id": "task2",
-      "objective": "Plot the results of the ResNet-32 classification, highlighting 'Vineyards' and 'Fruit trees and berry plantations' on the map.",
+      "objective": "Count the number of 'Passenger Car' detected in the xView1 images.",
       "agent_id": 2,
       "next": [],
       "prev": [
@@ -40,7 +40,7 @@
       "status": "pending",
       "history": "",
       "remaining_dependencies": 1,
-      "agent": "map_agent"
+      "agent": "data_agent"
     }
   }
 }

@@ -1,9 +1,9 @@
 {
-  "query": "Fetch BigEarthNet in Switzerland for and run the ResNet-32 classifier. Please plot on the map the 'Vineyards' and 'Fruit trees and berry plantations' LCC classes",
+  "query": "Run the YOLO-v6 LCC model on BigEarthNet from March 2018. Plot the 'Airports' LCC classification results on the map",
   "tasks": {
     "task0": {
       "id": "task0",
-      "objective": "Fetch images from the BigEarthNet dataset and filter the images specifically from Switzerland.",
+      "objective": "Fetch images from the BigEarthNet dataset for March 2018.",
       "agent_id": 0,
       "next": [
         "task1"
@@ -16,7 +16,7 @@
     },
     "task1": {
       "id": "task1",
-      "objective": "Run the ResNet-32 classifier on the fetched BigEarthNet images to detect 'Vineyards' and 'Fruit trees and berry plantations'.",
+      "objective": "Run the YOLO-v6 model on the fetched images to classify 'Airports'.",
       "agent_id": 1,
       "next": [
         "task2"
@@ -31,7 +31,7 @@
     },
     "task2": {
       "id": "task2",
-      "objective": "Plot the results of the ResNet-32 classification, highlighting 'Vineyards' and 'Fruit trees and berry plantations' on the map.",
+      "objective": "Plot the classification results of 'Airports' on the map.",
       "agent_id": 2,
       "next": [],
       "prev": [

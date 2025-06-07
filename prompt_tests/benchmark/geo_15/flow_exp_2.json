@@ -1,9 +1,9 @@
 {
-  "query": "Fetch xView1 images from Greece. How many images we got?",
+  "query": "Fetch xView1 images from Turkey. How many images are there?",
   "tasks": {
     "task0": {
       "id": "task0",
-      "objective": "Fetch images from the xView1 dataset and filter the images specifically from Greece.",
+      "objective": "Fetch images from the xView1 dataset and filter specifically for Turkey.",
       "agent_id": 0,
       "next": [
         "task1"
@@ -16,7 +16,7 @@
     },
     "task1": {
       "id": "task1",
-      "objective": "Count the number of images fetched from the xView1 dataset.",
+      "objective": "Count the number of images retrieved from the xView1 dataset for Turkey.",
       "agent_id": 1,
       "next": [],
       "prev": [

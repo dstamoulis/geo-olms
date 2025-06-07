@@ -1,9 +1,9 @@
 {
-  "query": "Fetch BigEarthNet in Switzerland for and run the ResNet-32 classifier. Please plot on the map the 'Vineyards' and 'Fruit trees and berry plantations' LCC classes",
+  "query": "First, let's load the xView1 images from Signapore for Summer 2017, but please make sure you consider a wide area. Then run the Swin-L detector. Based on the detection counts, which category showed up with more objects in that area: 'Oil Tanker', 'Ferry', or 'Sailboat'? Thanks in advance for the help!",
   "tasks": {
     "task0": {
       "id": "task0",
-      "objective": "Fetch images from the BigEarthNet dataset and filter the images specifically from Switzerland.",
+      "objective": "Load xView1 images from Singapore for Summer 2017, focusing on a wide area.",
       "agent_id": 0,
       "next": [
         "task1"
@@ -16,7 +16,7 @@
     },
     "task1": {
       "id": "task1",
-      "objective": "Run the ResNet-32 classifier on the fetched BigEarthNet images to detect 'Vineyards' and 'Fruit trees and berry plantations'.",
+      "objective": "Run the Swin-L detector on the loaded xView1 images to identify objects.",
       "agent_id": 1,
       "next": [
         "task2"
@@ -31,7 +31,7 @@
     },
     "task2": {
       "id": "task2",
-      "objective": "Plot the results of the ResNet-32 classification, highlighting 'Vineyards' and 'Fruit trees and berry plantations' on the map.",
+      "objective": "Analyze the detection counts to identify which category has the most objects: 'Oil Tanker', 'Ferry', or 'Sailboat'.",
       "agent_id": 2,
       "next": [],
       "prev": [
@@ -40,7 +40,7 @@
       "status": "pending",
       "history": "",
       "remaining_dependencies": 1,
-      "agent": "map_agent"
+      "agent": "data_agent"
     }
   }
 }

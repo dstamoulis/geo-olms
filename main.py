@@ -90,16 +90,16 @@ def main(args, workflow=None, query="No query provided"):
     )
 
     # Solving with an agent!
-    platform = Platform(model_client, messages, database, vision, map_tools, orch_agent)
-    # platform = Platform(model_client, messages, database, vision, map_tools, single_agent)
+    # platform = Platform(model_client, messages, database, vision, map_tools, orch_agent)
+    platform = Platform(model_client, messages, database, vision, map_tools, single_agent)
     agent_run = AgentRun(platform, results_output_file=results_output_file)
     
     start_time = time.time()
-    # response = platform.agent.run_query(query)
-    response = platform.agent.run_workflow(
-        {"database_agent": database_agent, "map_agent": map_agent, "detector_agent": detector_agent, "data_agent": data_agent},
-        workflow
-    )
+    response = platform.agent.run_query(query)
+    # response = platform.agent.run_workflow(
+    #     {"database_agent": database_agent, "map_agent": map_agent, "detector_agent": detector_agent, "data_agent": data_agent},
+    #     workflow
+    # )
     end_time = time.time()
     elapsed_time = round(end_time - start_time, 4)
     print("===elapsed time: ", elapsed_time, " s===")

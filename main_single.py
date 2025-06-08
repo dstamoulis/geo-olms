@@ -27,7 +27,6 @@ from utils import load_json_file, get_results_path
 
 def main(args, workflow=None, query="No query provided"):
 
-    results_output_file = get_results_path(args)
     model_client = BaseClient.from_cfg({
             "client": args.client,      # Options: "openai", "ollama", "vllm"
             "model": args.model,    # Model name, e.g., "gpt-4o-mini" or "llama3.3:70b" for ollama
@@ -50,7 +49,7 @@ def main(args, workflow=None, query="No query provided"):
 
     # Solving with an agent!
     platform = Platform(model_client, messages, database, vision, map_tools, single_agent)
-    agent_run = AgentRun(platform, results_output_file=results_output_file)
+    agent_run = AgentRun(platform, results_output_filenames=get_results_path(args))
     
     start_time = time.time()
     response = platform.agent.run_query(query)
@@ -61,8 +60,8 @@ def main(args, workflow=None, query="No query provided"):
     print(response)
     print(platform.database.images_gdf)
     print(platform.vision.detections_gdf)
-
-    agent_run.save_agent_run_result(AgentTask(query= query, messages= platform.messages.to_list_dict()))
+    
+    agent_run.save_agent_run_result(AgentTask(query= query, messages=platform.messages.to_list_dict()))
     platform.reset()
 
 

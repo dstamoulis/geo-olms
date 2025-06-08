@@ -1,15 +1,19 @@
 import json
 from collections import defaultdict
 import numpy as np
+import fiona
+import geopandas as gpd
+import os
 
 
 class AgentMetrics:
 
-    def __init__(self, gts_prefix, results_prefix):
+    def __init__(self, gts_path, results_path):
 
-        self.gts_prefix = gts_prefix
-        self.results_prefix = results_prefix
+        self.gts_path = gts_path
+        self.results_path = results_path
         self.reset_metrics()
+        self.verbose = False
 
     def reset_metrics(self):
 
@@ -31,8 +35,12 @@ class AgentMetrics:
 
         self.correctness_list = []
         self.error_types = defaultdict(int)
-        self.overall_correctness = 0
+        self.avg_correctness = 0
         self.error_details_dict = {}
+
+        self.success_list = []
+        self.avg_success = 0
+        self.unsuccess_types = defaultdict(int)
 
 
     def extend_allowed_functions(self, gt_tool_calls):
@@ -135,7 +143,7 @@ class AgentMetrics:
         # Compute correctness for this task (clip at 0).
         result_correctness = max(1 - (errors_in_result / num_gt_calls), 0) if num_gt_calls > 0 else 0
         self.correctness_list.append(result_correctness)
-        self.overall_correctness = np.mean(self.correctness_list) if self.correctness_list else -1
+        self.avg_correctness = np.mean(self.correctness_list) if self.correctness_list else -1
 
 
     def compute_avg_llm_metrics(self):
@@ -209,27 +217,80 @@ class AgentMetrics:
 
         print("-" * (label_width + value_width), "\n")
 
-
-    def print_overall_correctness(self):
+    def print_unsuccess_counts(self):
         """
-        Prints the overall correctness as a single-line table.
+        Prints the counts for each unssuccess issue in a formatted table.
         """
-        # Format as percentage if it’s a float in [0,1], otherwise raw value
-        val = self.overall_correctness
-        if isinstance(val, float) and 0.0 <= val <= 1.0:
-            val_str = f"{val:.1%}"
-        else:
-            val_str = str(val)
+        error_types_dict = {
+            "images layers": "Missing Images Dataset (not loaded)",
+            "detections layers": "Missing Detector (not ran)",
+            " layers": "Missing layers",
+            "images items": "Missing Images in Dataset (loaded but missing)",
+            "detections items": "Missing Detections (Detection run but missing dets)",
+            " items": "Missing items",
+        }
+        error_types_dict = {
+            "images layers": "Missing Images (Dataset not loaded)",
+            "detections layers": "Missing Detections (No Detector run)",
+            "images items": "Missing Images in Dataset (loaded but missing)",
+            "detections items": "Missing Detections (Detection run but missing dets)",
+            "images scatter": "Missing images scatter plot",
+            "detections scatter": "Missing detections scatter plot",
+            "landcover scatter": "Missing landcover scatter plot",
+            "map zoom": "Map not properly zoomed",
+        }
 
-        label = "Overall correctness"
-        # Compute widths
-        label_width = len(label) + 2
-        value_width = len(val_str) + 2
+        # Build rows of (label, count)
+        rows = [(error_types_dict[key], self.unsuccess_types.get(key, 0)) for key in error_types_dict.keys()]
 
-        # Print
-        print("Overall Correctness")
+        # Compute column widths
+        label_width = max(len(label) for label, _ in rows) + 2
+        value_width = max(len(str(count)) for _, count in rows) + 2
+
+        # Print header
+        print("Unsuccess Reason Types (Count)")
         print("-" * (label_width + value_width))
-        print(f"{label:<{label_width}}{val_str:>{value_width}}")
+
+        # Print each error count
+        for label, count in rows:
+            print(f"{label:<{label_width}}{count:>{value_width}}")
+
+        print("-" * (label_width + value_width), "\n")
+
+
+    def print_avg_agent_scores(self):
+        """
+        Prints the average correctness and average success side by side
+        in a single, neatly formatted table.
+        """
+        # Prepare the two metrics
+        metrics = [
+            ("Overall Correctness", self.avg_correctness),
+            ("Overall Success", self.avg_success)
+        ]
+
+        # Format values and build rows
+        rows = []
+        for label, val in metrics:
+            if isinstance(val, float) and 0.0 <= val <= 1.0:
+                val_str = f"{val:.1%}"
+            else:
+                val_str = str(val)
+            rows.append((label, val_str))
+
+        # Compute column widths
+        label_width = max(len(label) for label, _ in rows) + 2
+        value_width = max(len(value) for _, value in rows) + 2
+
+        # Print header
+        print("\nAgent Scores Summary")
+        print("-" * (label_width + value_width))
+
+        # Print each metric
+        for label, val_str in rows:
+            print(f"{label:<{label_width}}{val_str:>{value_width}}")
+
+        # Footer
         print("-" * (label_width + value_width), "\n")
 
 
@@ -257,14 +318,155 @@ class AgentMetrics:
         self.compute_avg_llm_metrics()
 
 
-    def evaluate_run(self, gts_file, results_file):
+    def uoi_success(self, gt_uois_dict: dict, res_uois_dict: dict, uoi_type: str = "", error_tol: float = 0.0) -> int:
+        """
+        Compares two UOI lists (ground-truth vs. results) for "success" under the following rules:
+        
+        1. Every layer in the GT must be present in the results (i.e. results_layers ⊇ gt_layers).
+        2. For each GT layer, compare the set of unique `uoi` values:
+        - Let GT = set of uoi in the GT layer.
+        - Let RES = set of uoi in the same-named results layer.
+        - It's a pass if |GT \ RES| / |GT| ≤ error_tol.
+            (i.e. you may miss up to error_tol fraction of GT images)
+        
+        Args:
+            gt_uois_dict: Dict with ground-truth UOIs json.
+            res_uois_dict: Dict with results UOIs json.
+            uoi_type: Str either (images or detections)
+            error_tol: Fractional tolerance for missing items (0 ⇒ must have 100% of GT).
+        
+        Returns:
+            1 if both checks pass, else 0.
+        """
+        # 1. List layers
+        gt_layers  = set(list(gt_uois_dict.keys()))
+        res_layers = set(list(res_uois_dict.keys()))
 
-        with open(gts_file) as f:
+        success = True
+        
+        # Check 1: all GT layers must be in results
+        if not gt_layers.issubset(res_layers):
+            missing = gt_layers - res_layers
+            if self.verbose: print(f"Missing layers in results: {missing}")
+            self.unsuccess_types[f"{uoi_type} layer"] +=1
+            success = False
+        
+        # Check 2: per-layer uoi superset with tolerance
+        for layer in gt_layers:
+            
+            gt_uois  = set(gt_uois_dict.get(layer, []))
+            res_uois = set(res_uois_dict.get(layer, []))
+            
+            # fraction missing = |GT - RES| / |GT|
+            missing_count = len(gt_uois - res_uois)
+            frac_missing  = missing_count / len(gt_uois) if gt_uois else 0.0
+            
+            if frac_missing > error_tol:
+                if self.verbose : 
+                    print(f"Layer '{layer}': missing {missing_count}/{len(gt_uois)} "
+                        f"({frac_missing:.1%} > tol={error_tol:.1%})")
+                self.unsuccess_types[f"{uoi_type} items"] +=1
+                success = False
+        
+        # All checks passed
+        return success
+
+
+    def map_state_success(self, gt_map_dict, results_map_dict, center_tol=0.5):
+        """
+        Compare a ground-truth map state dict and a result map state dict for “success”:
+        1. All three lists under gt["map_state"] must match exactly res["map_state"] (as sets).
+        2. The absolute difference in center lat/lon must be ≤ center_tol.    
+        Returns 1 if both conditions pass, else 0.
+        """
+        map_error_types = {
+            "image_datasets_scatter_plots" : "images scatter",
+            "detections_scatter_plots" : "detections scatter",
+            "landcover_scatter_plots" : "landcover scatter"
+        }
+        success = True
+        gt_state = gt_map_dict.get("map_state", {})
+        res_state = results_map_dict.get("map_state", {})
+        for key, plot_error_type in map_error_types.items():
+            gt_list = gt_state.get(key, [])
+            res_list = res_state.get(key, [])
+            if set(gt_list) != set(res_list):
+                self.unsuccess_types[plot_error_type] +=1
+                success = False
+
+        try:
+            gt_center = gt_map_dict.get("map_layout", {})\
+                        .get("mapbox", {})\
+                        .get("center", {})
+            res_center = results_map_dict.get("map_layout", {})\
+                            .get("mapbox", {})\
+                            .get("center", {})
+            gt_lat, gt_lon = float(gt_center["lat"]), float(gt_center["lon"])
+            res_lat, res_lon = float(res_center["lat"]), float(res_center["lon"])
+
+            if abs(gt_lat - res_lat) > center_tol or abs(gt_lon - res_lon) > center_tol:
+                if self.verbose: print(f"Center mismatch: GT=({gt_lat},{gt_lon}), "
+                        f"RES=({res_lat},{res_lon}), tol={center_tol}")
+                self.unsuccess_types["map zoom"] +=1
+                success = False
+
+        except (KeyError, TypeError, ValueError):
+            print("Invalid or missing center coordinates in map_layout.mapbox.center")
+            
+        return success
+
+    def success(self, 
+            gts_dict, results_dict,
+            gt_images_uois_dict, results_images_uois_dict, 
+            gt_detections_uois_dict, results_detections_uois_dict, 
+            gt_map_dict, results_map_dict,
+            imgs_error_tol = 0.2, dets_error_tol=0.2, map_degrees_error_tol=0.2
+        ):
+
+        images_success = self.uoi_success(
+            gt_images_uois_dict, results_images_uois_dict,
+            uoi_type="images", error_tol = imgs_error_tol
+            )
+        detections_success = self.uoi_success(
+            gt_detections_uois_dict, results_detections_uois_dict,
+            uoi_type="detections", error_tol = dets_error_tol
+            )
+        map_success = self.map_state_success(gt_map_dict, results_map_dict, map_degrees_error_tol)
+
+        successful_run = images_success and detections_success and map_success
+        self.success_list.append(successful_run)
+        self.avg_success = np.mean(self.success_list) if self.success_list else -1
+
+
+    def evaluate_run(self, run_id):
+
+        with open(os.path.join(self.gts_path, str(run_id), "result.json")) as f:
             gts_dict = json.load(f)
-        with open(results_file) as f:
+        with open(os.path.join(self.results_path, str(run_id), "result.json")) as f:
             results_dict = json.load(f)
 
+        with open(os.path.join(self.gts_path, str(run_id), "images_gdf.json")) as f:
+            gt_images_uois_dict = json.load(f)
+        with open(os.path.join(self.results_path, str(run_id), "images_gdf.json")) as f:
+            results_images_uois_dict = json.load(f)
+
+        with open(os.path.join(self.gts_path, str(run_id), "detections_gdf.json")) as f:
+            gt_detections_uois_dict = json.load(f)
+        with open(os.path.join(self.results_path, str(run_id), "detections_gdf.json")) as f:
+            results_detections_uois_dict = json.load(f)
+
+        with open(os.path.join(self.gts_path, str(run_id), "map_state.json")) as f:
+            gt_map_dict = json.load(f)
+        with open(os.path.join(self.results_path, str(run_id), "map_state.json")) as f:
+            results_map_dict = json.load(f)
+
         self.correctness(gts_dict, results_dict)
+        self.success(
+            gts_dict, results_dict,
+            gt_images_uois_dict, results_images_uois_dict, 
+            gt_detections_uois_dict, results_detections_uois_dict, 
+            gt_map_dict, results_map_dict
+        )
         self.llm_metrics(results_dict)
 
 
@@ -274,14 +476,12 @@ if __name__ == "__main__":
 
     gts_prefix = "results/openai/gpt_4o_mini/single_agent/openai_gpt_4o_mini_0_1_single_agent"
     results_prefix = "results/openai/gpt_4o_mini/geoflow/openai_gpt_4o_mini_0_1_geoflow"
-    agent_metrics = AgentMetrics(gts_prefix, results_prefix)
+    agent_metrics = AgentMetrics(gts_path, results_path)
 
     runs_from, runs_to = 0, 3
     runs_id = [i for i in range(runs_from, runs_to)]
 
     for run_id in runs_id:
-        gts_file = f"{gts_prefix}_{run_id}.json"
-        results_file = f"{results_prefix}_{run_id}.json"
-        agent_metrics.evaluate_run(gts_file, results_file)
+        agent_metrics.evaluate_run(run_id)
 
     agent_metrics.print_avg_llm_metrics()

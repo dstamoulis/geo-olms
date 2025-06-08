@@ -19,15 +19,19 @@ def get_results_path(args, base_dir="results") -> str:
     agent = re_args_component(str(args.agent))
     exp_id = re_args_component(str(args.exp_id))
 
-    # Build the base filename (without extension)
-    filename = f"{client}_{model}_{temp}_{agent}_{exp_id}.json"
+    # Directory hierarchy: results/{client}/{model}/{agent}/{exp_id}
+    results_path = os.path.join(base_dir, client, model, agent, exp_id)
+    os.makedirs(results_path, exist_ok=True)
 
-    # Directory hierarchy: results/{client}/{model}/{agent}
-    dir_path = os.path.join(base_dir, client, model, agent)
-    os.makedirs(dir_path, exist_ok=True)
-
-    # Full path to the .json file
-    return os.path.join(dir_path, filename)
+    # Build the base filenames
+    results_filenames = {
+        "results_path": str(results_path),
+        "result": os.path.join(results_path, "result.json"),
+        "images_gdf": os.path.join(results_path, "images_gdf.json"),
+        "detections_gdf": os.path.join(results_path, "detections_gdf.json"),
+        "map_state": os.path.join(results_path, "map_state.json"),
+    }
+    return results_filenames 
 
 
 

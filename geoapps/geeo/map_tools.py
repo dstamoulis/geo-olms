@@ -35,7 +35,20 @@ class MapTools:
             ),
             margin={"r": 0, "t": 0, "l": 0, "b": 0}
         )
+        self.map_state = {
+            'image_datasets_scatter_plots': [],
+            'detections_scatter_plots': [],
+            'landcover_scatter_plots': []
+        }
         return fig
+
+
+    def get_map_state(self):
+        return {
+            "map_state": self.map_state,
+            "map_layout": self.map_fig
+        }
+
 
     def _add_scatter(self, plot_geom, trace_name, customdata):
         """
@@ -84,6 +97,7 @@ class MapTools:
         customdata = images_gdf["filename"].tolist() if "filename" in images_gdf.columns else ["" for _ in range(len(gdf))]
         trace_name = f"{dataset} images"
         self._add_scatter(plot_geom, trace_name, customdata)
+        self.map_state['image_datasets_scatter_plots'].append(dataset)
         return f"Images scatter plot added with {len(images_gdf)} {dataset} images."
 
 
@@ -151,6 +165,7 @@ class MapTools:
         trace_name = f"{dataset} {detector_name} detections"
 
         self._add_scatter(plot_geom, trace_name, customdata)
+        self.map_state['detections_scatter_plots'].append(f"{dataset}_x_{detector_name}_x_{dataset}")
         return f"Scatter plot added with {len(detections_gdf)} {category_name} detections with detector {detector_name} for dataset {dataset}."
 
 
@@ -199,6 +214,7 @@ class MapTools:
         customdata = lcc_gdf["filename"].tolist() if "filename" in lcc_gdf.columns else ["" for _ in range(len(gdf))]
         trace_name = f"{dataset} {classifier_name} LCC classification results"
         self._add_scatter(plot_geom, trace_name, customdata)
+        self.map_state['landcover_scatter_plots'].append(f"{dataset}_x_{classifier_name}_x_{dataset}")
         return f"Scatter plot added with {len(lcc_gdf)} {category_name} LCC classification results for classifer model {classifier_name} and dataset {dataset}."
 
 

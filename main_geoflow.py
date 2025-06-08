@@ -78,7 +78,6 @@ def main(args, workflow=None, query="No query provided"):
         toolsets_list=[],
         system_message="You are an orchastrating agent handing off tasks to subagents most suited for given a given task!"
     )
-    
     single_agent = SingleAgent(
         api=args.api,
         name="single_agent",

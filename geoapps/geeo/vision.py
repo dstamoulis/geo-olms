@@ -137,7 +137,7 @@ class Vision:
             return DETECTOR_DATASET_ERROR_MSG.format(dataset=dataset, dataset_names=list(LCC_CLASSIFIER_MODELS.keys()))
 
         if classifier_name not in LCC_CLASSIFIER_MODELS[dataset]: 
-            return DETECTOR_MODEL_ERROR_MSG.format(
+            return LCC_CLASSIFIER_MODEL_ERROR_MSG.format(
                 classifier_name=classifier_name,
                 dataset=dataset,
                 classifier_names=LCC_CLASSIFIER_MODELS[dataset]

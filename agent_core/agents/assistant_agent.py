@@ -214,11 +214,11 @@ class AssistantAgent(BaseAgent):
                 content = task['objective']
                 text_message = TextMessage(role='user', content=content, source='user')
                 print(f"\nText message: {text_message}\n")
-                self.messages.add_message(text_message)
+                # self.messages.add_message(text_message) ! BUG
                 handoff_agent.messages.add_message(text_message)
                 response = handoff_agent.get_response_workflow(task_id, workflow)
                 print(f"\nResponse: {response}\n")
-                self.messages.add_message(response)
+                # self.messages.add_message(response) ! BUG
         if log_target:
             with open("target.json", "w") as f:
                 json.dump(workflow, f, indent=2)

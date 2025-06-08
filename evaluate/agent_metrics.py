@@ -113,6 +113,11 @@ class AgentMetrics:
             for idx, result_tool_call in enumerate(result_tool_calls):
                 if idx in used_candidate_indices:
                     continue
+                # handle handoff logic (steps)
+                if "handoff_transfer_to_" in result_tool_call.get('name'):
+                    # match_index = idx
+                    used_candidate_indices.add(idx)
+                    continue
                 # Candidate's function must be allowed.
                 if result_tool_call.get('name') not in self.allowed_functions:
                     # If candidate is not allowed, count it as infeasible and mark it as used.
@@ -132,8 +137,8 @@ class AgentMetrics:
                 # Compare arguments using your existing check.
                 if self.check_argument_error(gt_tool_call, result_tool_call):
                     self.error_types["Argument Error"] += 1
-                    errors_in_result += 1
-        
+                    errors_in_result 
+
         # Any candidate calls not used are counted as redundant.
         extra_calls = len(result_tool_calls) - len(used_candidate_indices)
         if extra_calls > 0:

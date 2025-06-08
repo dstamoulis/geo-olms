@@ -22,6 +22,7 @@ import argparse
 import json
 import time
 
+from utils import load_json_file, get_results_path
 
 # ------------------------------
 # Added
@@ -54,9 +55,9 @@ def load_json_file(file_path):
 def main(args, workflow=None, query="No query provided"):
 
     model_client = BaseClient.from_cfg({
-            "client": "openai",      # Options: "openai", "ollama", "vllm"
-            "model": "gpt-4o-mini",    # Model name, e.g., "gpt-4o-mini" or "llama3.3:70b" for ollama
-            "temperature": 0.1,        # Default temperature setting
+            "client": args.client,      # Options: "openai", "ollama", "vllm"
+            "model": args.model,    # Model name, e.g., "gpt-4o-mini" or "llama3.3:70b" for ollama
+            "temperature": args.temp,        # Default temperature setting
         })
     messages = Messages()
     database = Database()    
@@ -89,6 +90,14 @@ def main(args, workflow=None, query="No query provided"):
         toolsets_list=[map_tools],
         system_message="You are the map agent!"
     )
+    data_agent = SingleAgent(
+        api=args.api,
+        name="data_agent",
+        model_client=model_client,
+        messages=messages,
+        toolsets_list=[data_tools],
+        system_message="Expert in all kinds of image analyzing tasks!"
+    )
     verifier_agent = SingleAgent(
         api=args.api,
         name="verifier_agent",
@@ -97,7 +106,7 @@ def main(args, workflow=None, query="No query provided"):
         toolsets_list=[],
         system_message="You are a result verifier agent that verify if the query has been executed successfully." \
         "You will receive an input of fomat \"[Objective]: xxx. [Response]: yyy\", and you will decide if the Response" \
-        "successfully fulfill the ask from Objective. If it does, return \"COPMLETED\". If not, return \"ERROR\"." \
+        "successfully fulfill the ask from Objective. If it does, return \"COMPLETED\". If not, return \"ERROR\"." \
         "Example:\n"
         "[Objective]: Fetch images from the FAIR1M dataset and filter the images from the UK." \
         "[Response]: I have successfully fetched 14 images from the FAIR1M dataset for the UK.\n" \
@@ -108,10 +117,10 @@ def main(args, workflow=None, query="No query provided"):
     task_queue = deque()
     for task in workflow.values():
         task_queue.append(task)
-    state_queue = deque([database_agent, detector_agent, map_agent])
+    state_queue = deque([database_agent, detector_agent, data_agent, map_agent])
 
     platform = Platform(model_client, messages, database, vision, map_tools, verifier_agent)
-    agent_run = AgentRun(platform, results_output_file='./results/single_agent_test.json')
+    agent_run = AgentRun(platform, results_output_filenames=get_results_path(args))
 
     start_time = time.time()
     response = platform.agent.run_stateflow(
@@ -126,18 +135,19 @@ def main(args, workflow=None, query="No query provided"):
     print(platform.database.images_gdf)
     print(platform.vision.detections_gdf)
 
-    agent_run.add_task_result(AgentTask(queries=[query], rounds=[{"query": query, "messages": platform.messages.to_list_dict()}]))
-    agent_run.save_inference_results()
+    agent_run.save_agent_run_result(AgentTask(query= query, messages= platform.messages.to_list_dict()))
     platform.reset()
 
 if __name__ == "__main__":
-    i = 8
+
     parser = argparse.ArgumentParser(description='geo-olm agent')
     parser.add_argument('--api', default='ChatCompletion', help='choose between Responses and ChatCompletion')
+    parser.add_argument('--exp_id', default=0, help='run ID to choose')
+    parser.add_argument('--client', default='openai', help='client to use')
+    parser.add_argument('--model', default= "gpt-4o-mini", help='model LLM to use')
+    parser.add_argument('--temp', default= 0.1, help='model LLM to use')
+    parser.add_argument('--agent', default= 'stateflow', help='agent to use')
     args = parser.parse_args()
 
-    geo_path = f'./prompt_tests/benchmark/geo_{i}'
-    geo_flow = load_json_file(geo_path + '/flow.json')['tasks']
-    with open(geo_path + f"/query.txt", "r") as f:
-        query = f.read()
-    main(args, geo_flow, query)
+    geo_flow = load_json_file(f'./prompt_tests/benchmark/geo_{args.exp_id}/flow_gt.json')
+    main(args, geo_flow['tasks'], geo_flow["query"])

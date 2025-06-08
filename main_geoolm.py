@@ -25,8 +25,7 @@ from utils import load_json_file, get_results_path
     
 
 def main(args, workflow=None, query="No query provided"):
-
-    results_output_file = get_results_path(args)    
+ 
     model_client = BaseClient.from_cfg({
             "client": args.client,      # Options: "openai", "ollama", "vllm"
             "model": args.model,    # Model name, e.g., "gpt-4o-mini" or "llama3.3:70b" for ollama
@@ -63,6 +62,14 @@ def main(args, workflow=None, query="No query provided"):
         toolsets_list=[vision],
         system_message="You are the detector agent!"
     )
+    data_agent = SingleAgent(
+        api=args.api,
+        name="data_agent",
+        model_client=model_client,
+        messages=messages,
+        toolsets_list=[data_tools],
+        system_message="Expert in all kinds of image analyzing tasks!"
+    )
     orch_agent = SingleAgent(
         api=args.api,
         name="orch_agent",
@@ -74,11 +81,11 @@ def main(args, workflow=None, query="No query provided"):
 
     # Solving with an agent!
     platform = Platform(model_client, messages, database, vision, map_tools, orch_agent)
-    agent_run = AgentRun(platform, results_output_file=results_output_file)
+    agent_run = AgentRun(platform, results_output_filenames=get_results_path(args))
 
     start_time = time.time()
     response = platform.agent.run_flowPP(
-        {"database_agent": database_agent, "map_agent": map_agent, "detector_agent": detector_agent},
+        {"database_agent": database_agent, "map_agent": map_agent, "detector_agent": detector_agent, "data_agent": data_agent},
         workflow
     )
     end_time = time.time()
@@ -101,7 +108,7 @@ if __name__ == "__main__":
     parser.add_argument('--client', default='openai', help='client to use')
     parser.add_argument('--model', default= "gpt-4o-mini", help='model LLM to use')
     parser.add_argument('--temp', default= 0.1, help='model LLM to use')
-    parser.add_argument('--agent', default= 'geoflow', help='agent to use')
+    parser.add_argument('--agent', default= 'geoolm', help='agent to use')
     args = parser.parse_args()
 
     geo_flow = load_json_file(f'./prompt_tests/benchmark/geo_{args.exp_id}/flow_gt.json')

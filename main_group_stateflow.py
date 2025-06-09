@@ -22,7 +22,7 @@ import argparse
 import json
 import time
 
-from utils import load_json_file, get_results_path
+from utils import load_json_file, get_results_path, re_args_component
 
 
 def main(args, workflow=None, query="No query provided"):
@@ -132,5 +132,5 @@ if __name__ == "__main__":
     parser.add_argument('--flow_ver', default= 'flow_gt', help='agent to use')
     args = parser.parse_args()
 
-    geo_flow = load_json_file(f'./prompt_flows/flows/{args.flow_ver}/{args.exp_id}.json')
+    geo_flow = load_json_file(f'./prompt_flows/flows/{re_args_component(args.flow_ver)}/{args.exp_id}.json')
     main(args, geo_flow['tasks'], geo_flow["query"])

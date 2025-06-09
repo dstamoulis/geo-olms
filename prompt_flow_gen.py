@@ -53,13 +53,13 @@ if __name__ == "__main__":
     parser.add_argument('--client', default='openai', help='client to use')
     parser.add_argument('--model', default= "gpt-4o-mini", help='model LLM to use')
     parser.add_argument('--temp', default= 0.1, help='model LLM to use')
-    parser.add_argument('--flow_ver', default= None, help='agent to use')
+    parser.add_argument('--flow_ver', default=None, help='agent to use')
     args = parser.parse_args()
 
     # The query to generate flow json for!
     query = load_json_file(f'./prompt_flows/flows/flow_gt/{args.exp_id}.json')['query']
     # The output file (workflow json)
-    flow_ver = f"flow_{re_args_component(args.model)}" if args.flow_ver is None else re_args_component(args.flow_ver)
+    flow_ver = f"{re_args_component(args.model)}" if args.flow_ver is None else re_args_component(args.flow_ver)
 
     base_dir = './prompt_flows/flows/'
     results_path = os.path.join(base_dir, flow_ver)

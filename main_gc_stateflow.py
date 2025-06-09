@@ -104,15 +104,23 @@ def main(args, workflow=None, query="No query provided"):
         model_client=model_client,
         messages=messages,
         toolsets_list=[],
-        system_message="You are an orchastrating agent handing off tasks! The workflow of completing a given task is modeled as a state-machine, " \
-            "and your job is to decide the next state to transition to based on the current state and the task at hand. " \
-            "The available agents to choose from are:\n" \
-            "- database_agent: Expert in fetching images from a database!\n" \
-            "- map_agent: Expert in performing all kinds of operations on a map!\n" \
-            "- detector_agent: Expert in processing images fetched from a database, such as object detection!\n" \
-            "- data_agent: Expert in all kinds of image analyzing tasks!\n" \
-            "You should choose ONLY from one of the four agents and return the name of the chosen agent! Or, return \'DONE\' if the task is completed. " \
-            "Your return message should ONLY be \'database_agent\', \'map_agent\', \'detector_agent\', \'data_agent\', or \'DONE\'." \
+        system_message="""
+            You are an orchastrating agent handing off tasks! The workflow of completing a given task is modeled as a state-machine,
+            and your job is to decide the next agent (state) to transition to based on the current state and the task at hand.
+
+            The available agents to choose from are:
+            - database_agent: Expert in fetching images from a database!
+            - map_agent: Expert in performing all kinds of operations on a map!
+            - detector_agent: Expert in processing images fetched from a database, such as object detection!
+            - data_agent: Expert in all kinds of image analyzing tasks!
+
+            REPLY FORMAT:
+            - You message should be the name of one of the four agents. Or, return "DONE" if the task is completed.
+            - Your return message should ONLY be ["database_agent", "map_agent", "detector_agent", "data_agent", "DONE"] (no punctuation, no additional text).
+            
+            ATTENTION:
+            - GIVE UP IF YOU FIND YOURSELF REPEATING THE SAME TOOL CALL OVER AND OVER!!
+            """
     )
 
     platform = Platform(model_client, messages, database, vision, map_tools, orch_agent)

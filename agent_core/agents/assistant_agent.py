@@ -308,9 +308,7 @@ class AssistantAgent(BaseAgent):
                 # hand off the task to the corresponding agent
                 handoff_agent = handoffs[orch_response.content]
                 print(f"\nHandoffing to {handoff_agent.name}...")
-                # handoff_agent.messages.messages.extend(self.messages.messages)
-                response = handoff_agent.get_response()
-                # self.messages = handoff_agent.messages
+                handoff_agent.get_response()
             else:
                 raise ValueError(f"Unknown response from orch_agent: {orch_response.content}")
 

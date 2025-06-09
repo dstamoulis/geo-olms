@@ -4,7 +4,7 @@
 * [ ] @Justin: Line 252 assistant.py: errors out when the response is anything BUT the exact match you are expecting ==> add parser to handle cases (e.g., if the LLM reasons or think but correctly says NEXT or DONE in the end, then make sure to parse that last part and proceed correctly)
 * [x] Add back gpt_prompt_ollama @Janani-Dimi
 * [x] Compile list of experiments @Dimi
-* [x] Compile list of evaluations! @Dimi
+* [ ] Compile list of evaluations! @Dimi
 * [ ] Add Token-runtime cost in agent_eval @Dimi!!!
 * [ ] Update flow-correctness score @Stanley
 * [ ] Paper skeleton @Justin
@@ -123,3 +123,23 @@ GeoFlow: Run each baseline with different ollama models with their respective ol
 * [ ] llama3.3:70b
 * [ ] phi4-mini:3.8b
 * [ ] mistral-small:24b
+
+
+### exp9_run_gpt_baselines_with_oracle_flow_gt.sh
+
+Run each baseline with gpt-4o-mini model with oracle `flow_gt` as input:
+
+* [x] single (flow-less!)
+* [x] swarm (flow-less!)
+* [x] geoflow
+* [x] geoolm
+* [x] seq_stateflow
+* [x] state_stateflow
+* [x] state_stateflow
+
+### exp10_run_gpt_baselines_with_gpt_flow.sh
+
+Run each baseline with gpt-4o-mini model with its respective ollama-generated `flows` as input: 
+
+* [ ] geoflow
+* [ ] geoolm

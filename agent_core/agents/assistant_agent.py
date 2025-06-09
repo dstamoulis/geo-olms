@@ -125,24 +125,6 @@ class AssistantAgent(BaseAgent):
             self.log(f"Requesting response from {self.model_client.client_class} client ({self.model_client.model})...")
             messages = [{"role": "system", "content": self.system_message}] if self.system_message is not None else []
 
-            # experiment: return function call result without having a function call request
-            # if turn == 1:
-            #     print(f"#####\nmessages before tampering: {messages}\n#####")
-            #     messages.append({
-            #         'arguments': '{"lat":51.5074,"lon":-0.1278,"zoom":10}',
-            #         'call_id': 'call_fake_1',
-            #         'name': 'zoom_map',
-            #         'type': 'function_call',
-            #         'id': 'fc_fake_1',
-            #         'status': 'completed'
-            #     })
-            #     messages.append({
-            #         'type': 'function_call_output',
-            #         'call_id': 'fake_call_1',
-            #         'output': 'Zoom updated.'
-            #     })
-            #     print(f"#####\nmessages after tampering: {messages}\n#####")
-
             messages = messages + self.messages.get_client_messages(self.model_client.client_class)
             if self.api == "Responses":
                 chat_response = self.model_client.get_response_Response(messages, tools=self.tool_schemas)
@@ -199,9 +181,9 @@ class AssistantAgent(BaseAgent):
 
         return chat_response
 
-# ------------------------------------------------
-# Workflow execution
-# ------------------------------------------------
+    # ------------------------------------------------
+    # Workflow execution
+    # ------------------------------------------------
     def get_response_workflow(self, task_id, workflow):
         while True:
             self.log(f"Requesting response from {self.model_client.client_class} client ({self.model_client.model})...")
@@ -254,6 +236,36 @@ class AssistantAgent(BaseAgent):
                 json.dump(workflow, f, indent=2)
         return response.content if ui_mode else response
     
+
+    # ------------------------------------------------------------------------------
+    # Main loop for executing Seq-StateFlow (Dimi)
+    def run_seq_stateflow_ds(self, query, handoff_message: str, agents: dict, agents_sequence: list, ui_mode=False, log_target=False):
+
+        sequence_reset = True
+        resets_cnt = 0
+        while sequence_reset:
+
+            sequence_reset = False
+            for next_agent_name in agents_sequence:
+
+                next_agent = agents[next_agent_name]
+                text_message = TextMessage(role='user', content=query+handoff_message, source='user')
+                # print(f"\nText message: {text_message}\n")
+                # self.messages.add_message(text_message)
+                next_agent.messages.add_message(text_message)
+                response = next_agent.get_response()
+                print(f"\nResponse: {response}\n")
+                next_agent.messages.add_message(response)
+                # self.messages.add_message(response)
+
+                if response.content == "ERROR":
+                    resets_cnt+=1
+                    sequence_reset = resets_cnt < 2 # so if you reset twice already, give up
+                    break
+
+        return response.content if ui_mode else response
+
+
     # ------------------------------------------------------------------------------
     # Main loop for executing Sequential StateFlow
     def run_seq_stateflow(self, state_list: list, query: str, state_stack: deque, ui_mode=False):

@@ -24,7 +24,7 @@ import time
 
 from utils import load_json_file, get_results_path
 
-    
+
 def main(args, workflow=None, query="No query provided"):
 
     model_client = BaseClient.from_cfg({
@@ -38,6 +38,44 @@ def main(args, workflow=None, query="No query provided"):
     map_tools = MapTools(database, vision, map_style="open-street-map")
     data_tools = DataTools(database, vision)
 
+
+    # SYSTEM: You are the {agent_name} in a 3-step sequential pipeline:
+    # database_agent → detector_agent → data_agent → map_agent
+
+    transition_message = """\
+        SYSTEM: You are the {agent_name} in a 3-step sequential pipeline:
+        database_agent → detector_agent → map_agent
+
+        REPLY FORMAT:
+        - Your message must be exactly “NEXT” or “ERROR” (uppercase, no punctuation, no additional text).
+        - Do NOT output anything else."""
+
+    handoff_message = """\
+        INSTRUCTIONS: You are part of a 3-step sequential pipeline:
+        database_agent → detector_agent → map_agent
+
+        On your turn, you must:
+        1. Look at the current conversation state and decide if you have any tools or actions to perform.
+            • If you have no relevant tools or your step is not needed, consider your turn finished immediately.
+            • Otherwise, perform your operations (e.g. database queries, detections, plotting).
+            • Your operations are self-contained, so you try to complete your part in a SINGLE go, without repeat the same step over and over!! If done, proceed with NEXT
+        2. Monitor for any execution errors (e.g., calling a tool before its inputs exist).
+            • If you detect any error or unfulfilled dependency problems from previous steps, you MUST signal ERROR.
+        3. When you are done, you must signal exactly one token:
+            • “NEXT” if you completed your work successfully or intentionally skipped because you had nothing to do.
+            • “ERROR” if you encountered any problem or unfulfilled dependency.
+
+        REPLY FORMAT:
+        - Your message must be exactly “NEXT” or “ERROR” (uppercase, no punctuation, no additional text).
+        - Do NOT output anything else.
+
+        Example valid replies:
+        NEXT
+        ERROR
+
+        Now it's your turn—carry out your step, then reply with NEXT or ERROR."""
+
+        
     # Subagents
     database_agent = SingleAgent(
         api=args.api,
@@ -45,7 +83,7 @@ def main(args, workflow=None, query="No query provided"):
         model_client=model_client,
         messages=messages,
         toolsets_list=[database],
-        system_message="You are the database agent!"
+        system_message=f"You are an expert in fetching images from a database!\n {transition_message.format(agent_name='database_agent')}"
     )
     detector_agent = SingleAgent(
         api=args.api,
@@ -53,7 +91,7 @@ def main(args, workflow=None, query="No query provided"):
         model_client=model_client,
         messages=messages,
         toolsets_list=[vision],
-        system_message="You are the detector agent!"
+        system_message=f"You are an expert in processing images fetched from a database, such as object detection! \n {transition_message.format(agent_name='detector_agent')}"
     )
     map_agent = SingleAgent(
         api=args.api,
@@ -61,7 +99,7 @@ def main(args, workflow=None, query="No query provided"):
         model_client=model_client,
         messages=messages,
         toolsets_list=[map_tools],
-        system_message="You are the map agent!"
+        system_message=f"You are an expert in performing all kinds of operations on a map! \n {transition_message.format(agent_name='map_agent')}"
     )
     data_agent = SingleAgent(
         api=args.api,
@@ -69,36 +107,31 @@ def main(args, workflow=None, query="No query provided"):
         model_client=model_client,
         messages=messages,
         toolsets_list=[data_tools],
-        system_message="Expert in all kinds of image analyzing tasks!"
+        system_message=f"You are an expert in all kinds of image analyzing tasks! \n {transition_message.format(agent_name='data_agent')}"
     )
-    verifier_agent = SingleAgent(
+    orch_agent = SingleAgent(
         api=args.api,
-        name="verifier_agent",
+        name="orch_agent",
         model_client=model_client,
         messages=messages,
         toolsets_list=[],
-        system_message="You are a result verifier agent that verify if the query has been executed successfully." \
-        "You will receive an input of fomat \"[Objective]: xxx. [Response]: yyy\", and you will decide if the Response" \
-        "successfully fulfill the ask from Objective. If it does, return \"COMPLETED\". If not, return \"ERROR\"." \
-        "Example:\n"
-        "[Objective]: Fetch images from the FAIR1M dataset and filter the images from the UK." \
-        "[Response]: I have successfully fetched 14 images from the FAIR1M dataset for the UK.\n" \
-        "In the above case, you will return \"COMPLETED\"." \
+        system_message="Placeholder."
     )
 
-    # process tasks for StateFlow
-    task_queue = deque()
-    for task in workflow.values():
-        task_queue.append(task)
-    state_queue = deque([database_agent, detector_agent, data_agent, map_agent])
+    agents_dict = {"database_agent": database_agent, "map_agent": map_agent, "detector_agent": detector_agent, "data_agent": data_agent}
+    agents_sequence = ["database_agent", "detector_agent", "data_agent", "map_agent"]
 
-    platform = Platform(model_client, messages, database, vision, map_tools, verifier_agent)
+    agents_dict = {"database_agent": database_agent, "map_agent": map_agent, "detector_agent": detector_agent}
+    agents_sequence = ["database_agent", "detector_agent", "map_agent"]
+    platform = Platform(model_client, messages, database, vision, map_tools, orch_agent)
     agent_run = AgentRun(platform, results_output_filenames=get_results_path(args))
 
     start_time = time.time()
-    response = platform.agent.run_stateflow(
-        task_queue=task_queue,
-        state_queue=state_queue,
+    response = platform.agent.run_seq_stateflow_ds(
+        query=query,
+        handoff_message=handoff_message,
+        agents=agents_dict,
+        agents_sequence=agents_sequence
     )
     end_time = time.time()
     elapsed_time = round(end_time - start_time, 4)

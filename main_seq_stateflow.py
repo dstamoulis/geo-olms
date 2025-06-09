@@ -24,33 +24,6 @@ import time
 
 from utils import load_json_file, get_results_path
 
-# ------------------------------
-# Added
-# ------------------------------
-def load_json_file(file_path):
-    """
-    Loads JSON data from a file.
-
-    Args:
-        file_path (str): The path to the JSON file.
-
-    Returns:
-        dict or list: The loaded JSON data as a Python dictionary or list, or None if an error occurs.
-    """
-    try:
-        with open(file_path, 'r') as file:
-            data = json.load(file)
-            return data
-    except FileNotFoundError:
-        print(f"Error: File not found: {file_path}")
-        return None
-    except json.JSONDecodeError:
-        print(f"Error: Invalid JSON format in: {file_path}")
-        return None
-    except Exception as e:
-         print(f"An unexpected error occurred: {e}")
-         return None
-    
 
 def main(args, workflow=None, query="No query provided"):
 
@@ -68,7 +41,7 @@ def main(args, workflow=None, query="No query provided"):
     transition_message = "Based on your ability, please decide if you have the required tools to complete the task, which " \
         "will be in the format \'[Objective]: xxx\'.\nIf you DO NOT have the required tools, return \'PASS\'.\nIf you DO have the required tools for the task, " \
         "go on and try to complete the task/subtask.\n" \
-        "At any point of completing the tasks/subtasks, if you encounter any error, return \'ERROR\'.\n" \
+        "At any point of completing the tasks/subtasks, if you encounter any error, return \'ERROR\'.\n Upon completing in your turn, ONLY REPLY WITH EITHER PASS or ERROR. Nothing else!!!" \
         
     # Subagents
     database_agent = SingleAgent(

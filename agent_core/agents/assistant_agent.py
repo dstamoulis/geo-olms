@@ -144,7 +144,6 @@ class AssistantAgent(BaseAgent):
             #     print(f"#####\nmessages after tampering: {messages}\n#####")
 
             messages = messages + self.messages.get_client_messages(self.model_client.client_class)
-            # self.log(f"Messages sent to model\n{messages}\n")
             if self.api == "Responses":
                 chat_response = self.model_client.get_response_Response(messages, tools=self.tool_schemas)
             else:
@@ -291,16 +290,15 @@ class AssistantAgent(BaseAgent):
         self.messages.add_message(TextMessage(role='user', content=f"{query}", source='user'))
         while True:
             orch_response = self.get_response()
-            print(f"\nOrchestrator response: {orch_response.content}\n")
             if orch_response.content == "DONE":
                 return orch_response.content if ui_mode else orch_response
             elif orch_response.content == "database_agent" or orch_response.content == "map_agent" or orch_response.content == "detector_agent" or orch_response.content == "data_agent":
                 # hand off the task to the corresponding agent
                 handoff_agent = handoffs[orch_response.content]
-                print(f"\nHandoff to {handoff_agent.name}...")
-                handoff_agent.messages.messages.extend(self.messages.messages)
+                print(f"\nHandoffing to {handoff_agent.name}...")
+                # handoff_agent.messages.messages.extend(self.messages.messages)
                 response = handoff_agent.get_response()
-                self.messages = handoff_agent.messages
+                # self.messages = handoff_agent.messages
             else:
                 raise ValueError(f"Unknown response from orch_agent: {orch_response.content}")
 

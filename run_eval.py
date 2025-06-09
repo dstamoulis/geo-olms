@@ -6,6 +6,7 @@ def main():
     # results_path = "results/openai/gpt_4o_mini/geoflow/"
     # results_path = "results/openai/gpt_4o_mini/geoolm/"
     results_path = "results/openai/gpt_4o_mini/swarm/"
+    results_path = "results/openai/gpt_4o_mini/swarm/"
     agent_metrics = AgentMetrics(gts_path, results_path)
 
     runs_from, runs_to = 0, 22

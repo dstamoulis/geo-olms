@@ -144,6 +144,7 @@ class AssistantAgent(BaseAgent):
             #     print(f"#####\nmessages after tampering: {messages}\n#####")
 
             messages = messages + self.messages.get_client_messages(self.model_client.client_class)
+            # self.log(f"Messages sent to model\n{messages}\n")
             if self.api == "Responses":
                 chat_response = self.model_client.get_response_Response(messages, tools=self.tool_schemas)
             else:
@@ -177,7 +178,7 @@ class AssistantAgent(BaseAgent):
             messages = [{"role": "system", "content": self.system_message}] if self.system_message is not None else []
 
             messages = messages + self.messages.get_client_messages(self.model_client.client_class)
-            self.log(f"Messages sent to model\n{messages}\n")
+            # self.log(f"Messages sent to model\n{messages}\n")
             if self.api == "Responses":
                 chat_response = self.model_client.get_response_Response(messages, tools=self.tool_schemas)
             else:
@@ -221,7 +222,6 @@ class AssistantAgent(BaseAgent):
 
             # === handle tool calls ===
             for tool_call in chat_response.tool_calls:
-                # tool_response = self.execute_tool_call(tool_call)
                 if self.api == "Responses":
                     tool_response = self.execute_tool_call_Response(tool_call)
                 else:
@@ -284,6 +284,25 @@ class AssistantAgent(BaseAgent):
                 break
             state = state_stack.pop()
         return response.content if ui_mode else response
+    
+    # ------------------------------------------------------------------------------
+    # Main loop for executing GC StateFlow
+    def run_gc_stateflow(self, handoffs: dict, query: str, ui_mode=False):
+        self.messages.add_message(TextMessage(role='user', content=f"{query}", source='user'))
+        while True:
+            orch_response = self.get_response()
+            print(f"\nOrchestrator response: {orch_response.content}\n")
+            if orch_response.content == "DONE":
+                return orch_response.content if ui_mode else orch_response
+            elif orch_response.content == "database_agent" or orch_response.content == "map_agent" or orch_response.content == "detector_agent" or orch_response.content == "data_agent":
+                # hand off the task to the corresponding agent
+                handoff_agent = handoffs[orch_response.content]
+                print(f"\nHandoff to {handoff_agent.name}...")
+                handoff_agent.messages.messages.extend(self.messages.messages)
+                response = handoff_agent.get_response()
+                self.messages = handoff_agent.messages
+            else:
+                raise ValueError(f"Unknown response from orch_agent: {orch_response.content}")
 
     # ------------------------------------------------------------------------------
     # Main loop for executing StateFlow

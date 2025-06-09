@@ -1,5 +1,3 @@
-from openai import OpenAI
-client = OpenAI()
 import json
 import argparse
 import sys
@@ -7,37 +5,44 @@ import os
 import time
 from collections import OrderedDict
 
-from utils import load_json_file, strip_json_code_block
+from llm_clients.base_client import BaseClient
+from utils import load_json_file, strip_json_code_block, re_args_component
 from prompt_flows.gen_prompt import INIT_WORKFLOW_PROMPT, INIT_WORKFLOW_TEMPLATE, AGENT_LIST
 
 
-def generate_workflow(query):
-    completion = client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=[
-            {
-                "role": "user",
-                "content": 
-                f'''
-                {INIT_WORKFLOW_PROMPT}\n
+def generate_workflow(query, args):
 
-                For example:
-                {INIT_WORKFLOW_TEMPLATE}\n
+    model_client = BaseClient.from_cfg({
+        "client": args.client,      # Options: "openai", "ollama", "vllm"
+        "model": args.model,    # Model name, e.g., "gpt-4o-mini" or "llama3.3:70b" for ollama
+        "temperature": args.temp,        # Default temperature setting
+    })
 
-                Available Agents:
-                {AGENT_LIST}
+    messages=[
+                {
+                    "role": "user",
+                    "content": 
+                    f'''
+                    {INIT_WORKFLOW_PROMPT}\n
 
-                Provide the output in the same format as the example above. Make sure you choose only the agents provided in the \"Available Agents\" to complete the task.
+                    For example:
+                    {INIT_WORKFLOW_TEMPLATE}\n
 
-                Here is the task to be executed:
+                    Available Agents:
+                    {AGENT_LIST}
 
-                '{query}'
-                '''
-        
-            }
-        ]
-    )
-    return completion
+                    Provide the output in the same format as the example above. Make sure you choose only the agents provided in the \"Available Agents\" to complete the task.
+
+                    Here is the task to be executed:
+
+                    '{query}'
+                    '''
+            
+                }
+            ]
+
+    response = model_client.get_response(messages)
+    return response
 
 
 if __name__ == "__main__":
@@ -48,14 +53,13 @@ if __name__ == "__main__":
     parser.add_argument('--client', default='openai', help='client to use')
     parser.add_argument('--model', default= "gpt-4o-mini", help='model LLM to use')
     parser.add_argument('--temp', default= 0.1, help='model LLM to use')
-    parser.add_argument('--agent', default= 'geoflow', help='agent to use')
-    # parser.add_argument('--flow_ver', default= 'flow_gt', help='agent to use')
+    parser.add_argument('--flow_ver', default= None, help='agent to use')
     args = parser.parse_args()
 
     # The query to generate flow json for!
     query = load_json_file(f'./prompt_flows/flows/flow_gt/{args.exp_id}.json')['query']
     # The output file (workflow json)
-    flow_ver = f"flow_{args.model.replace(':', '_').replace('-', '_')}"
+    flow_ver = f"flow_{re_args_component(args.model)}" if args.flow_ver is None else re_args_component(args.flow_ver)
 
     base_dir = './prompt_flows/flows/'
     results_path = os.path.join(base_dir, flow_ver)
@@ -63,12 +67,11 @@ if __name__ == "__main__":
     os.makedirs(results_path, exist_ok=True)
 
     start_time = time.time()
-    response = generate_workflow(query)
+    response = generate_workflow(query, args)
     elapsed_time = round(time.time() - start_time, 4)
 
-    # Save the generated GeoFlow JSON
-    response_msg = response.choices[0].message.content
-    cleaned_json_str = strip_json_code_block(response_msg)
+    # Save the generated JSON
+    cleaned_json_str = strip_json_code_block(response.content)
     parsed_json = json.loads(cleaned_json_str)
 
     generated_workflow = OrderedDict()
@@ -77,11 +80,11 @@ if __name__ == "__main__":
     generated_workflow["model_client"] = {        
         "client_class": str(args.client),
         "model": str(args.model),
-        "temperature": 0.1,
-        "prompt_tokens": response.usage.prompt_tokens,
-        "cached_tokens": response.usage.prompt_tokens_details.cached_tokens,
-        "completion_tokens": response.usage.completion_tokens,
-        "total_tokens": response.usage.total_tokens,
+        "temperature": str(args.temp),
+        "prompt_tokens": response.prompt_tokens,
+        "cached_tokens": response.cached_tokens,
+        "completion_tokens": response.completion_tokens,
+        "total_tokens": response.total_tokens,
         "time_elapsed": elapsed_time,
     }
     with open(geo_flow_dest, "w") as f:

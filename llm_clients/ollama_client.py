@@ -84,7 +84,7 @@ class OllamaClient(BaseClient):
         token_limits = {
             128000: {
                 "qwen2.5:7b", "qwen2.5:14b", "qwen2.5:32b", "qwen2.5:72b",
-                "qwen2:7b", "qwen2:72b",
+                "qwen2:7b", "qwen2:72b", "qwen3:8b",
                 "hermes3:3b", "hermes3:8b", "hermes3:70b",
                 "llama3.1", "llama3.1:8b", "llama3.1:70b",
                 "llama3.3", "llama3.3:70b", "llama3.2:1b", "llama3.2:3b",

@@ -442,8 +442,16 @@ class AgentMetrics:
         self.success_list.append(successful_run)
         self.avg_success = np.mean(self.success_list) if self.success_list else -1
 
+    def missing_run(self):
+        self.success_list.append(False)
+        self.avg_success = np.mean(self.success_list) if self.success_list else -1
 
     def evaluate_run(self, run_id):
+
+        path = os.path.join(self.results_path, str(run_id), "result.json")
+        if not os.path.isfile(path):
+            self.missing_run()
+            return
 
         with open(os.path.join(self.gts_path, str(run_id), "result.json")) as f:
             gts_dict = json.load(f)

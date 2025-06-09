@@ -1,4 +1,5 @@
 from evaluate.agent_metrics import AgentMetrics
+import os
 
 def main():
 
@@ -6,13 +7,13 @@ def main():
     # results_path = "results/openai/gpt_4o_mini/geoflow/"
     # results_path = "results/openai/gpt_4o_mini/geoolm/"
     results_path = "results/openai/gpt_4o_mini/swarm/"
-    results_path = "results/openai/gpt_4o_mini/swarm/"
+    results_path = "results/openai/gpt_4o_mini/seq_stateflow/"
     agent_metrics = AgentMetrics(gts_path, results_path)
 
     runs_from, runs_to = 0, 22
     runs_id = [i for i in range(runs_from, runs_to)]
 
-    for run_id in runs_id:
+    for run_id in runs_id: 
         agent_metrics.evaluate_run(run_id)
 
     agent_metrics.print_avg_llm_metrics()

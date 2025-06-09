@@ -69,6 +69,9 @@ def main(args, workflow=None, query="No query provided"):
         - Your message must be exactly “NEXT” or “ERROR” (uppercase, no punctuation, no additional text).
         - Do NOT output anything else.
 
+        ATTENTION:
+        - GIVE UP IF YOU FIND YOURSELF REPEATING THE SAME TOOL CALL OVER AND OVER!!
+        
         Example valid replies:
         NEXT
         ERROR

@@ -6,7 +6,7 @@ api_client = OpenAI()
 def objective_score_llm(gt_objective: str, res_objective: str) -> int:
     """
     Uses GPT-4o-mini to rate how well res_objective matches gt_objective
-    on a 1–5 scale, where 5 means “fully captures dataset, dates, location,
+    on a 1-5 scale, where 5 means “fully captures dataset, dates, location,
     plot type, model/detection, etc.” and 1 means “none of the required info.”
     """
     prompt = f"""

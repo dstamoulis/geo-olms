@@ -3,11 +3,15 @@ import os
 
 def main():
 
-    gts_path = "results/openai/gpt_4o_mini/single_agent/"
-    # results_path = "results/openai/gpt_4o_mini/geoflow/"
-    # results_path = "results/openai/gpt_4o_mini/geoolm/"
-    results_path = "results/openai/gpt_4o_mini/swarm/"
-    results_path = "results/openai/gpt_4o_mini/seq_stateflow/"
+    gts_path = "results/flow_gt/openai/gpt_4o_mini/single_agent/"
+
+    run_flow_ver = "flow_gpt_4o_mini" # flow_gt, flow_gpt_4o_mini
+    run_client = "openai" # openai, ollama
+    run_model = "gpt_4o_mini"
+
+    run_method = "geoflow" # geoflow, geoolm, swarm, seq_stateflow, group_stateflow, single_agent
+
+    results_path = f"results/{run_flow_ver}/{run_client}/{run_model}/{run_method}/"
     agent_metrics = AgentMetrics(gts_path, results_path)
 
     runs_from, runs_to = 0, 22

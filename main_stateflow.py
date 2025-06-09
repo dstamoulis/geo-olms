@@ -120,7 +120,8 @@ if __name__ == "__main__":
     parser.add_argument('--model', default= "gpt-4o-mini", help='model LLM to use')
     parser.add_argument('--temp', default= 0.1, help='model LLM to use')
     parser.add_argument('--agent', default= 'stateflow', help='agent to use')
+    parser.add_argument('--flow_ver', default= 'flow_gt', help='agent to use')
     args = parser.parse_args()
 
-    geo_flow = load_json_file(f'./prompt_tests/benchmark/geo_{args.exp_id}/flow_gt.json')
+    geo_flow = load_json_file(f'./prompt_flows/flows/{args.flow_ver}/{args.exp_id}.json')
     main(args, geo_flow['tasks'], geo_flow["query"])

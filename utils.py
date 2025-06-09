@@ -18,9 +18,10 @@ def get_results_path(args, base_dir="results") -> str:
     temp = re_args_component(str(args.temp))
     agent = re_args_component(str(args.agent))
     exp_id = re_args_component(str(args.exp_id))
+    flow_ver = re_args_component(str(args.flow_ver))
 
     # Directory hierarchy: results/{client}/{model}/{agent}/{exp_id}
-    results_path = os.path.join(base_dir, client, model, agent, exp_id)
+    results_path = os.path.join(base_dir, flow_ver, client, model, agent, exp_id)
     os.makedirs(results_path, exist_ok=True)
 
     # Build the base filenames
@@ -33,7 +34,18 @@ def get_results_path(args, base_dir="results") -> str:
     }
     return results_filenames 
 
-
+def strip_json_code_block(raw_content):
+    # Remove leading/trailing whitespace
+    raw_content = raw_content.strip()
+    
+    # Remove triple backtick wrapper if present
+    if raw_content.startswith("```json") or raw_content.startswith("```"):
+        # Split by lines, remove the first and last lines
+        lines = raw_content.splitlines()
+        # Handle empty or malformed content defensively
+        if len(lines) >= 3:
+            return "\n".join(lines[1:-1])
+    return raw_content
 
 def load_json_file(file_path):
     """

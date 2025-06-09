@@ -149,38 +149,7 @@ class AssistantAgent(BaseAgent):
 
         return chat_response
     
-    def get_response_seq(self, state_list):
-        """
-        Retrieves the conversation history in API format, then calls the model client to get a response.
-        """
-        while True:
-
-            self.log(f"Requesting response from {self.model_client.client_class} client ({self.model_client.model})...")
-            messages = [{"role": "system", "content": self.system_message}] if self.system_message is not None else []
-
-            messages = messages + self.messages.get_client_messages(self.model_client.client_class)
-            # self.log(f"Messages sent to model\n{messages}\n")
-            if self.api == "Responses":
-                chat_response = self.model_client.get_response_Response(messages, tools=self.tool_schemas)
-            else:
-                chat_response = self.model_client.get_response(messages, tools=self.tool_schemas)
-            self.log(f"Received response: {chat_response}")
-            self.messages.add_message(chat_response)
-
-            if not isinstance(chat_response, ToolCallRequestMessage):  # if finished handling tool calls, break
-                break
-
-            # === handle tool calls ===
-            for tool_call in chat_response.tool_calls:
-                # tool_response = self.execute_tool_call(tool_call)
-                if self.api == "Responses":
-                    tool_response = self.execute_tool_call_Response(tool_call)
-                else:
-                    tool_response = self.execute_tool_call(tool_call)
-                self.messages.add_message(tool_response)
-
-        return chat_response
-
+    
     # ------------------------------------------------
     # Workflow execution
     # ------------------------------------------------
@@ -239,7 +208,7 @@ class AssistantAgent(BaseAgent):
 
     # ------------------------------------------------------------------------------
     # Main loop for executing Seq-StateFlow (Dimi)
-    def run_seq_stateflow_ds(self, query, handoff_message: str, agents: dict, agents_sequence: list, ui_mode=False, log_target=False):
+    def run_seq_stateflow(self, query, handoff_message: str, agents: dict, agents_sequence: list, ui_mode=False, log_target=False):
 
         sequence_reset = True
         resets_cnt = 0
@@ -265,36 +234,6 @@ class AssistantAgent(BaseAgent):
 
         return response.content if ui_mode else response
 
-
-    # ------------------------------------------------------------------------------
-    # Main loop for executing Sequential StateFlow
-    def run_seq_stateflow(self, state_list: list, query: str, state_stack: deque, ui_mode=False):
-        completed_states = deque()
-        state = state_stack.pop()
-        # state.messages.add_message(TextMessage(role='user', content=f"\n[Objective]: {query}", source='user'))
-        history = [TextMessage(role='user', content=f"\n[Objective]: {query}", source='user')]
-        while True:
-            state.messages.messages.extend(history)  # add history to the current state messages
-            response = state.get_response_seq(state_list)
-            
-            print(f"\nVerification Result: {response.content}")
-            # Decide the transition to the next state
-            if response.content == "PASS":
-                # self.messages = state.messages.to_list()
-                completed_states.append(state)
-            elif response.content == "ERROR":
-                # Revert back to the first state 'database_agent'
-                while completed_states:
-                    temp = completed_states.pop()
-                    state_stack.append(temp)
-                history.extend(state.messages)
-            else:
-                history.extend(state.messages)
-
-            if not state_stack:
-                break
-            state = state_stack.pop()
-        return response.content if ui_mode else response
     
     # ------------------------------------------------------------------------------
     # Main loop for executing GC StateFlow

@@ -1,0 +1,16 @@
+{
+  "query": "Where is 39.3434\u00b0 N, 117.3616\u00b0 E? I want to see it on the map; please zoom there!",
+  "tasks": {
+    "task0": {
+      "id": "task0",
+      "objective": "Zoom the map to 39.3434\u00b0 N, 117.3616\u00b0 E.",
+      "agent_id": 0,
+      "next": [],
+      "prev": [],
+      "status": "pending",
+      "history": "",
+      "remaining_dependencies": 0,
+      "agent": "map_agent"
+    }
+  }
+}

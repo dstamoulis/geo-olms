@@ -24,33 +24,6 @@ import time
 
 from utils import load_json_file, get_results_path
 
-# ------------------------------
-# Added
-# ------------------------------
-def load_json_file(file_path):
-    """
-    Loads JSON data from a file.
-
-    Args:
-        file_path (str): The path to the JSON file.
-
-    Returns:
-        dict or list: The loaded JSON data as a Python dictionary or list, or None if an error occurs.
-    """
-    try:
-        with open(file_path, 'r') as file:
-            data = json.load(file)
-            return data
-    except FileNotFoundError:
-        print(f"Error: File not found: {file_path}")
-        return None
-    except json.JSONDecodeError:
-        print(f"Error: Invalid JSON format in: {file_path}")
-        return None
-    except Exception as e:
-         print(f"An unexpected error occurred: {e}")
-         return None
-    
 
 def main(args, workflow=None, query="No query provided"):
 
@@ -156,7 +129,8 @@ if __name__ == "__main__":
     parser.add_argument('--model', default= "gpt-4o-mini", help='model LLM to use')
     parser.add_argument('--temp', default= 0.1, help='model LLM to use')
     parser.add_argument('--agent', default= 'group_stateflow', help='agent to use')
+    parser.add_argument('--flow_ver', default= 'flow_gt', help='agent to use')
     args = parser.parse_args()
 
-    geo_flow = load_json_file(f'./prompt_tests/benchmark/geo_{args.exp_id}/flow_gt.json')
+    geo_flow = load_json_file(f'./prompt_flows/flows/{args.flow_ver}/{args.exp_id}.json')
     main(args, geo_flow['tasks'], geo_flow["query"])

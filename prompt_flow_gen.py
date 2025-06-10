@@ -102,26 +102,41 @@ if __name__ == "__main__":
     geo_flow_dest = os.path.join(results_path, f"{args.exp_id}.json")
     os.makedirs(results_path, exist_ok=True)
 
-    start_time = time.time()
-    response = generate_workflow(query, args)
-    elapsed_time = round(time.time() - start_time, 4)
+    max_retries = 3
+    attempts = 0
 
-    # Save the generated JSON
-    cleaned_json_str = extract_json_object(response.content)
-    parsed_json = json.loads(cleaned_json_str)
+    while attempts < max_retries:
+        attempts += 1
+        try:
+            start_time = time.time()
+            response = generate_workflow(query, args)
+            elapsed_time = round(time.time() - start_time, 4)
 
-    generated_workflow = OrderedDict()
-    generated_workflow["query"] = query  # Replace with actual query
-    generated_workflow["tasks"] = parsed_json.get("tasks", {})
-    generated_workflow["model_client"] = {        
-        "client_class": str(args.client),
-        "model": str(args.model),
-        "temperature": str(args.temp),
-        "prompt_tokens": response.prompt_tokens,
-        "cached_tokens": response.cached_tokens,
-        "completion_tokens": response.completion_tokens,
-        "total_tokens": response.total_tokens,
-        "time_elapsed": elapsed_time,
-    }
-    with open(geo_flow_dest, "w") as f:
-        json.dump(generated_workflow, f, indent=2)
+            # Save the generated JSON
+            print(response.content)
+            cleaned_json_str = extract_json_object(response.content)
+            parsed_json = json.loads(cleaned_json_str)
+
+            generated_workflow = OrderedDict()
+            generated_workflow["query"] = query  # Replace with actual query
+            generated_workflow["tasks"] = parsed_json.get("tasks", {})
+            generated_workflow["model_client"] = {        
+                "client_class": str(args.client),
+                "model": str(args.model),
+                "temperature": str(args.temp),
+                "prompt_tokens": response.prompt_tokens,
+                "cached_tokens": response.cached_tokens,
+                "completion_tokens": response.completion_tokens,
+                "total_tokens": response.total_tokens,
+                "time_elapsed": elapsed_time,
+            }
+            with open(geo_flow_dest, "w") as f:
+                json.dump(generated_workflow, f, indent=2)
+            # if we got here, it succeeded
+            print(f"[Attempt {attempts}/{max_retries}] worked for exp_id {args.exp_id}")
+            break
+
+        except Exception as e:
+            print(f"[Attempt {attempts}/{max_retries}] Failed to produce flow JSON for exp_id {args.exp_id}: {e}")
+            if attempts < max_retries:
+                print(f"Trying again!")

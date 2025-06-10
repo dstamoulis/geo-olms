@@ -98,6 +98,7 @@ def match_tasks(gt_group, res_group, error_types):
         matched.add(best_res['id'])
 
         if best_score < 4:
+            # print(f'The two objectives are different: gt_group: {gt_group}\n \n res_group: {res_group}')
             error_types["wrong objective"] += 1
         if gt_task["agent"] != best_res["agent"]:
             error_types["wrong agent"] += 1

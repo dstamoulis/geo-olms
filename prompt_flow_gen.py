@@ -9,6 +9,37 @@ from llm_clients.base_client import BaseClient
 from utils import load_json_file, strip_json_code_block, re_args_component
 from prompt_flows.gen_prompt import INIT_WORKFLOW_PROMPT, INIT_WORKFLOW_TEMPLATE, AGENT_LIST
 
+import re
+
+def extract_json_object(raw: str) -> str:
+    """
+    Extracts the first JSON object from `raw` text.
+    1) If there's a ```json…``` code block, return its contents.
+    2) Otherwise, find the first “{” and grab the balanced {...} substring.
+    Returns the JSON string or raises ValueError if none found.
+    """
+    raw = raw.strip()
+
+    # 1) Try to pull from a ```json …``` block
+    m = re.search(r"```json\s*(\{.*?\})\s*```", raw, re.DOTALL)
+    if m:
+        return m.group(1)
+
+    # 2) Otherwise look for the first “{” and match braces
+    start = raw.find("{")
+    if start == -1:
+        raise ValueError("No JSON object found in response")
+
+    depth = 0
+    for i, ch in enumerate(raw[start:], start):
+        if ch == "{":
+            depth += 1
+        elif ch == "}":
+            depth -= 1
+            if depth == 0:
+                return raw[start : i + 1]
+    raise ValueError("Unbalanced braces in response")
+
 
 def generate_workflow(query, args):
 
@@ -25,13 +56,18 @@ def generate_workflow(query, args):
                     f'''
                     {INIT_WORKFLOW_PROMPT}\n
 
-                    For example:
-                    {INIT_WORKFLOW_TEMPLATE}\n
-
                     Available Agents:
                     {AGENT_LIST}
 
-                    Provide the output in the same format as the example above. Make sure you choose only the agents provided in the \"Available Agents\" to complete the task.
+                    **INSTRUCTIONS:
+                    ==> Provide the output in the same format as the example above. 
+                    ==> Make sure you choose only the agents provided in the **Available Agents** to complete the task.
+
+                    **IMPORTANT**
+
+                    1. You must output the JSON object following the template above.
+                    2. Do **NOT** include any markdown backticks, explanations, or extra text!! ONLY the raw JSON.
+                    3. Your response must begin with \"{{\" and end with \"}}"" and parse as valid JSON.
 
                     Here is the task to be executed:
 
@@ -71,7 +107,7 @@ if __name__ == "__main__":
     elapsed_time = round(time.time() - start_time, 4)
 
     # Save the generated JSON
-    cleaned_json_str = strip_json_code_block(response.content)
+    cleaned_json_str = extract_json_object(response.content)
     parsed_json = json.loads(cleaned_json_str)
 
     generated_workflow = OrderedDict()

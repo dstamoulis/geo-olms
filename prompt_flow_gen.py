@@ -13,11 +13,16 @@ import re
 
 def extract_json_object(raw: str) -> str:
     """
-    Extracts the first JSON object from `raw` text.
-    1) If there's a ```json…``` code block, return its contents.
-    2) Otherwise, find the first “{” and grab the balanced {...} substring.
+    Extracts the first JSON object from `raw` text, ignoring any <think>...</think> sections.
+    1) Strip out any <think>…</think> blocks entirely.
+    2) If there's a ```json...``` code block, return its contents.
+    3) Otherwise, find the first “{” and grab the balanced {...} substring.
     Returns the JSON string or raises ValueError if none found.
     """
+    # 0) Remove any <think>...</think> sections
+    raw = re.sub(r"<think>.*?</think>", "", raw, flags=re.DOTALL)
+
+    # Trim whitespace
     raw = raw.strip()
 
     # 1) Try to pull from a ```json …``` block

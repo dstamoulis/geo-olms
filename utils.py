@@ -4,7 +4,7 @@ import os
 import re
 
 def re_args_component(value: str) -> str:
-    return re.sub(r"[.\-]", "_", value)
+    return re.sub(r"[.\-\:]", "_", value)
 
 def get_results_path(args, base_dir="results") -> str:
     """

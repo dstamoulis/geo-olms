@@ -137,7 +137,8 @@ def evaluate_flow_correctness(gt_path, res_path):
 
 
 if __name__ == "__main__":
-    gt_path = 'prompt_tests/benchmark/geo_0/flow_gt.json'
-    res_path = 'prompt_tests/benchmark/geo_0/flow_exp_2.json'
-    score = evaluate_flow_correctness(gt_path, res_path)
-    print(score)
+    for i in range(22):
+        gt_path = f'prompt_tests/benchmark/geo_{i}/flow_gt.json'
+        res_path = f'prompt_tests/benchmark/geo_{i}/flow_exp_2.json'
+        score = evaluate_flow_correctness(gt_path, res_path)
+        print(f'Exp {i}: {score}')

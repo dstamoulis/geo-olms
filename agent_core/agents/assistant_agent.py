@@ -289,9 +289,12 @@ class AssistantAgent(BaseAgent):
             agent_calls += f"{task_id}: {task['objective']}, agent: {task['agent']}\n"
         agent_calls += f"Here is the dict_keys of available agents: {agents.keys()}. For each task, match it with an agent that is strictly in the dict_keys, make a guess if you need. Then just return only the one-to-one result in this format: task_num: agent_name"
         print(f"************************ agent_calls: \n{agent_calls}")
-        # TODO!!
-        agent_match = self.model_client.get_response_Response(agent_calls)
+
+        # agent_match = self.model_client.get_response_Response(agent_calls)
+        message = [{"role": "system", "content": agent_calls}]
+        agent_match = self.model_client.get_response(message)
         print(f"---------------------Agent match response: \n{agent_match.content}")
+        tool_calls = agent_match.tool_calls
 
         # Convert the LLM response into a dictionary of form: task_id: agent_name
         pattern = r"\s*(task\d+):\s*([a-zA-Z0-9_]+)" 

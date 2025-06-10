@@ -1,7 +1,26 @@
+import os
 import json
+import argparse
 from collections import deque, defaultdict
 from openai import OpenAI
 api_client = OpenAI()
+
+from utils import re_args_component
+
+def group_tasks_by_agent_order(tasks, roots):
+    visited = set()
+    queue = deque(roots)
+    agent_to_tasks = defaultdict(list)
+    while queue:
+        tid = queue.popleft()
+        if tid in visited:
+            continue
+        visited.add(tid)
+        task = tasks[tid]
+        agent_to_tasks[task['agent']].append(task)
+        queue.extend(task.get('next', []))
+    return agent_to_tasks
+
 
 def objective_score_llm(gt_objective: str, res_objective: str) -> int:
     """
@@ -58,12 +77,39 @@ def objective_score_llm(gt_objective: str, res_objective: str) -> int:
         return 1
 
 
-
 def load_graph(js):
     """Return a dict of nodes and a root list (ids with empty prev)."""
     tasks = js["tasks"]
     roots = [tid for tid, t in tasks.items() if not t.get("prev")]
     return tasks, roots
+
+def match_tasks(gt_group, res_group, error_types):
+    matched = set()
+    for gt_task in gt_group:
+        best_score = -1
+        best_res = None
+        for res_task in res_group:
+            if res_task['id'] in matched:
+                continue
+            score = objective_score_llm(gt_task["objective"], res_task["objective"])
+            if score > best_score:
+                best_score = score
+                best_res = res_task
+
+        if best_res is None:
+            error_types["missing task"] += 1
+            continue
+
+        matched.add(best_res['id'])
+
+        if best_score < 4:
+            error_types["wrong objective"] += 1
+        if gt_task["agent"] != best_res["agent"]:
+            error_types["wrong agent"] += 1
+        if set(gt_task.get("next", [])) != set(best_res.get("next", [])):
+            error_types["wrong next steps"] += 1
+        if set(gt_task.get("prev", [])) != set(best_res.get("prev", [])):
+            error_types["wrong prev steps"] += 1
 
 def evaluate_flow_correctness(gt_path, res_path):
     gt_js = json.load(open(gt_path))
@@ -72,74 +118,49 @@ def evaluate_flow_correctness(gt_path, res_path):
     gt_tasks, gt_roots = load_graph(gt_js)
     res_tasks, res_roots = load_graph(res_js)
 
+    # Group by agent and order
+    gt_agent_groups = group_tasks_by_agent_order(gt_tasks, gt_roots)
+    res_agent_groups = group_tasks_by_agent_order(res_tasks, res_roots)
+
     error_types = defaultdict(int)
     num_gt = len(gt_tasks)
     denom = num_gt * 4 + 1
 
-    # 0) step‐count error will be counted later if we didn't visit all GT nodes
+    for agent in gt_agent_groups:
+        gt_group = gt_agent_groups[agent]
+        res_group = res_agent_groups.get(agent, [])
+        match_tasks(gt_group, res_group, error_types)
 
-    visited = set()
-    queue = deque()
-
-    # Initialize by matching each GT root to the first same‐agent res root
-    for gr in gt_roots:
-        gnode = gt_tasks[gr]
-        for rr in res_roots:
-            if res_tasks[rr]["agent"] == gnode["agent"]:
-                queue.append((gr, rr))
-                visited.add(gr)
-                break
-
-    # BFS over matched pairs
-    while queue:
-        gid, rid = queue.popleft()
-        g, r = gt_tasks[gid], res_tasks[rid]
-
-        # 1) objective
-        if objective_score_llm(g["objective"], r["objective"]) < 4:
-            error_types["wrong objective"] += 1
-        # 2) agent
-        if g["agent"] != r["agent"]:
-            error_types["wrong agent"] += 1
-        # 3) next count (structure)
-        if set(g.get("next", [])) != set(r.get("next", [])):
-            error_types["wrong next steps"] += 1
-        # 4) prev count
-        if set(g.get("prev", [])) != set(r.get("prev", [])):
-            error_types["wrong prev steps"] += 1
-
-        # Enqueue successors
-        gsuccs = g.get("next", [])
-        # build map agent→rid successor for quick lookup
-        rsuccs = res_tasks[rid].get("next", [])
-        agent_to_rsucc = {
-            res_tasks[nid]["agent"]: nid for nid in rsuccs
-        }
-        for gn in gsuccs:
-            if gn in visited:
-                continue
-            targ_agent = gt_tasks[gn]["agent"]
-            rn = agent_to_rsucc.get(targ_agent)
-            if rn:
-                queue.append((gn, rn))
-                visited.add(gn)
-            else:
-                # missing next
-                error_types["wrong next steps"] += 1
-                # we still mark visited so we don’t double‐count missing
-                visited.add(gn)
-
-    # 0) now that BFS is done, check total steps
-    if len(visited) != num_gt:
+    # Additional check: total step count
+    if len(gt_tasks) != len(res_tasks):
         error_types["wrong number of steps"] += 1
 
     total_err = sum(error_types.values())
-    score = max(0.0, 1.0 - total_err/denom)
+    score = max(0.0, 1.0 - total_err / denom)
     return score, error_types
 
 
 if __name__ == "__main__":
-    gt_path = 'prompt_tests/benchmark/geo_0/flow_gt.json'
-    res_path = 'prompt_tests/benchmark/geo_0/flow_exp_2.json'
-    score = evaluate_flow_correctness(gt_path, res_path)
-    print(score)
+
+    parser = argparse.ArgumentParser(description='geo-olm agent')
+    parser.add_argument('--model', default= "gpt-4o-mini", help='model LLM to use')
+    parser.add_argument('--flow_ver', default=None, help='agent to use')
+    args = parser.parse_args()
+
+    flow_ver = f"{re_args_component(args.model)}" if args.flow_ver is None else re_args_component(args.flow_ver)
+    base_dir = './prompt_flows/flows'
+    results_path = os.path.join(base_dir, flow_ver)
+
+    scores_list = []
+    for i in range(22):
+
+        gt_path = f'{base_dir}/flow_gt/{i}.json'
+        res_path = os.path.join(results_path, f"{i}.json")
+        score, error_types = evaluate_flow_correctness(gt_path, res_path)
+        print(f'Exp {i}: {score}, {error_types}')
+        scores_list.append(score)
+
+    avg_score = sum(scores_list) / len(scores_list) if scores_list else -1
+    # print(f"[{flow_ver}] Flow score: {avg_score}")
+    print(f"{flow_ver}: {avg_score}")
+

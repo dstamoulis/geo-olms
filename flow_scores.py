@@ -3,6 +3,22 @@ from collections import deque, defaultdict
 from openai import OpenAI
 api_client = OpenAI()
 
+
+def group_tasks_by_agent_order(tasks, roots):
+    visited = set()
+    queue = deque(roots)
+    agent_to_tasks = defaultdict(list)
+    while queue:
+        tid = queue.popleft()
+        if tid in visited:
+            continue
+        visited.add(tid)
+        task = tasks[tid]
+        agent_to_tasks[task['agent']].append(task)
+        queue.extend(task.get('next', []))
+    return agent_to_tasks
+
+
 def objective_score_llm(gt_objective: str, res_objective: str) -> int:
     """
     Uses GPT-4o-mini to rate how well res_objective matches gt_objective
@@ -58,20 +74,6 @@ def objective_score_llm(gt_objective: str, res_objective: str) -> int:
         return 1
 
 
-def group_tasks_by_agent_order(tasks, roots):
-    visited = set()
-    queue = deque(roots)
-    agent_to_tasks = defaultdict(list)
-    while queue:
-        tid = queue.popleft()
-        if tid in visited:
-            continue
-        visited.add(tid)
-        task = tasks[tid]
-        agent_to_tasks[task['agent']].append(task)
-        queue.extend(task.get('next', []))
-    return agent_to_tasks
-
 def load_graph(js):
     """Return a dict of nodes and a root list (ids with empty prev)."""
     tasks = js["tasks"]
@@ -98,7 +100,6 @@ def match_tasks(gt_group, res_group, error_types):
         matched.add(best_res['id'])
 
         if best_score < 4:
-            # print(f'The two objectives are different: gt_group: {gt_group}\n \n res_group: {res_group}')
             error_types["wrong objective"] += 1
         if gt_task["agent"] != best_res["agent"]:
             error_types["wrong agent"] += 1

@@ -23,7 +23,8 @@ import json
 import time
 
 from utils import load_json_file, get_results_path, re_args_component
-
+from utils import DATABASE_AGENT_SYSTEM, MAP_AGENT_SYSTEM, DETECTOR_AGENT_SYSTEM, DATA_AGENT_SYSTEM
+from utils import SUBAGENTS_INSTRUCTIONS, SUBTASK_INSTRUCTIONS
 
 def main(args, workflow=None, query="No query provided"):
 
@@ -38,46 +39,6 @@ def main(args, workflow=None, query="No query provided"):
     map_tools = MapTools(database, vision, map_style="open-street-map")
     data_tools = DataTools(database, vision)
 
-
-    # SYSTEM: You are the {agent_name} in a 3-step sequential pipeline:
-    # database_agent → detector_agent → data_agent → map_agent
-
-    transition_message = """\
-        SYSTEM: You are the {agent_name} in a 3-step sequential pipeline:
-        database_agent → detector_agent → map_agent
-
-        REPLY FORMAT:
-        - Your message must be exactly “NEXT” or “ERROR” (uppercase, no punctuation, no additional text).
-        - Do NOT output anything else."""
-
-    handoff_message = """\
-        INSTRUCTIONS: You are part of a 3-step sequential pipeline:
-        database_agent → detector_agent → map_agent
-
-        On your turn, you must:
-        1. Look at the current conversation state and decide if you have any tools or actions to perform.
-            • If you have no relevant tools or your step is not needed, consider your turn finished immediately.
-            • Otherwise, perform your operations (e.g. database queries, detections, plotting).
-            • Your operations are self-contained, so you try to complete your part in a SINGLE go, without repeat the same step over and over!! If done, proceed with NEXT
-        2. Monitor for any execution errors (e.g., calling a tool before its inputs exist).
-            • If you detect any error or unfulfilled dependency problems from previous steps, you MUST signal ERROR.
-        3. When you are done, you must signal exactly one token:
-            • “NEXT” if you completed your work successfully or intentionally skipped because you had nothing to do.
-            • “ERROR” if you encountered any problem or unfulfilled dependency.
-
-        REPLY FORMAT:
-        - Your message must be exactly “NEXT” or “ERROR” (uppercase, no punctuation, no additional text).
-        - Do NOT output anything else.
-
-        ATTENTION:
-        - GIVE UP IF YOU FIND YOURSELF REPEATING THE SAME TOOL CALL OVER AND OVER!!
-        
-        Example valid replies:
-        NEXT
-        ERROR
-
-        Now it's your turn—carry out your step, then reply with NEXT or ERROR."""
-
         
     # Subagents
     database_agent = SingleAgent(
@@ -86,7 +47,7 @@ def main(args, workflow=None, query="No query provided"):
         model_client=model_client,
         messages=messages,
         toolsets_list=[database],
-        system_message=f"You are an expert in fetching images from a database!\n {transition_message.format(agent_name='database_agent')}"
+        system_message=DATABASE_AGENT_SYSTEM
     )
     detector_agent = SingleAgent(
         api=args.api,
@@ -94,7 +55,7 @@ def main(args, workflow=None, query="No query provided"):
         model_client=model_client,
         messages=messages,
         toolsets_list=[vision],
-        system_message=f"You are an expert in processing images fetched from a database, such as object detection! \n {transition_message.format(agent_name='detector_agent')}"
+        system_message=DETECTOR_AGENT_SYSTEM
     )
     map_agent = SingleAgent(
         api=args.api,
@@ -102,7 +63,7 @@ def main(args, workflow=None, query="No query provided"):
         model_client=model_client,
         messages=messages,
         toolsets_list=[map_tools],
-        system_message=f"You are an expert in performing all kinds of operations on a map! \n {transition_message.format(agent_name='map_agent')}"
+        system_message=MAP_AGENT_SYSTEM
     )
     data_agent = SingleAgent(
         api=args.api,
@@ -110,7 +71,7 @@ def main(args, workflow=None, query="No query provided"):
         model_client=model_client,
         messages=messages,
         toolsets_list=[data_tools],
-        system_message=f"You are an expert in all kinds of image analyzing tasks! \n {transition_message.format(agent_name='data_agent')}"
+        system_message=DATA_AGENT_SYSTEM
     )
     orch_agent = SingleAgent(
         api=args.api,
@@ -124,17 +85,16 @@ def main(args, workflow=None, query="No query provided"):
     agents_dict = {"database_agent": database_agent, "map_agent": map_agent, "detector_agent": detector_agent, "data_agent": data_agent}
     agents_sequence = ["database_agent", "detector_agent", "data_agent", "map_agent"]
 
-    agents_dict = {"database_agent": database_agent, "map_agent": map_agent, "detector_agent": detector_agent}
-    agents_sequence = ["database_agent", "detector_agent", "map_agent"]
     platform = Platform(model_client, messages, database, vision, map_tools, orch_agent)
     agent_run = AgentRun(platform, results_output_filenames=get_results_path(args))
 
     start_time = time.time()
     response = platform.agent.run_seq_stateflow(
         query=query,
-        handoff_message=handoff_message,
+        subtask_instructions=SUBTASK_INSTRUCTIONS,
         agents=agents_dict,
-        agents_sequence=agents_sequence
+        agents_sequence=agents_sequence,
+        subagents_instructions = SUBAGENTS_INSTRUCTIONS
     )
     end_time = time.time()
     elapsed_time = round(end_time - start_time, 4)

@@ -23,6 +23,7 @@ import json
 import time
 
 from utils import load_json_file, get_results_path, re_args_component
+from utils import DATABASE_AGENT_SYSTEM, MAP_AGENT_SYSTEM, DETECTOR_AGENT_SYSTEM, DATA_AGENT_SYSTEM
 
     
 def main(args, workflow=None, query="No query provided"):
@@ -45,7 +46,7 @@ def main(args, workflow=None, query="No query provided"):
         model_client=model_client,
         messages=messages,
         toolsets_list=[database],
-        system_message="You are the database agent!"
+        system_message=DATABASE_AGENT_SYSTEM
     )
     detector_agent = SingleAgent(
         api=args.api,
@@ -53,7 +54,7 @@ def main(args, workflow=None, query="No query provided"):
         model_client=model_client,
         messages=messages,
         toolsets_list=[vision],
-        system_message="You are the detector agent!"
+        system_message=DETECTOR_AGENT_SYSTEM
     )
     map_agent = SingleAgent(
         api=args.api,
@@ -61,7 +62,7 @@ def main(args, workflow=None, query="No query provided"):
         model_client=model_client,
         messages=messages,
         toolsets_list=[map_tools],
-        system_message="You are the map agent!"
+        system_message=MAP_AGENT_SYSTEM
     )
     data_agent = SingleAgent(
         api=args.api,
@@ -69,7 +70,7 @@ def main(args, workflow=None, query="No query provided"):
         model_client=model_client,
         messages=messages,
         toolsets_list=[data_tools],
-        system_message="Expert in all kinds of image analyzing tasks!"
+        system_message=DATA_AGENT_SYSTEM
     )
     verifier_agent = SingleAgent(
         api=args.api,
@@ -77,13 +78,7 @@ def main(args, workflow=None, query="No query provided"):
         model_client=model_client,
         messages=messages,
         toolsets_list=[],
-        system_message="You are a result verifier agent that verify if the query has been executed successfully." \
-        "You will receive an input of fomat \"[Objective]: xxx. [Response]: yyy\", and you will decide if the Response" \
-        "successfully fulfill the ask from Objective. If it does, return \"COMPLETED\". If not, return \"ERROR\"." \
-        "Example:\n"
-        "[Objective]: Fetch images from the FAIR1M dataset and filter the images from the UK." \
-        "[Response]: I have successfully fetched 14 images from the FAIR1M dataset for the UK.\n" \
-        "In the above case, you will return \"COMPLETED\"." \
+        system_message="You are an expert workflow allocator. Given a list of available agent names, your task is to assign the proper agent to each objective!" \
     )
 
     # process tasks for StateFlow

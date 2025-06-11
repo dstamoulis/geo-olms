@@ -23,6 +23,8 @@ import json
 import time
 
 from utils import load_json_file, get_results_path, re_args_component
+from utils import DATABASE_AGENT_SYSTEM, MAP_AGENT_SYSTEM, DETECTOR_AGENT_SYSTEM, DATA_AGENT_SYSTEM
+from utils import SUBAGENTS_INSTRUCTIONS, SUBTASK_INSTRUCTIONS, GROUP_MANAGER_INSTRUCTIONS
 
 
 def main(args, workflow=None, query="No query provided"):
@@ -45,7 +47,7 @@ def main(args, workflow=None, query="No query provided"):
         model_client=model_client,
         messages=messages,
         toolsets_list=[database],
-        system_message="You are the database agent!"
+        system_message=DATABASE_AGENT_SYSTEM
     )
     detector_agent = SingleAgent(
         api=args.api,
@@ -53,7 +55,7 @@ def main(args, workflow=None, query="No query provided"):
         model_client=model_client,
         messages=messages,
         toolsets_list=[vision],
-        system_message="You are the detector agent!"
+        system_message=DETECTOR_AGENT_SYSTEM
     )
     map_agent = SingleAgent(
         api=args.api,
@@ -61,7 +63,7 @@ def main(args, workflow=None, query="No query provided"):
         model_client=model_client,
         messages=messages,
         toolsets_list=[map_tools],
-        system_message="You are the map agent!"
+        system_message=MAP_AGENT_SYSTEM
     )
     data_agent = SingleAgent(
         api=args.api,
@@ -69,7 +71,7 @@ def main(args, workflow=None, query="No query provided"):
         model_client=model_client,
         messages=messages,
         toolsets_list=[data_tools],
-        system_message="Expert in all kinds of image analyzing tasks!"
+        system_message=DATA_AGENT_SYSTEM
     )
     orch_agent = SingleAgent(
         api=args.api,
@@ -77,37 +79,21 @@ def main(args, workflow=None, query="No query provided"):
         model_client=model_client,
         messages=messages,
         toolsets_list=[],
-        system_message="""
-            You are an orchastrating agent handing off tasks! The workflow of completing a given task is modeled as a state-machine,
-            and your job is to decide the next agent (state) to transition to based on the current state and the task at hand.
-
-            The available agents to choose from are:
-            - database_agent: Expert in fetching images from a database!
-            - map_agent: Expert in performing all kinds of operations on a map!
-            - detector_agent: Expert in processing images fetched from a database, such as object detection!
-            - data_agent: Expert in all kinds of image analyzing tasks!
-
-            REPLY FORMAT:
-            - You message should be the name of one of the four agents. Or, return "DONE" if the task is completed.
-            - Your return message should ONLY be "database_agent", "map_agent", "detector_agent", "data_agent", "DONE" (no punctuation, no additional text).
-            
-            ATTENTION:
-            - GIVE UP IF YOU FIND YOURSELF REPEATING THE SAME TOOL CALL OVER AND OVER!!
-            """
+        system_message=GROUP_MANAGER_INSTRUCTIONS
     )
-
+    
     platform = Platform(model_client, messages, database, vision, map_tools, orch_agent)
     agent_run = AgentRun(platform, results_output_filenames=get_results_path(args))
+    agents_dict = {"database_agent": database_agent, "map_agent": map_agent, "detector_agent": detector_agent, "data_agent": data_agent}
 
     start_time = time.time()
-    response = platform.agent.run_gc_stateflow(
-        handoffs={
-            "database_agent": database_agent,
-            "detector_agent": detector_agent,
-            "map_agent": map_agent,
-            "data_agent": data_agent
-        },
-        query=query
+    response = platform.agent.run_group_manager(
+        query=query,
+        agents=agents_dict,
+        orch_instructions=GROUP_MANAGER_INSTRUCTIONS,
+        subtask_instructions=SUBTASK_INSTRUCTIONS,
+        subagents_instructions = SUBAGENTS_INSTRUCTIONS
+
     )
     end_time = time.time()
     elapsed_time = round(end_time - start_time, 4)

@@ -22,6 +22,7 @@ import json
 import time
 
 from utils import load_json_file, get_results_path, re_args_component
+from utils import DATABASE_AGENT_SYSTEM, MAP_AGENT_SYSTEM, DETECTOR_AGENT_SYSTEM, DATA_AGENT_SYSTEM
 
 
 def main(args, workflow=None, query="No query provided"):
@@ -44,7 +45,7 @@ def main(args, workflow=None, query="No query provided"):
         model_client=model_client,
         messages=messages,
         toolsets_list=[database],
-        system_message="Expert in fetching images from a database!"
+        system_message=DATABASE_AGENT_SYSTEM
     )
     map_agent = SingleAgent(
         api=args.api,
@@ -52,7 +53,7 @@ def main(args, workflow=None, query="No query provided"):
         model_client=model_client,
         messages=messages,
         toolsets_list=[map_tools],
-        system_message="Expert in performing all kinds of operations on a map!"
+        system_message=MAP_AGENT_SYSTEM
     )
     detector_agent = SingleAgent(
         api=args.api,
@@ -60,7 +61,7 @@ def main(args, workflow=None, query="No query provided"):
         model_client=model_client,
         messages=messages,
         toolsets_list=[vision],
-        system_message="Expert in processing images fetched from a database, such as object detection!"
+        system_message=DETECTOR_AGENT_SYSTEM
     )
     data_agent = SingleAgent(
         api=args.api,
@@ -68,7 +69,7 @@ def main(args, workflow=None, query="No query provided"):
         model_client=model_client,
         messages=messages,
         toolsets_list=[data_tools],
-        system_message="Expert in all kinds of image analyzing tasks!"
+        system_message=DATA_AGENT_SYSTEM
     )
     orch_agent = SingleAgent(
         api=args.api,
@@ -77,14 +78,6 @@ def main(args, workflow=None, query="No query provided"):
         messages=messages,
         toolsets_list=[],
         system_message="You are an orchastrating agent handing off tasks to subagents most suited for given a given task!"
-    )
-    single_agent = SingleAgent(
-        api=args.api,
-        name="single_agent",
-        model_client=model_client,
-        messages=messages,
-        toolsets_list=[database, vision, map_tools, data_tools],
-        system_message="You are a geospatial agent helping with fetching images from a database!"
     )
 
     # Solving with an agent!

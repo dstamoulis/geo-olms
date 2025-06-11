@@ -180,8 +180,8 @@ class AssistantAgent(BaseAgent):
 
 
     # ------------------------------------------------------------------------------
-    # Updated loop for executing "geoolm" (Dimi!)
-    def run_workflow_flow(self, agents: dict, workflow: dict, ui_mode=False, log_target=False):
+    # Updated loop for executing "geoolm"
+    def run_workflow_flow(self, agents: dict, workflow: dict, orch_instructions: str, ui_mode=False, log_target=False):
         """
         1. Extract objectives in ID order.
         2. Prompt the LLM to assign each task to one of the given agents.
@@ -194,22 +194,6 @@ class AssistantAgent(BaseAgent):
         
         # 2) Build the prompt
         llm_prompt = f"""
-            For each of the following tasks and their objectives, assign exactly one agent.
-            You may choose only from: {list(agents.keys())}.
-
-            Each task is self-contained and maps to a single agent:
-
-            > database_agent: tools for database queries and image filtering  
-            > detector_agent: detection and classification on prior images  
-            > data_agent: data-count and analytics tools  
-            > map_agent: map zooming, plotting, and visualization tools  
-
-            Reply ONLY with a JSON object mapping task IDs to agent names.  
-            DO NOT include any backticks, commentary, or extra text—only the raw JSON.
-
-            Example valid output:
-            {{"task0": "database_agent", "task1": "detector_agent", "task2": "map_agent"}}
-
             Here are the tasks to assign:
             {json.dumps(agent_task_objectives, indent=2)}
             """
@@ -223,7 +207,7 @@ class AssistantAgent(BaseAgent):
             attempts += 1
             response = self.model_client.get_response([  # replace with your LLM call
                 {"role": "system", "content": "You are an expert workflow allocator. Given a list of available agent names, your task is to assign the proper agent to each objective!"},
-                {"role": "user",   "content": llm_prompt}
+                {"role": "user",   "content": orch_instructions + llm_prompt}
             ])
             raw = response.content
             try:
@@ -258,10 +242,11 @@ class AssistantAgent(BaseAgent):
 
 
     # ------------------------------------------------------------------------------
-    # Main loop for executing Seq-StateFlow (Dimi)
-    def run_seq_stateflow(self, query, handoff_message: str, agents: dict, agents_sequence: list, ui_mode=False, log_target=False):
+    # Main loop for executing Seq-StateFlow
+    def run_seq_stateflow(self, query, subtask_instructions: str, agents: dict, agents_sequence: list, subagents_instructions: list, ui_mode=False):
 
         sequence_reset = True
+        max_sequence_resets = 2
         resets_cnt = 0
         while sequence_reset:
 
@@ -269,80 +254,118 @@ class AssistantAgent(BaseAgent):
             for next_agent_name in agents_sequence:
 
                 next_agent = agents[next_agent_name]
-                text_message = TextMessage(role='user', content=query+handoff_message, source='user')
+                subtask_example = subagents_instructions[next_agent_name]["example"] if subagents_instructions else ""
+                subtask_scope = subagents_instructions[next_agent_name]["scope"] if subagents_instructions else ""
+                llm_promt = subtask_instructions.format(next_agent_name=next_agent_name, scope=subtask_scope, subtask_example=subtask_example)
+                text_message = TextMessage(role='user', content=llm_promt + query, source='user')
                 # print(f"\nText message: {text_message}\n")
                 next_agent.messages.add_message(text_message)
                 response = next_agent.get_response()
                 print(f"\nResponse: {response}\n")
-                next_agent.messages.add_message(response)
 
                 if parse_llm_delimiter_message(response.content, "ERROR"):
                     resets_cnt+=1
-                    sequence_reset = resets_cnt < 2 # so if you reset twice already, give up
+                    sequence_reset = resets_cnt < max_sequence_resets # so if you reset twice already, give up
                     break
 
         return response.content if ui_mode else response
 
+        
+    # ------------------------------------------------------------------------------
+    # Main loop for executing Group StateFlow
+    def run_group_manager(self, query: str, agents: dict, orch_instructions: str, subtask_instructions: str, subagents_instructions: dict, ui_mode=False):
+        
+        max_orchestrator_steps = 10  # large-value to unstuck inf-loops
+        orchestrator_steps = 0
+        
+        while orchestrator_steps <= max_orchestrator_steps:
+            orchestrator_steps +=1
+
+            orchestrator_llm_prompt = orch_instructions + query
+            text_message = TextMessage(role='user', content=orchestrator_llm_prompt, source='user')
+            self.messages.add_message(text_message)
+            
+            orch_response = self.get_response()
+
+            next_agent_name = None
+            raw = orch_response.content
+            try:
+                # extract_json_object as defined earlier
+                json_str = extract_json_object(raw)
+                candidate_agent_assignment = json.loads(json_str)
+                _, next_agent_name = next(iter(candidate_agent_assignment.items()))
+
+            except Exception as e:
+                print(f"Attempt failed to produce agent-assignement JSON: {e}")
+                pass
+
+            if next_agent_name is not None and next_agent_name in agents:
+
+                # hand off the task to the corresponding agent
+                handoff_agent = agents[next_agent_name]
+                print(f"\nHandoffing to {handoff_agent.name}...")
+                subtask_example = subagents_instructions[next_agent_name]["example"] if subagents_instructions else ""
+                subtask_scope = subagents_instructions[next_agent_name]["scope"] if subagents_instructions else ""
+                subagents_llm_prompt = subtask_instructions.format(next_agent_name=next_agent_name, scope=subtask_scope, subtask_example=subtask_example)
+                text_message = TextMessage(role='user', content=subagents_llm_prompt + query, source='user')
+                handoff_agent.messages.add_message(text_message)
+                response = handoff_agent.get_response()
+                print(f"\nResponse: {response}\n")
+
+            elif next_agent_name == "end_agent":
+
+                return orch_response.content if ui_mode else orch_response       
+
+        return orch_response.content if ui_mode else orch_response
+    
 
     # ------------------------------------------------------------------------------
-    # Main loop for executing GC StateFlow
-    def run_gc_stateflow(self, handoffs: dict, query: str, ui_mode=False):
-        self.messages.add_message(TextMessage(role='user', content=f"{query}", source='user'))
-        while True:
-            orch_response = self.get_response()
-            if parse_llm_delimiter_message(orch_response.content, "DONE"):
-                return orch_response.content if ui_mode else orch_response
-            elif orch_response.content == "database_agent" or orch_response.content == "map_agent" or orch_response.content == "detector_agent" or orch_response.content == "data_agent":
-                # hand off the task to the corresponding agent
-                handoff_agent = handoffs[orch_response.content]
-                print(f"\nHandoffing to {handoff_agent.name}...")
-                handoff_agent.get_response()
-            else:
-                raise ValueError(f"Unknown response from orch_agent: {orch_response.content}")
-
-    
-
-# ------------------------------------------------------------------------------
-# Helper functions
-def format_verifier_message(objective, response):
-    """
-    Formats the message for the verifier agent to check if the response meets the objective.
-    
-    Args:
-        objective (str): The task objective.
-        response (str): The response to verify.
-    
-    Returns:
-        str: Formatted message for the verifier agent.
-    """
-    return f"[Objective]: {objective}. [Response]: {response}"
-    
-def get_context(task_id: str, workflow: dict):
-    context_lines = []
-    for prev_id in workflow[task_id]['prev']:
-        if prev_id in workflow:
-            context_lines.append(
-                    f"Task {prev_id}:\n"
-                    f"  Objective: {workflow[prev_id]['objective']}\n"
-                    f"  Result: {workflow[prev_id]['history']}\n"
-                )
+    # Main loop for executing Group StateFlow
+    def run_magentic_stateflow(self, query: str, agents: dict, orch_instructions: str, subagents_instructions: dict, ui_mode=False):
         
-        if context_lines:
-            return "\n".join(context_lines)
-        else:
-            return "No completed previous tasks context available."
-    return context_lines
+        max_orchestrator_steps = 10 # large-value to unstuck inf-loops
+        orchestrator_steps = 0
+        
+        while orchestrator_steps <= max_orchestrator_steps:
+            orchestrator_steps +=1
 
-def get_downstream_objectives(task_id: str, workflow: dict):
-    downstream_objectives = []
-    for next_id in workflow[task_id]['next']:
-        if next_id in workflow:
-            downstream_objectives.append(workflow[next_id]['objective'])
-    return downstream_objectives if downstream_objectives else ["No downstream objectives available."]
+            llm_prompt = f"""
+                {orch_instructions}
 
-def format_content(objective, context, downstream_objectives):
-    return (
-        f"\n**Objective**\n{objective}\n"
-        f"**Context from upstream tasks**\n{context if context else 'No context available.'}\n"
-        f"**Downstream objectives**\n{downstream_objectives if downstream_objectives else 'No downstream objectives available.'}\n"
-    )
+                Now solve and continue with the following user task:
+
+                {query}
+                """
+
+            text_message = TextMessage(role='user', content=llm_prompt, source='user')
+            self.messages.add_message(text_message)
+            orch_response = self.get_response()
+
+            handoff_decision = None
+            raw = orch_response.content
+            try:
+                # extract_json_object as defined earlier
+                json_str = extract_json_object(raw)
+                candidate_agent_assignment = json.loads(json_str)
+                handoff_decision, handoff_objective = next(iter(candidate_agent_assignment.items()))
+
+            except Exception as e:
+                print(f"Attempt failed to produce agent-assignement JSON: {e}")
+                pass
+
+            if handoff_decision is not None and handoff_decision in agents:
+                # hand off the task to the corresponding agent
+                handoff_agent = agents[handoff_decision]
+                handoff_prefix = subagents_instructions[handoff_decision] if subagents_instructions else ""
+                print(f"\nHandoffing to {handoff_agent.name}...")
+                text_message = TextMessage(role='user', content=handoff_prefix+handoff_objective, source='user')
+                handoff_agent.messages.add_message(text_message)
+                response = handoff_agent.get_response()
+                print(f"\nResponse: {response}\n")
+
+            elif handoff_decision == "end_agent":
+
+                return orch_response.content if ui_mode else orch_response                
+
+        return orch_response.content if ui_mode else orch_response
+    

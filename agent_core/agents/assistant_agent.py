@@ -7,6 +7,7 @@ import re
 from agent_core.agents.base_agent import BaseAgent
 from agent_core.modules.messages import ChatResponseMessage, TextMessage, ToolCall, ToolCallRequestMessage, ToolResponseMessage
 from agent_core.modules.tool_schema import function_to_tool_json, function_to_tool_json_Response
+from utils import parse_agent_decision
 
 from collections import deque
 
@@ -126,6 +127,7 @@ class AssistantAgent(BaseAgent):
             messages = [{"role": "system", "content": self.system_message}] if self.system_message is not None else []
 
             messages = messages + self.messages.get_client_messages(self.model_client.client_class)
+            # self.log(f"Messages sent to model\n{messages}\n")
             if self.api == "Responses":
                 chat_response = self.model_client.get_response_Response(messages, tools=self.tool_schemas)
             else:
@@ -237,19 +239,36 @@ class AssistantAgent(BaseAgent):
 
     # ------------------------------------------------------------------------------
     # Main loop for executing GC StateFlow
-    def run_gc_stateflow(self, handoffs: dict, query: str, ui_mode=False):
-        self.messages.add_message(TextMessage(role='user', content=f"{query}", source='user'))
+    def run_gc_stateflow(self, handoffs: dict, orch_message: str, query: str, ui_mode=False):
+        error_cnt = 0
+        errorout = False
+        text_message = TextMessage(role='user', content=query, source='user')
+        self.messages.add_message(text_message)
+        
         while True:
+            if errorout:
+                break
+            
+            # text_message = TextMessage(role='user', content=f"[Task]: {query}\n{orch_message}", source='user')
+            # self.messages.add_message(text_message)
             orch_response = self.get_response()
-            if orch_response.content == "DONE":
+
+            # Test parsing
+            test_response = "<thinking>The task is not DONE yet... data_agent is not suitable. <thinking>" + orch_response.content
+
+            handoff_decision = parse_agent_decision(test_response)
+            if handoff_decision == "DONE":
                 return orch_response.content if ui_mode else orch_response
-            elif orch_response.content == "database_agent" or orch_response.content == "map_agent" or orch_response.content == "detector_agent" or orch_response.content == "data_agent":
+            elif handoff_decision == "database_agent" or handoff_decision == "map_agent" or handoff_decision == "detector_agent" or handoff_decision == "data_agent":
                 # hand off the task to the corresponding agent
-                handoff_agent = handoffs[orch_response.content]
+                handoff_agent = handoffs[handoff_decision]
                 print(f"\nHandoffing to {handoff_agent.name}...")
                 handoff_agent.get_response()
             else:
-                raise ValueError(f"Unknown response from orch_agent: {orch_response.content}")
+                error_cnt += 1
+                errorout = error_cnt < 2
+
+        return orch_response.content if ui_mode else orch_response
 
     # ------------------------------------------------------------------------------
     # Main loop for executing StateFlow

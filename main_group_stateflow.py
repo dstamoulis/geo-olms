@@ -38,6 +38,24 @@ def main(args, workflow=None, query="No query provided"):
     map_tools = MapTools(database, vision, map_style="open-street-map")
     data_tools = DataTools(database, vision)
 
+    orch_message = """\
+        You are an orchastrating agent handing off tasks! The workflow of completing a given task is modeled as a state-machine,
+        and your job is to decide the next agent (state) to transition to based on the current state and the task at hand.
+
+        The available agents to choose from are:
+        - database_agent: Expert in fetching images from a database!
+        - map_agent: Expert in performing all kinds of operations on a map!
+        - detector_agent: Expert in processing images fetched from a database, such as object detection!
+        - data_agent: Expert in all kinds of image analyzing tasks!
+
+        REPLY FORMAT:
+        - You message should be the name of one of the four agents. Or, return "DONE" if the task is completed.
+        - Your return message should ONLY be "database_agent", "map_agent", "detector_agent", "data_agent", "DONE" (no punctuation, no additional text).
+        
+        ATTENTION:
+        - GIVE UP IF YOU FIND YOURSELF REPEATING THE SAME TOOL CALL OVER AND OVER!!
+    """
+
     # Subagents
     database_agent = SingleAgent(
         api=args.api,
@@ -45,7 +63,7 @@ def main(args, workflow=None, query="No query provided"):
         model_client=model_client,
         messages=messages,
         toolsets_list=[database],
-        system_message="You are the database agent!"
+        system_message="You are an expert in fetching images from a database!"
     )
     detector_agent = SingleAgent(
         api=args.api,
@@ -53,7 +71,7 @@ def main(args, workflow=None, query="No query provided"):
         model_client=model_client,
         messages=messages,
         toolsets_list=[vision],
-        system_message="You are the detector agent!"
+        system_message="You are an expert in processing images fetched from a database, such as object detection!"
     )
     map_agent = SingleAgent(
         api=args.api,
@@ -61,7 +79,7 @@ def main(args, workflow=None, query="No query provided"):
         model_client=model_client,
         messages=messages,
         toolsets_list=[map_tools],
-        system_message="You are the map agent!"
+        system_message="You are an expert in performing all kinds of operations on a map!"
     )
     data_agent = SingleAgent(
         api=args.api,
@@ -69,7 +87,7 @@ def main(args, workflow=None, query="No query provided"):
         model_client=model_client,
         messages=messages,
         toolsets_list=[data_tools],
-        system_message="Expert in all kinds of image analyzing tasks!"
+        system_message="You are an expert in all kinds of image analyzing tasks!"
     )
     orch_agent = SingleAgent(
         api=args.api,
@@ -77,23 +95,8 @@ def main(args, workflow=None, query="No query provided"):
         model_client=model_client,
         messages=messages,
         toolsets_list=[],
-        system_message="""
-            You are an orchastrating agent handing off tasks! The workflow of completing a given task is modeled as a state-machine,
-            and your job is to decide the next agent (state) to transition to based on the current state and the task at hand.
-
-            The available agents to choose from are:
-            - database_agent: Expert in fetching images from a database!
-            - map_agent: Expert in performing all kinds of operations on a map!
-            - detector_agent: Expert in processing images fetched from a database, such as object detection!
-            - data_agent: Expert in all kinds of image analyzing tasks!
-
-            REPLY FORMAT:
-            - You message should be the name of one of the four agents. Or, return "DONE" if the task is completed.
-            - Your return message should ONLY be "database_agent", "map_agent", "detector_agent", "data_agent", "DONE" (no punctuation, no additional text).
-            
-            ATTENTION:
-            - GIVE UP IF YOU FIND YOURSELF REPEATING THE SAME TOOL CALL OVER AND OVER!!
-            """
+        # system_message="You are an orchastrating agent handing off tasks!"
+        system_message=orch_message
     )
 
     platform = Platform(model_client, messages, database, vision, map_tools, orch_agent)
@@ -107,6 +110,7 @@ def main(args, workflow=None, query="No query provided"):
             "map_agent": map_agent,
             "data_agent": data_agent
         },
+        orch_message=orch_message,
         query=query
     )
     end_time = time.time()

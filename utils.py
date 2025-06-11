@@ -145,15 +145,15 @@ SUBAGENTS_INSTRUCTIONS = {
         },
         "detector_agent":  {
             "example": "Run the ResNet-32 classifier on BigEarthNet images to detect 'Vineyards' and 'Fruit trees and berry plantations'.",
-            "scope": "fetch and filter imagery by dataset, location, and date."
+            "scope": "run object detection or classification on provided images."
         },
         "map_agent":  {
             "example": "Plot ResNet-32 classification results highlighting the 'Fruit trees and berry plantations' class on the map.",
-            "scope": "fetch and filter imagery by dataset, location, and date."
+            "scope": "generate map visualizations (zoom, plot)."
         },
         "data_agent": {
             "example":  "Count the ResNet-32 classification results for 'Vineyards' class.",
-            "scope": "fetch and filter imagery by dataset, location, and date."
+            "scope": "perform counts or analytics on images or detections."
         }
 }
 

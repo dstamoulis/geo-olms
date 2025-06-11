@@ -7,9 +7,23 @@ import re
 from agent_core.agents.base_agent import BaseAgent
 from agent_core.modules.messages import ChatResponseMessage, TextMessage, ToolCall, ToolCallRequestMessage, ToolResponseMessage
 from agent_core.modules.tool_schema import function_to_tool_json, function_to_tool_json_Response
-from utils import parse_agent_decision
+from utils import extract_json_object, parse_agent_decision
 
 from collections import deque
+
+def ordered_workflow_tasks(workflow: dict) -> list[str]:
+    """
+    Given a dict whose keys are task IDs like "task0", "task1", ..., "task10", 
+    return a list of those keys sorted by their numeric suffix:
+      ["task0", "task1", "task2", ..., "task10", "task11", ...]
+    """
+    def sort_key(task_id: str):
+        # extract the trailing number (e.g. "10" from "task10")
+        m = re.search(r'(\d+)$', task_id)
+        return int(m.group(1)) if m else float('inf')
+
+    return sorted(workflow.keys(), key=sort_key)
+
 
 class AssistantAgent(BaseAgent):
     def __init__(self, name, model_client, messages, api="ChatCompletion", handoffs=[], tools=None, system_message="", console=None):
@@ -214,28 +228,99 @@ class AssistantAgent(BaseAgent):
     # ------------------------------------------------------------------------------
     # Main loop for executing GeoFlow
     def run_workflow(self, agents: dict, workflow: dict, ui_mode=False, log_target=False):
-        for task_id, task in workflow.items():
-            # TODO: if completed, fetch history from ground truth
-            if task['status'] == 'completed':
-                print(f"Task {task_id} already completed. Skipping.")
-                continue
-            else:
-                print(f"\nProcessing task {task_id} with objective: {task['objective']}")
-                handoff_agent = agents[task['agent']]
-                content = task['objective']
-                text_message = TextMessage(role='user', content=content, source='user')
-                print(f"\nText message: {text_message}\n")
-                # self.messages.add_message(text_message) ! BUG
-                handoff_agent.messages.add_message(text_message)
-                response = handoff_agent.get_response_workflow(task_id, workflow)
-                print(f"\nResponse: {response}\n")
-                # self.messages.add_message(response) ! BUG
-        if log_target:
-            with open("target.json", "w") as f:
-                json.dump(workflow, f, indent=2)
+
+        # 1) Build ordered list of objectives
+        ordered_task_ids = ordered_workflow_tasks(workflow)
+
+        # 2) Execute workflow
+        for task_id in ordered_task_ids:
+            task = workflow[task_id]
+            print(f"\nProcessing task {task_id} with objective: {task['objective']}")
+            handoff_agent = agents[task['agent']]
+            text_message = TextMessage(role='user', content=task['objective'], source='user')
+            print(f"\nText message: {text_message}\n")
+            handoff_agent.messages.add_message(text_message)
+            response = handoff_agent.get_response()
+            print(f"\nResponse: {response}\n")
         return response.content if ui_mode else response
     
+    # ------------------------------------------------------------------------------
+    # Updated loop for executing "geoolm" (Dimi!)
+    def run_workflow_flow(self, agents: dict, workflow: dict, ui_mode=False, log_target=False):
+        """
+        1. Extract objectives in ID order.
+        2. Prompt the LLM to assign each task to one of the given agents.
+        3. Retry up to 3 times if the JSON is invalid or contains unknown agents.
+        4. Return the assignment dict.
+        """
+        # 1) Build ordered list of objectives
+        ordered_task_ids = ordered_workflow_tasks(workflow)
+        agent_task_objectives = {tid: workflow[tid]["objective"] for tid in ordered_task_ids}
+        
+        # 2) Build the prompt
+        llm_prompt = f"""
+            For each of the following tasks and their objectives, assign exactly one agent.
+            You may choose only from: {list(agents.keys())}.
 
+            Each task is self-contained and maps to a single agent:
+
+            > database_agent: tools for database queries and image filtering  
+            > detector_agent: detection and classification on prior images  
+            > data_agent: data-count and analytics tools  
+            > map_agent: map zooming, plotting, and visualization tools  
+
+            Reply ONLY with a JSON object mapping task IDs to agent names.  
+            DO NOT include any backticks, commentary, or extra text—only the raw JSON.
+
+            Example valid output:
+            {{"task0": "database_agent", "task1": "detector_agent", "task2": "map_agent"}}
+
+            Here are the tasks to assign:
+            {json.dumps(agent_task_objectives, indent=2)}
+            """
+
+        # 3) LLM call to assign agents to objectives
+        max_retries = 3
+        attempts = 0
+        agent_assignment = None
+
+        while attempts < max_retries:
+            attempts += 1
+            response = self.model_client.get_response([  # replace with your LLM call
+                {"role": "system", "content": "You are an expert workflow allocator. Given a list of available agent names, your task is to assign the proper agent to each objective!"},
+                {"role": "user",   "content": llm_prompt}
+            ])
+            raw = response.content
+            try:
+                # extract_json_object as defined earlier
+                json_str = extract_json_object(raw)
+                candidate_agent_assignment = json.loads(json_str)
+                # 4) Validate agent names
+                if all(agent in agents for agent in candidate_agent_assignment.values()):
+                    agent_assignment = candidate_agent_assignment
+                    break
+            except Exception as e:
+                print(f"[Attempt {attempts}/{max_retries}] Failed to produce agent-assignement JSON: {e}")
+                pass
+
+        if agent_assignment is None:
+            print("Failed to get valid agent assignment after retries")
+            return 
+
+        print(f"[Attempt {attempts}/{max_retries}] Produced agent-assignement JSON: {agent_assignment}")
+
+        # 4) Execute workflow
+        for task_id in ordered_task_ids:
+            task_objective = agent_task_objectives[task_id]
+            handoff_agent = agents[agent_assignment[task_id]]
+            print(f"\nProcessing task {task_id} with objective: {task_objective} and agent: {agent_assignment[task_id]}")
+            text_message = TextMessage(role='user', content=task_objective, source='user')
+            print(f"\nText message: {text_message}\n")
+            handoff_agent.messages.add_message(text_message)
+            response = handoff_agent.get_response()
+            print(f"\nResponse: {response}\n")
+        return response.content if ui_mode else response
+    
     # ------------------------------------------------------------------------------
     # Main loop for executing Seq-StateFlow (Dimi)
     def run_seq_stateflow(self, query, handoff_message: str, agents: dict, agents_sequence: list, ui_mode=False, log_target=False):
@@ -361,48 +446,3 @@ class AssistantAgent(BaseAgent):
             with open("target.json", "w") as f:
                 json.dump(workflow, f, indent=2)
         return response.content if ui_mode else response
-
-# ------------------------------------------------------------------------------
-# Helper functions
-def format_verifier_message(objective, response):
-    """
-    Formats the message for the verifier agent to check if the response meets the objective.
-    
-    Args:
-        objective (str): The task objective.
-        response (str): The response to verify.
-    
-    Returns:
-        str: Formatted message for the verifier agent.
-    """
-    return f"[Objective]: {objective}. [Response]: {response}"
-    
-def get_context(task_id: str, workflow: dict):
-    context_lines = []
-    for prev_id in workflow[task_id]['prev']:
-        if prev_id in workflow:
-            context_lines.append(
-                    f"Task {prev_id}:\n"
-                    f"  Objective: {workflow[prev_id]['objective']}\n"
-                    f"  Result: {workflow[prev_id]['history']}\n"
-                )
-        
-        if context_lines:
-            return "\n".join(context_lines)
-        else:
-            return "No completed previous tasks context available."
-    return context_lines
-
-def get_downstream_objectives(task_id: str, workflow: dict):
-    downstream_objectives = []
-    for next_id in workflow[task_id]['next']:
-        if next_id in workflow:
-            downstream_objectives.append(workflow[next_id]['objective'])
-    return downstream_objectives if downstream_objectives else ["No downstream objectives available."]
-
-def format_content(objective, context, downstream_objectives):
-    return (
-        f"\n**Objective**\n{objective}\n"
-        f"**Context from upstream tasks**\n{context if context else 'No context available.'}\n"
-        f"**Downstream objectives**\n{downstream_objectives if downstream_objectives else 'No downstream objectives available.'}\n"
-    )

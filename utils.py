@@ -6,10 +6,12 @@ import re
 def re_args_component(value: str) -> str:
     return re.sub(r"[.\-]", "_", value)
 
+
 def parse_agent_decision(response: str) -> str:
     pattern = r"\b(database_agent|detector_agent|map_agent|data_agent|DONE)\b(?!.*\b(database_agent|detector_agent|map_agent|data_agent|DONE)\b)"
     match = re.search(pattern, response)
     return match.group(1) if match else None
+
 
 def get_results_path(args, base_dir="results") -> str:
     """
@@ -39,6 +41,7 @@ def get_results_path(args, base_dir="results") -> str:
     }
     return results_filenames 
 
+
 def strip_json_code_block(raw_content):
     # Remove leading/trailing whitespace
     raw_content = raw_content.strip()
@@ -51,6 +54,7 @@ def strip_json_code_block(raw_content):
         if len(lines) >= 3:
             return "\n".join(lines[1:-1])
     return raw_content
+
 
 def load_json_file(file_path):
     """
@@ -75,4 +79,63 @@ def load_json_file(file_path):
     except Exception as e:
          print(f"An unexpected error occurred: {e}")
          return None
+    
+    
+def parse_llm_delimiter_message(raw: str, delimiter_str) -> bool:
+    """
+    Return True if the LLM response ends with delimiter_str (ignoring quotes, <think>...</think>, 
+    or trailing explanation).  Handles delimiter_str like ERROR, DONE, etc. 
+    """
+    # 1) Remove any <think>...</think> blocks
+    cleaned = re.sub(r'<think>.*?</think>', '', raw, flags=re.DOTALL)
+
+    # 2) Split into lines and keep only non-blank lines
+    lines = [line.strip() for line in cleaned.splitlines() if line.strip()]
+
+    if not lines:
+        return False
+
+    # 3) Consider the last non-blank line
+    last = lines[-1]
+
+    # 4) Strip surrounding quotes or backticks
+    last = last.strip(' "\'`')
+
+    # 5) Check if it equals ERROR
+    return last.upper() == delimiter_str
+
+
+def extract_json_object(raw: str) -> str:
+    """
+    Extracts the first JSON object from `raw` text, ignoring any <think>...</think> sections.
+    1) Strip out any <think>…</think> blocks entirely.
+    2) If there's a ```json...``` code block, return its contents.
+    3) Otherwise, find the first “{” and grab the balanced {...} substring.
+    Returns the JSON string or raises ValueError if none found.
+    """
+    # 0) Remove any <think>...</think> sections
+    raw = re.sub(r"<think>.*?</think>", "", raw, flags=re.DOTALL)
+
+    # Trim whitespace
+    raw = raw.strip()
+
+    # 1) Try to pull from a ```json …``` block
+    m = re.search(r"```json\s*(\{.*?\})\s*```", raw, re.DOTALL)
+    if m:
+        return m.group(1)
+
+    # 2) Otherwise look for the first “{” and match braces
+    start = raw.find("{")
+    if start == -1:
+        raise ValueError("No JSON object found in response")
+
+    depth = 0
+    for i, ch in enumerate(raw[start:], start):
+        if ch == "{":
+            depth += 1
+        elif ch == "}":
+            depth -= 1
+            if depth == 0:
+                return raw[start : i + 1]
+    raise ValueError("Unbalanced braces in response")
     

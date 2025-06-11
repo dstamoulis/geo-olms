@@ -242,6 +242,8 @@ class AssistantAgent(BaseAgent):
             print("Failed to get valid agent assignment after retries")
             return 
 
+        print(f"[Attempt {attempts}/{max_retries}] Produced agent-assignement JSON: {agent_assignment}")
+
         # 4) Execute workflow
         for task_id in ordered_task_ids:
             task_objective = agent_task_objectives[task_id]

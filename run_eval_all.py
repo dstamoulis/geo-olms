@@ -9,10 +9,11 @@ def main():
     run_client = "openai" # openai, ollama
     run_model = "gpt-4o-mini"
     run_flow_ver = run_model #"flow_gt"
+    run_flow_ver = "flow_gt"
 
     run_methods = ['single_agent', 'geoflow', 'geoolm', 'swarm', 'seq_stateflow', 'group_stateflow']
     run_methods = ['geoflow', 'geoolm', 'swarm', 'seq_stateflow', 'group_stateflow']
-    run_methods = ['geoflow']
+    run_methods = ['geoolm', 'geoflow']
 
     for run_method in run_methods:
 

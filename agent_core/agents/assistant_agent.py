@@ -8,7 +8,22 @@ from agent_core.agents.base_agent import BaseAgent
 from agent_core.modules.messages import ChatResponseMessage, TextMessage, ToolCall, ToolCallRequestMessage, ToolResponseMessage
 from agent_core.modules.tool_schema import function_to_tool_json, function_to_tool_json_Response
 
-from collections import deque
+from collections import deque, OrderedDict
+from utils import extract_json_object, parse_llm_delimiter_message
+
+def ordered_workflow_tasks(workflow: dict) -> list[str]:
+    """
+    Given a dict whose keys are task IDs like "task0", "task1", ..., "task10", 
+    return a list of those keys sorted by their numeric suffix:
+      ["task0", "task1", "task2", ..., "task10", "task11", ...]
+    """
+    def sort_key(task_id: str):
+        # extract the trailing number (e.g. "10" from "task10")
+        m = re.search(r'(\d+)$', task_id)
+        return int(m.group(1)) if m else float('inf')
+
+    return sorted(workflow.keys(), key=sort_key)
+
 
 class AssistantAgent(BaseAgent):
     def __init__(self, name, model_client, messages, api="ChatCompletion", handoffs=[], tools=None, system_message="", console=None):
@@ -17,7 +32,6 @@ class AssistantAgent(BaseAgent):
         """
         super().__init__(name, model_client, messages, handoffs, tools, system_message, console)
         self.api = api
-
 
         # turn python functions into tools and save a reverse map
         # following: https://cookbook.openai.com/examples/orchestrating_agents
@@ -119,12 +133,10 @@ class AssistantAgent(BaseAgent):
         """
         Retrieves the conversation history in API format, then calls the model client to get a response.
         """
-        # turn = 0
         while True:
 
             self.log(f"Requesting response from {self.model_client.client_class} client ({self.model_client.model})...")
             messages = [{"role": "system", "content": self.system_message}] if self.system_message is not None else []
-
             messages = messages + self.messages.get_client_messages(self.model_client.client_class)
             if self.api == "Responses":
                 chat_response = self.model_client.get_response_Response(messages, tools=self.tool_schemas)
@@ -145,66 +157,103 @@ class AssistantAgent(BaseAgent):
                     tool_response = self.execute_tool_call(tool_call)
                 self.messages.add_message(tool_response)
 
-            # turn += 1
-
         return chat_response
-    
-    
-    # ------------------------------------------------
-    # Workflow execution
-    # ------------------------------------------------
-    def get_response_workflow(self, task_id, workflow):
-        while True:
-            self.log(f"Requesting response from {self.model_client.client_class} client ({self.model_client.model})...")
-            messages = [{"role": "system", "content": self.system_message}] if self.system_message is not None else []
 
-            messages = messages + self.messages.get_client_messages(self.model_client.client_class)
-            # self.log(f"Messages sent to model\n{messages}\n")
-            if self.api == "Responses":
-                chat_response = self.model_client.get_response_Response(messages, tools=self.tool_schemas)
-            else:
-                chat_response = self.model_client.get_response(messages, tools=self.tool_schemas)
-            self.log(f"Received response: {chat_response}")
-            self.messages.add_message(chat_response)
-
-            if not isinstance(chat_response, ToolCallRequestMessage):  # if finished handling tool calls, break
-                break
-
-            # === handle tool calls ===
-            for tool_call in chat_response.tool_calls:
-                if self.api == "Responses":
-                    tool_response = self.execute_tool_call_Response(tool_call)
-                else:
-                    tool_response = self.execute_tool_call(tool_call)
-                self.messages.add_message(tool_response)
-
-        workflow[task_id]['history'] = chat_response.content
-        return chat_response
-    
     # ------------------------------------------------------------------------------
     # Main loop for executing GeoFlow
     def run_workflow(self, agents: dict, workflow: dict, ui_mode=False, log_target=False):
-        for task_id, task in workflow.items():
-            # TODO: if completed, fetch history from ground truth
-            if task['status'] == 'completed':
-                print(f"Task {task_id} already completed. Skipping.")
-                continue
-            else:
-                print(f"\nProcessing task {task_id} with objective: {task['objective']}")
-                handoff_agent = agents[task['agent']]
-                content = task['objective']
-                text_message = TextMessage(role='user', content=content, source='user')
-                print(f"\nText message: {text_message}\n")
-                # self.messages.add_message(text_message) ! BUG
-                handoff_agent.messages.add_message(text_message)
-                response = handoff_agent.get_response_workflow(task_id, workflow)
-                print(f"\nResponse: {response}\n")
-                # self.messages.add_message(response) ! BUG
-        if log_target:
-            with open("target.json", "w") as f:
-                json.dump(workflow, f, indent=2)
+
+        # 1) Build ordered list of objectives
+        ordered_task_ids = ordered_workflow_tasks(workflow)
+
+        # 2) Execute workflow
+        for task_id in ordered_task_ids:
+            task = workflow[task_id]
+            print(f"\nProcessing task {task_id} with objective: {task['objective']}")
+            handoff_agent = agents[task['agent']]
+            text_message = TextMessage(role='user', content=task['objective'], source='user')
+            print(f"\nText message: {text_message}\n")
+            handoff_agent.messages.add_message(text_message)
+            response = handoff_agent.get_response()
+            print(f"\nResponse: {response}\n")
         return response.content if ui_mode else response
-    
+
+
+    # ------------------------------------------------------------------------------
+    # Updated loop for executing "geoolm" (Dimi!)
+    def run_workflow_flow(self, agents: dict, workflow: dict, ui_mode=False, log_target=False):
+        """
+        1. Extract objectives in ID order.
+        2. Prompt the LLM to assign each task to one of the given agents.
+        3. Retry up to 3 times if the JSON is invalid or contains unknown agents.
+        4. Return the assignment dict.
+        """
+        # 1) Build ordered list of objectives
+        ordered_task_ids = ordered_workflow_tasks(workflow)
+        agent_task_objectives = {tid: workflow[tid]["objective"] for tid in ordered_task_ids}
+        
+        # 2) Build the prompt
+        llm_prompt = f"""
+            For each of the following tasks and their objectives, assign exactly one agent.
+            You may choose only from: {list(agents.keys())}.
+
+            Each task is self-contained and maps to a single agent:
+
+            > database_agent: tools for database queries and image filtering  
+            > detector_agent: detection and classification on prior images  
+            > data_agent: data-count and analytics tools  
+            > map_agent: map zooming, plotting, and visualization tools  
+
+            Reply ONLY with a JSON object mapping task IDs to agent names.  
+            DO NOT include any backticks, commentary, or extra text—only the raw JSON.
+
+            Example valid output:
+            {{"task0": "database_agent", "task1": "detector_agent", "task2": "map_agent"}}
+
+            Here are the tasks to assign:
+            {json.dumps(agent_task_objectives, indent=2)}
+            """
+
+        # 3) LLM call to assign agents to objectives
+        max_retries = 3
+        attempts = 0
+        agent_assignment = None
+
+        while attempts < max_retries:
+            attempts += 1
+            response = self.model_client.get_response([  # replace with your LLM call
+                {"role": "system", "content": "You are an expert workflow allocator. Given a list of available agent names, your task is to assign the proper agent to each objective!"},
+                {"role": "user",   "content": llm_prompt}
+            ])
+            raw = response.content
+            try:
+                # extract_json_object as defined earlier
+                json_str = extract_json_object(raw)
+                candidate_agent_assignment = json.loads(json_str)
+                # 4) Validate agent names
+                if all(agent in agents for agent in candidate_agent_assignment.values()):
+                    agent_assignment = candidate_agent_assignment
+                    break
+            except Exception as e:
+                print(f"[Attempt {attempts}/{max_retries}] Failed to produce agent-assignement JSON: {e}")
+                pass
+
+        if agent_assignment is None:
+            print("Failed to get valid agent assignment after retries")
+            return 
+
+        # 4) Execute workflow
+        for task_id in ordered_task_ids:
+            task_objective = agent_task_objectives[task_id]
+            handoff_agent = agents[agent_assignment[task_id]]
+            print(f"\nProcessing task {task_id} with objective: {task_objective} and agent: {agent_assignment[task_id]}")
+            text_message = TextMessage(role='user', content=task_objective, source='user')
+            print(f"\nText message: {text_message}\n")
+            handoff_agent.messages.add_message(text_message)
+            response = handoff_agent.get_response()
+            print(f"\nResponse: {response}\n")
+        return response.content if ui_mode else response
+
 
     # ------------------------------------------------------------------------------
     # Main loop for executing Seq-StateFlow (Dimi)
@@ -220,14 +269,12 @@ class AssistantAgent(BaseAgent):
                 next_agent = agents[next_agent_name]
                 text_message = TextMessage(role='user', content=query+handoff_message, source='user')
                 # print(f"\nText message: {text_message}\n")
-                # self.messages.add_message(text_message)
                 next_agent.messages.add_message(text_message)
                 response = next_agent.get_response()
                 print(f"\nResponse: {response}\n")
                 next_agent.messages.add_message(response)
-                # self.messages.add_message(response)
 
-                if response.content == "ERROR":
+                if parse_llm_delimiter_message(response.content, "ERROR"):
                     resets_cnt+=1
                     sequence_reset = resets_cnt < 2 # so if you reset twice already, give up
                     break
@@ -241,7 +288,7 @@ class AssistantAgent(BaseAgent):
         self.messages.add_message(TextMessage(role='user', content=f"{query}", source='user'))
         while True:
             orch_response = self.get_response()
-            if orch_response.content == "DONE":
+            if parse_llm_delimiter_message(orch_response.content, "DONE"):
                 return orch_response.content if ui_mode else orch_response
             elif orch_response.content == "database_agent" or orch_response.content == "map_agent" or orch_response.content == "detector_agent" or orch_response.content == "data_agent":
                 # hand off the task to the corresponding agent
@@ -251,74 +298,7 @@ class AssistantAgent(BaseAgent):
             else:
                 raise ValueError(f"Unknown response from orch_agent: {orch_response.content}")
 
-    # ------------------------------------------------------------------------------
-    # Main loop for executing StateFlow
-    def run_stateflow(self, task_queue: deque, state_queue: deque, ui_mode=False):
-        state = state_queue.popleft()
-        task = task_queue.popleft()
-        while True:
-            content = task['objective']
-            state.messages.add_message(TextMessage(role='user', content=content, source='user'))
-            response = state.get_response()
-
-            # Verify the response
-            verifier_message = format_verifier_message(content, response.content)
-            self.messages.reset_messages()
-            self.messages.add_message(TextMessage(role='user', content=verifier_message, source='verifier'))
-            verification = self.get_response()
-
-            print(f"\nVerification Result: {verification.content}")
-            # Decide the transition to the next state
-            if verification.content == "COMPLETED":
-                print(f"Task {task['id']} completed successfully.\n")
-                if not task_queue:
-                    break
-                state = state_queue.popleft()
-                task = task_queue.popleft()
-            else:
-                # TODO: ERROR state self-evaluation logic
-                continue
-        return response.content if ui_mode else response
     
-    # ------------------------------------------------------------------------------
-    # Main loop for executing Flow++
-    def run_flowPP(self, agents: dict, workflow: dict, ui_mode=False, log_target=False):
-        agent_calls = ""
-        for task_id, task in workflow.items():
-            # print(f'task_id: {task_id}, task: {task}')
-            agent_calls += f"{task_id}: {task['objective']}, agent: {task['agent']}\n"
-        agent_calls += f"Here is the dict_keys of available agents: {agents.keys()}. For each task, match it with an agent that is strictly in the dict_keys, make a guess if you need. Then just return only the one-to-one result in this format: task_num: agent_name"
-        print(f"************************ agent_calls: \n{agent_calls}")
-
-        # agent_match = self.model_client.get_response_Response(agent_calls)
-        message = [{"role": "system", "content": agent_calls}]
-        agent_match = self.model_client.get_response(message)
-        print(f"---------------------Agent match response: \n{agent_match.content}")
-        tool_calls = agent_match.tool_calls
-
-        # Convert the LLM response into a dictionary of form: task_id: agent_name
-        pattern = r"\s*(task\d+):\s*([a-zA-Z0-9_]+)" 
-        matches = re.findall(pattern, agent_match.content)
-        task_agent_map = dict(matches)
-        print(f"++++++++++++++++ map: \n{task_agent_map}")
-
-        for task_id, task in workflow.items():
-            # TODO: if completed, fetch history from ground truth
-            if task['status'] == 'completed':
-                print(f"Task {task_id} already completed. Skipping.")
-                continue
-            else:
-                print(f"\nProcessing task {task_id} with objective: {task['objective']}")
-                handoff_agent = agents[task_agent_map[task_id]]
-                content = task['objective']
-                text_message = TextMessage(role='user', content=content, source='user')
-                handoff_agent.messages.add_message(text_message)
-                response = handoff_agent.get_response_workflow(task_id, workflow)
-
-        if log_target:
-            with open("target.json", "w") as f:
-                json.dump(workflow, f, indent=2)
-        return response.content if ui_mode else response
 
 # ------------------------------------------------------------------------------
 # Helper functions

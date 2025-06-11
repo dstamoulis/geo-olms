@@ -71,3 +71,61 @@ def load_json_file(file_path):
          print(f"An unexpected error occurred: {e}")
          return None
     
+
+def parse_llm_delimiter_message(raw: str, delimiter_str) -> bool:
+    """
+    Return True if the LLM response ends with delimiter_str (ignoring quotes, <think>...</think>, 
+    or trailing explanation).  Handles delimiter_str like ERROR, DONE, etc. 
+    """
+    # 1) Remove any <think>...</think> blocks
+    cleaned = re.sub(r'<think>.*?</think>', '', raw, flags=re.DOTALL)
+
+    # 2) Split into lines and keep only non-blank lines
+    lines = [line.strip() for line in cleaned.splitlines() if line.strip()]
+
+    if not lines:
+        return False
+
+    # 3) Consider the last non-blank line
+    last = lines[-1]
+
+    # 4) Strip surrounding quotes or backticks
+    last = last.strip(' "\'`')
+
+    # 5) Check if it equals ERROR
+    return last.upper() == delimiter_str
+
+
+def extract_json_object(raw: str) -> str:
+    """
+    Extracts the first JSON object from `raw` text, ignoring any <think>...</think> sections.
+    1) Strip out any <think>…</think> blocks entirely.
+    2) If there's a ```json...``` code block, return its contents.
+    3) Otherwise, find the first “{” and grab the balanced {...} substring.
+    Returns the JSON string or raises ValueError if none found.
+    """
+    # 0) Remove any <think>...</think> sections
+    raw = re.sub(r"<think>.*?</think>", "", raw, flags=re.DOTALL)
+
+    # Trim whitespace
+    raw = raw.strip()
+
+    # 1) Try to pull from a ```json …``` block
+    m = re.search(r"```json\s*(\{.*?\})\s*```", raw, re.DOTALL)
+    if m:
+        return m.group(1)
+
+    # 2) Otherwise look for the first “{” and match braces
+    start = raw.find("{")
+    if start == -1:
+        raise ValueError("No JSON object found in response")
+
+    depth = 0
+    for i, ch in enumerate(raw[start:], start):
+        if ch == "{":
+            depth += 1
+        elif ch == "}":
+            depth -= 1
+            if depth == 0:
+                return raw[start : i + 1]
+    raise ValueError("Unbalanced braces in response")

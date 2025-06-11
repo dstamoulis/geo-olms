@@ -84,7 +84,7 @@ def main(args, workflow=None, query="No query provided"):
     agent_run = AgentRun(platform, results_output_filenames=get_results_path(args))
 
     start_time = time.time()
-    response = platform.agent.run_flowPP(
+    response = platform.agent.run_workflow_flow(
         {"database_agent": database_agent, "map_agent": map_agent, "detector_agent": detector_agent, "data_agent": data_agent},
         workflow
     )

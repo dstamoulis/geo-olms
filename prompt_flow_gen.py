@@ -10,40 +10,7 @@ from utils import load_json_file, strip_json_code_block, re_args_component
 from prompt_flows.gen_prompt import INIT_WORKFLOW_PROMPT, INIT_WORKFLOW_TEMPLATE, AGENT_LIST
 
 import re
-
-def extract_json_object(raw: str) -> str:
-    """
-    Extracts the first JSON object from `raw` text, ignoring any <think>...</think> sections.
-    1) Strip out any <think>…</think> blocks entirely.
-    2) If there's a ```json...``` code block, return its contents.
-    3) Otherwise, find the first “{” and grab the balanced {...} substring.
-    Returns the JSON string or raises ValueError if none found.
-    """
-    # 0) Remove any <think>...</think> sections
-    raw = re.sub(r"<think>.*?</think>", "", raw, flags=re.DOTALL)
-
-    # Trim whitespace
-    raw = raw.strip()
-
-    # 1) Try to pull from a ```json …``` block
-    m = re.search(r"```json\s*(\{.*?\})\s*```", raw, re.DOTALL)
-    if m:
-        return m.group(1)
-
-    # 2) Otherwise look for the first “{” and match braces
-    start = raw.find("{")
-    if start == -1:
-        raise ValueError("No JSON object found in response")
-
-    depth = 0
-    for i, ch in enumerate(raw[start:], start):
-        if ch == "{":
-            depth += 1
-        elif ch == "}":
-            depth -= 1
-            if depth == 0:
-                return raw[start : i + 1]
-    raise ValueError("Unbalanced braces in response")
+from utils import extract_json_object
 
 
 def generate_workflow(query, args):

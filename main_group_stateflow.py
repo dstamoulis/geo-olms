@@ -33,14 +33,15 @@ def main(args, workflow=None, query="No query provided"):
             "temperature": args.temp,        # Default temperature setting
         })
     messages = Messages()
+    agent_messages = messages if args.orch_message == 'sys' else Messages()
     database = Database()    
     vision = Vision(database)    
     map_tools = MapTools(database, vision, map_style="open-street-map")
     data_tools = DataTools(database, vision)
 
-    orch_message = """\
+    orch_prompt = """\
         You are an orchastrating agent handing off tasks! The workflow of completing a given task is modeled as a state-machine,
-        and your job is to decide the next agent (state) to transition to based on the current state and the task at hand.
+        and your job is to decide the next agent (state) to transition to based on the current message and the task at hand.
 
         The available agents to choose from are:
         - database_agent: Expert in fetching images from a database!
@@ -49,11 +50,17 @@ def main(args, workflow=None, query="No query provided"):
         - data_agent: Expert in all kinds of image analyzing tasks!
 
         REPLY FORMAT:
-        - You message should be the name of one of the four agents. Or, return "DONE" if the task is completed.
+        - Your message should be the name of one of the four agents. Or, return "DONE" if the task is completed.
         - Your return message should ONLY be "database_agent", "map_agent", "detector_agent", "data_agent", "DONE" (no punctuation, no additional text).
         
         ATTENTION:
         - GIVE UP IF YOU FIND YOURSELF REPEATING THE SAME TOOL CALL OVER AND OVER!!
+    """
+
+    agent_prompt = """\
+        You are part of a larger team of agents handling a multi-step task. Focus only on your assigned part — do 
+        not attempt to complete the entire task. When done, return a concise summary of your output to help the 
+        orchestrating agent decide the next step.
     """
 
     # Subagents
@@ -61,58 +68,71 @@ def main(args, workflow=None, query="No query provided"):
         api=args.api,
         name="database_agent",
         model_client=model_client,
-        messages=messages,
+        messages=agent_messages,
         toolsets_list=[database],
-        system_message="You are an expert in fetching images from a database!"
+        system_message=f"You are an expert in fetching images from a database! {agent_prompt}"
     )
     detector_agent = SingleAgent(
         api=args.api,
         name="detector_agent",
         model_client=model_client,
-        messages=messages,
+        messages=agent_messages,
         toolsets_list=[vision],
-        system_message="You are an expert in processing images fetched from a database, such as object detection!"
+        system_message=f"You are an expert in processing images fetched from a database, such as object detection! {agent_prompt}"
     )
     map_agent = SingleAgent(
         api=args.api,
         name="map_agent",
         model_client=model_client,
-        messages=messages,
+        messages=agent_messages,
         toolsets_list=[map_tools],
-        system_message="You are an expert in performing all kinds of operations on a map!"
+        system_message=f"You are an expert in performing all kinds of operations on a map! {agent_prompt}"
     )
     data_agent = SingleAgent(
         api=args.api,
         name="data_agent",
         model_client=model_client,
-        messages=messages,
+        messages=agent_messages,
         toolsets_list=[data_tools],
-        system_message="You are an expert in all kinds of image analyzing tasks!"
+        system_message=f"You are an expert in all kinds of image analyzing tasks! {agent_prompt}"
     )
-    orch_agent = SingleAgent(
+    orch_agent_sys = SingleAgent(
         api=args.api,
         name="orch_agent",
         model_client=model_client,
         messages=messages,
         toolsets_list=[],
-        # system_message="You are an orchastrating agent handing off tasks!"
-        system_message=orch_message
+        system_message=orch_prompt
+    )
+    orch_agent_usr = SingleAgent(
+        api=args.api,
+        name="orch_agent",
+        model_client=model_client,
+        messages=messages,
+        toolsets_list=[],
+        system_message="You are an orchastrating agent handing off tasks!"
     )
 
-    platform = Platform(model_client, messages, database, vision, map_tools, orch_agent)
-    agent_run = AgentRun(platform, results_output_filenames=get_results_path(args))
+    handoffs = {
+        "database_agent": database_agent,
+        "detector_agent": detector_agent,
+        "map_agent": map_agent,
+        "data_agent": data_agent
+    }
 
-    start_time = time.time()
-    response = platform.agent.run_gc_stateflow(
-        handoffs={
-            "database_agent": database_agent,
-            "detector_agent": detector_agent,
-            "map_agent": map_agent,
-            "data_agent": data_agent
-        },
-        orch_message=orch_message,
-        query=query
-    )
+    if args.orch_message == 'sys':
+        # Add orch message as system message
+        platform = Platform(model_client, messages, database, vision, map_tools, orch_agent_sys)
+        agent_run = AgentRun(platform, results_output_filenames=get_results_path(args))
+        start_time = time.time()
+        response = platform.agent.run_group_stateflow_sys(handoffs=handoffs, query=query)
+    elif args.orch_message == 'usr':
+        # Add orch message as user message in very loop
+        platform = Platform(model_client, messages, database, vision, map_tools, orch_agent_usr)
+        agent_run = AgentRun(platform, results_output_filenames=get_results_path(args))
+        start_time = time.time()
+        response = platform.agent.run_group_stateflow_usr(handoffs=handoffs, orch_message=orch_prompt, query=query)
+    
     end_time = time.time()
     elapsed_time = round(end_time - start_time, 4)
     print("===\nelapsed time: ", elapsed_time, " s\n===")
@@ -134,6 +154,7 @@ if __name__ == "__main__":
     parser.add_argument('--temp', default= 0.1, help='model LLM to use')
     parser.add_argument('--agent', default= 'group_stateflow', help='agent to use')
     parser.add_argument('--flow_ver', default= 'flow_gt', help='agent to use')
+    parser.add_argument('--orch_message', default='sys', help='add orch message as system message or user message')
     args = parser.parse_args()
 
     geo_flow = load_json_file(f'./prompt_flows/flows/{re_args_component(args.flow_ver)}/{args.exp_id}.json')

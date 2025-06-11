@@ -120,14 +120,13 @@ class AssistantAgent(BaseAgent):
         """
         Retrieves the conversation history in API format, then calls the model client to get a response.
         """
-        # turn = 0
         while True:
 
             self.log(f"Requesting response from {self.model_client.client_class} client ({self.model_client.model})...")
             messages = [{"role": "system", "content": self.system_message}] if self.system_message is not None else []
 
             messages = messages + self.messages.get_client_messages(self.model_client.client_class)
-            # self.log(f"Messages sent to model\n{messages}\n")
+            self.log(f"Messages sent to model\n{messages}\n")
             if self.api == "Responses":
                 chat_response = self.model_client.get_response_Response(messages, tools=self.tool_schemas)
             else:
@@ -140,14 +139,44 @@ class AssistantAgent(BaseAgent):
 
             # === handle tool calls ===
             for tool_call in chat_response.tool_calls:
-                # tool_response = self.execute_tool_call(tool_call)
                 if self.api == "Responses":
                     tool_response = self.execute_tool_call_Response(tool_call)
                 else:
                     tool_response = self.execute_tool_call(tool_call)
                 self.messages.add_message(tool_response)
 
-            # turn += 1
+        return chat_response
+    
+    def get_response_subagent(self, orch_agent):
+        """
+        Retrieves the conversation history in API format, then calls the model client to get a response.
+        """
+        while True:
+
+            self.log(f"Requesting response from {self.model_client.client_class} client ({self.model_client.model})...")
+            messages = [{"role": "system", "content": self.system_message}] if self.system_message is not None else []
+
+            messages = messages + self.messages.get_client_messages(self.model_client.client_class)
+            self.log(f"Messages sent to model\n{messages}\n")
+            if self.api == "Responses":
+                chat_response = self.model_client.get_response_Response(messages, tools=self.tool_schemas)
+            else:
+                chat_response = self.model_client.get_response(messages, tools=self.tool_schemas)
+            self.log(f"Received response: {chat_response}")
+            self.messages.add_message(chat_response)
+            orch_agent.messages.add_message(chat_response)
+
+            if not isinstance(chat_response, ToolCallRequestMessage):  # if finished handling tool calls, break
+                break
+
+            # === handle tool calls ===
+            for tool_call in chat_response.tool_calls:
+                if self.api == "Responses":
+                    tool_response = self.execute_tool_call_Response(tool_call)
+                else:
+                    tool_response = self.execute_tool_call(tool_call)
+                self.messages.add_message(tool_response)
+                orch_agent.messages.add_message(tool_response)
 
         return chat_response
     
@@ -180,7 +209,6 @@ class AssistantAgent(BaseAgent):
                     tool_response = self.execute_tool_call(tool_call)
                 self.messages.add_message(tool_response)
 
-        workflow[task_id]['history'] = chat_response.content
         return chat_response
     
     # ------------------------------------------------------------------------------
@@ -221,15 +249,12 @@ class AssistantAgent(BaseAgent):
 
                 next_agent = agents[next_agent_name]
                 text_message = TextMessage(role='user', content=query+handoff_message, source='user')
-                # print(f"\nText message: {text_message}\n")
-                # self.messages.add_message(text_message)
                 next_agent.messages.add_message(text_message)
                 response = next_agent.get_response()
-                print(f"\nResponse: {response}\n")
                 next_agent.messages.add_message(response)
-                # self.messages.add_message(response)
 
-                if response.content == "ERROR":
+                transition_decision = parse_agent_decision(response.content)
+                if transition_decision == "ERROR":
                     resets_cnt+=1
                     sequence_reset = resets_cnt < 2 # so if you reset twice already, give up
                     break
@@ -238,8 +263,8 @@ class AssistantAgent(BaseAgent):
 
 
     # ------------------------------------------------------------------------------
-    # Main loop for executing GC StateFlow
-    def run_gc_stateflow(self, handoffs: dict, orch_message: str, query: str, ui_mode=False):
+    # Main loop for executing Group StateFlow, with orch_message as system message
+    def run_group_stateflow_sys(self, handoffs: dict, query: str, ui_mode=False):
         error_cnt = 0
         errorout = False
         text_message = TextMessage(role='user', content=query, source='user')
@@ -249,14 +274,9 @@ class AssistantAgent(BaseAgent):
             if errorout:
                 break
             
-            # text_message = TextMessage(role='user', content=f"[Task]: {query}\n{orch_message}", source='user')
-            # self.messages.add_message(text_message)
             orch_response = self.get_response()
+            handoff_decision = parse_agent_decision(orch_response.content)
 
-            # Test parsing
-            test_response = "<thinking>The task is not DONE yet... data_agent is not suitable. <thinking>" + orch_response.content
-
-            handoff_decision = parse_agent_decision(test_response)
             if handoff_decision == "DONE":
                 return orch_response.content if ui_mode else orch_response
             elif handoff_decision == "database_agent" or handoff_decision == "map_agent" or handoff_decision == "detector_agent" or handoff_decision == "data_agent":
@@ -269,35 +289,38 @@ class AssistantAgent(BaseAgent):
                 errorout = error_cnt < 2
 
         return orch_response.content if ui_mode else orch_response
-
+    
     # ------------------------------------------------------------------------------
-    # Main loop for executing StateFlow
-    def run_stateflow(self, task_queue: deque, state_queue: deque, ui_mode=False):
-        state = state_queue.popleft()
-        task = task_queue.popleft()
+    # Main loop for executing GC StateFlow, with orch_message as user message
+    def run_group_stateflow_usr(self, handoffs: dict, orch_message: str, query: str, ui_mode=False):
+        error_cnt = 0
+        errorout = False
+        
         while True:
-            content = task['objective']
-            state.messages.add_message(TextMessage(role='user', content=content, source='user'))
-            response = state.get_response()
+            if errorout:
+                break
+            
+            text_message = TextMessage(role='user', content=f"*****\n{orch_message}\n*****\nNow please help me with the task: {query}", source='user')
+            self.messages.add_message(text_message)
 
-            # Verify the response
-            verifier_message = format_verifier_message(content, response.content)
-            self.messages.reset_messages()
-            self.messages.add_message(TextMessage(role='user', content=verifier_message, source='verifier'))
-            verification = self.get_response()
-
-            print(f"\nVerification Result: {verification.content}")
-            # Decide the transition to the next state
-            if verification.content == "COMPLETED":
-                print(f"Task {task['id']} completed successfully.\n")
-                if not task_queue:
-                    break
-                state = state_queue.popleft()
-                task = task_queue.popleft()
+            orch_response = self.get_response()
+            handoff_decision = parse_agent_decision(orch_response.content)
+            
+            if handoff_decision == "DONE":
+                return orch_response.content if ui_mode else orch_response
+            elif handoff_decision == "database_agent" or handoff_decision == "map_agent" or handoff_decision == "detector_agent" or handoff_decision == "data_agent":
+                # hand off the task to the corresponding agent
+                handoff_agent = handoffs[handoff_decision]
+                print(f"Handing off to {handoff_agent.name}...")
+                if not handoff_agent.messages:
+                    handoff_message = TextMessage(role='user', content=query, source='user')
+                    handoff_agent.messages.add_message(handoff_message)
+                handoff_agent.get_response_subagent(self)
             else:
-                # TODO: ERROR state self-evaluation logic
-                continue
-        return response.content if ui_mode else response
+                error_cnt += 1
+                errorout = error_cnt < 2
+
+        return orch_response.content if ui_mode else orch_response
     
     # ------------------------------------------------------------------------------
     # Main loop for executing Flow++

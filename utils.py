@@ -7,10 +7,8 @@ def re_args_component(value: str) -> str:
     return re.sub(r"[.\-]", "_", value)
 
 def parse_agent_decision(response: str) -> str:
-    print(f"\nParsing response: {response}")
     pattern = r"\b(database_agent|detector_agent|map_agent|data_agent|DONE)\b(?!.*\b(database_agent|detector_agent|map_agent|data_agent|DONE)\b)"
     match = re.search(pattern, response)
-    print(f"Match found: {match.group(0) if match else 'None'}\n")
     return match.group(1) if match else None
 
 def get_results_path(args, base_dir="results") -> str:

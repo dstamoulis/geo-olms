@@ -128,7 +128,7 @@ if __name__ == "__main__":
     parser.add_argument('--client', default='openai', help='client to use')
     parser.add_argument('--model', default= "gpt-4o-mini", help='model LLM to use')
     parser.add_argument('--temp', default= 0.1, help='model LLM to use')
-    parser.add_argument('--agent', default= 'geoolm', help='agent to use')
+    parser.add_argument('--agent', default= 'flow', help='agent to use')
     parser.add_argument('--flow_ver', default= 'flow_gt', help='agent to use')
     args = parser.parse_args()
 

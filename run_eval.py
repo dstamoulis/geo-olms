@@ -9,7 +9,7 @@ def main():
     run_client = "openai" # openai, ollama
     run_model = "gpt_4o_mini"
 
-    run_method = "geoflow" # geoflow, geoolm, swarm, seq_stateflow, group_stateflow, single_agent
+    run_method = "geoflow" # geoflow, flow, swarm, seq_stateflow, group_stateflow, single_agent
 
     results_path = f"results/{run_flow_ver}/{run_client}/{run_model}/{run_method}/"
     agent_metrics = AgentMetrics(gts_path, results_path)

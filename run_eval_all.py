@@ -7,17 +7,17 @@ def main():
     gts_path = "results/flow_gt/openai/gpt_4o_mini/single_agent/"
 
     run_client = "openai" # openai, ollama
-    run_model = "gpt-4o-mini"
     run_model = "o4-mini"
     run_model = "o3"
+    run_model = "gpt-4o-mini"
     # run_model = "gpt-4.1"
     run_flow_ver = run_model
     run_flow_ver = "flow_gt"
 
-    run_methods = ['single_agent', 'geoflow', 'geoolm', 'swarm', 'seq_stateflow', 'group_stateflow']
+    run_methods = ['single_agent', 'geoflow', 'flow', 'swarm', 'seq_stateflow', 'group_stateflow']
     run_methods = ['seq_stateflow', 'group_stateflow']
     run_methods = ['seq_stateflow']
-    run_methods = ['geoflow', 'geoolm', 'swarm', 'seq_stateflow', 'group_stateflow']
+    run_methods = ['geoflow', 'flow', 'swarm', 'seq_stateflow', 'group_stateflow']
     # run_methods = ['geoflow']
     # run_methods = ['swarm']
 

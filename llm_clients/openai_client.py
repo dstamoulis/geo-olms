@@ -39,7 +39,7 @@ class OpenAIClient(BaseClient):
             model=self.model,
             messages=messages,
             tools=tools,
-            temperature=self.temperature,
+            # temperature=self.temperature,
         )
         elapsed_time = round(time.time() - start_time, 4)
         if tools is not None and response.choices[0].message.tool_calls:

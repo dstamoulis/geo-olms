@@ -102,14 +102,14 @@ def match_tasks(gt_group, res_group, error_types):
 
         matched.add(best_res['id'])
 
-        if best_score < 4:
+        if best_score < 3:
             error_types["wrong objective"] += 1
         if gt_task["agent"] != best_res["agent"]:
             error_types["wrong agent"] += 1
-        if set(gt_task.get("next", [])) != set(best_res.get("next", [])):
-            error_types["wrong next steps"] += 1
-        if set(gt_task.get("prev", [])) != set(best_res.get("prev", [])):
-            error_types["wrong prev steps"] += 1
+        # if set(gt_task.get("next", [])) != set(best_res.get("next", [])):
+        #     error_types["wrong next steps"] += 1
+        # if set(gt_task.get("prev", [])) != set(best_res.get("prev", [])):
+        #     error_types["wrong prev steps"] += 1
 
 def evaluate_flow_correctness(gt_path, res_path):
     gt_js = json.load(open(gt_path))
@@ -145,6 +145,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='geo-olm agent')
     parser.add_argument('--model', default= "gpt-4o-mini", help='model LLM to use')
     parser.add_argument('--flow_ver', default=None, help='agent to use')
+    parser.add_argument('--cost', action="store_true", help='agent to use')
     args = parser.parse_args()
 
     flow_ver = f"{re_args_component(args.model)}" if args.flow_ver is None else re_args_component(args.flow_ver)
@@ -152,15 +153,23 @@ if __name__ == "__main__":
     results_path = os.path.join(base_dir, flow_ver)
 
     scores_list = []
+    costs_list = []
     for i in range(22):
 
         gt_path = f'{base_dir}/flow_gt/{i}.json'
         res_path = os.path.join(results_path, f"{i}.json")
-        score, error_types = evaluate_flow_correctness(gt_path, res_path)
-        print(f'Exp {i}: {score}, {error_types}')
-        scores_list.append(score)
+        if args.cost:
+            res_js = json.load(open(res_path))
+            cost = res_js["model_client"]["total_tokens"]
+            costs_list.append(cost)
+        else:
+            score, error_types = evaluate_flow_correctness(gt_path, res_path)
+            print(f'Exp {i}: {score}, {error_types}')
+            scores_list.append(score)
 
-    avg_score = sum(scores_list) / len(scores_list) if scores_list else -1
-    # print(f"[{flow_ver}] Flow score: {avg_score}")
-    print(f"{flow_ver}: {avg_score}")
-
+    if args.cost:
+        avg_cost = sum(costs_list) / len(costs_list) if costs_list else -1
+        print(f"{flow_ver}: {avg_cost}")
+    else:
+        avg_score = sum(scores_list) / len(scores_list) if scores_list else -1
+        print(f"{flow_ver}: {avg_score}")

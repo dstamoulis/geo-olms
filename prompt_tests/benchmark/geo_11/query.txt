@@ -1,1 +1,0 @@
-Plot on the map the FAIR1M, BigEarthNet, and xView1 images in Greece from 2nd half of 2012

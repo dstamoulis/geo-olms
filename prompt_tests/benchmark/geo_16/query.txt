@@ -1,1 +1,0 @@
-Run the YOLO-v6 LCC model on BigEarthNet from March 2018. Plot the 'Airports' LCC classification results on the map

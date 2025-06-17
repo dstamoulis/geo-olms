@@ -1,1 +1,0 @@
-Fetch xView1 and FAIR1M images from July 2017. Then run the Swin-L detector on each imagery source. 

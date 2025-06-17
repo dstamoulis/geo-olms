@@ -207,7 +207,6 @@ MAGENTIC_PROMPT = """
 
         >> {"detector_agent": "Run the ResNet-32 classifier on BigEarthNet images to detect 'Vineyards' and 'Fruit trees and berry plantations'."}
 
-        
         OR:
 
         >> {"data_agent": "Count the ResNet-32 classification results for 'Vineyards' class."}

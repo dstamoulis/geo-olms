@@ -8,12 +8,18 @@ def main():
 
     run_client = "openai" # openai, ollama
     run_model = "gpt-4o-mini"
-    run_flow_ver = run_model #"flow_gt"
+    run_model = "o4-mini"
+    run_model = "o3"
+    # run_model = "gpt-4.1"
+    run_flow_ver = run_model
     run_flow_ver = "flow_gt"
 
     run_methods = ['single_agent', 'geoflow', 'geoolm', 'swarm', 'seq_stateflow', 'group_stateflow']
+    run_methods = ['seq_stateflow', 'group_stateflow']
+    run_methods = ['seq_stateflow']
     run_methods = ['geoflow', 'geoolm', 'swarm', 'seq_stateflow', 'group_stateflow']
-    run_methods = ['geoolm', 'geoflow']
+    # run_methods = ['geoflow']
+    # run_methods = ['swarm']
 
     for run_method in run_methods:
 
@@ -26,7 +32,7 @@ def main():
         for run_id in runs_id: 
             agent_metrics.evaluate_run(run_id)
 
-        print(f"Run: {run_method}")
+        print(f"\nRun: {run_method}")
         agent_metrics.print_avg_llm_metrics()
         # agent_metrics.print_error_counts()
         # agent_metrics.print_unsuccess_counts()

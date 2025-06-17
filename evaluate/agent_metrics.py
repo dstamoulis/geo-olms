@@ -171,11 +171,11 @@ class AgentMetrics:
         """
         # Collect the values into a list of (label, value) pairs
         rows = [
-            ("Runs evaluated",        self.num_runs_evaluated),
+            # ("Runs evaluated",        self.num_runs_evaluated),
             ("Avg total tokens",      self.avg_total_tokens),
             ("Avg prompt tokens",     self.avg_prompt_tokens),
             ("Avg completion tokens", self.avg_completion_tokens),
-            ("Avg cached tokens",     self.avg_cached_tokens),
+            # ("Avg cached tokens",     self.avg_cached_tokens),
             ("Avg runtime (s)",       self.avg_runtime),
         ]
 

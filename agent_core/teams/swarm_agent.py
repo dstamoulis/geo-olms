@@ -33,6 +33,7 @@ class SwarmAgent:
         database, 
         detector, 
         map_ops,
+        data_ops,
         triage,
         system_message="", 
         ):
@@ -56,6 +57,7 @@ class SwarmAgent:
         self.detector = detector
         self.database = database
         self.map_ops = map_ops
+        self.data_ops = data_ops
         self.triage = triage
 
         self.triage_agent = AssistantAgent(
@@ -66,7 +68,7 @@ class SwarmAgent:
             tools=[],
             system_message="Pass the request off to a SINGLE ONE AND ONLY HANDOFF AGENT!! Do NOT call multiple handoffs at once!!"
             )
-
+        
         self.database_agent = AssistantAgent(
             name="database_agent",
             model_client=model_client,
@@ -94,9 +96,20 @@ class SwarmAgent:
             system_message="You are the detector agent!"
             )
 
+        
+        self.data_agent = AssistantAgent(
+            name="data_agent",
+            model_client=model_client,
+            messages=messages,
+            handoffs=agent_toolset(triage),
+            tools=agent_toolset(data_ops),
+            system_message="You are the data (analysis) agent!"
+            )
+
         self.triage.database_agent = self.database_agent
         self.triage.map_agent = self.map_agent
         self.triage.detector_agent = self.detector_agent
+        self.triage.data_agent = self.data_agent
 
         self.new_agent = self.database_agent
         self.update_current_agent()

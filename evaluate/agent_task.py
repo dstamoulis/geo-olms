@@ -1,46 +1,42 @@
 # tasks/geo_task.py
 
 class AgentTask:
-    def __init__(self, queries=None, rounds=None):
+    def __init__(self, query=None, messages=None):
         """
         Initialize an AgentTask.
         
         Args:
-            queries (list of str): Optionally, a list of initial queries.
-            rounds (list of dict): Optionally, a list of rounds already completed.
-                Each round is a dict with keys like 'query' and 'messages'.
+            query (str): Optionally, query.
+            messages (list of dict): Optionally, a list of messages so far.
         """
-        self.queries = queries if queries is not None else []
+        self.query = query
         # The rounds will be a simple list of rounds.
-        self.rounds = rounds if rounds is not None else []
+        self.messages = messages if messages is not None else []
 
-    def add_round(self, query, messages):
+    def add_run(self, query, messages):
         """
-        Adds a new round (query + response) to the task.
+        Adds a new run (query + response) to the task.
         
         Args:
             query (str): The new query.
             messages (list): The conversation messages after processing the query.
         """
-        self.queries.append(query)
-        self.rounds.append({"query": query, "messages": messages})
+        self.query = query
+        self.messages = messages 
 
     def get_full_conversation(self):
         """
-        Returns the full conversation history (all messages from all rounds).
+        Returns the full conversation history (all messages so far).
         """
-        full_conversation = []
-        for round_data in self.rounds:
-            full_conversation.extend(round_data["messages"])
-        return full_conversation
+        return self.messages
 
     def to_dict(self):
         """
         Serializes the AgentTask to a dictionary.
         """
         return {
-            "queries": self.queries,
-            "rounds": self.rounds
+            "query": self.query,
+            "messages": self.messages
         }
 
     @classmethod
@@ -49,11 +45,11 @@ class AgentTask:
         Deserializes a dictionary into an AgentTask instance.
         
         Args:
-            data (dict): A dictionary with keys "queries" and "rounds".
+            data (dict): A dictionary with keys "query" and "messages".
         
         Returns:
             AgentTask: A new instance.
         """
-        queries = data.get("queries", [])
-        rounds = data.get("rounds", [])
-        return cls(queries, rounds)
+        query = data.get("query", None)
+        messages = data.get("messages", [])
+        return cls(query, messages)

@@ -8,3 +8,9 @@ results/*/
 results/*/*.json
 datasets/gpkgs/
 datasets/gpkgs/*.gpkg
+target.json
+debug/
+*.pyc
+*/*.pyc
+*/*/*.pyc
+*/*/*/*.pyc

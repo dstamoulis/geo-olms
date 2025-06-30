@@ -3,7 +3,7 @@ from agent_core.agents.assistant_agent import AssistantAgent
 from agent_core.modules.toolset import agent_toolset
 
 class SingleAgent(AssistantAgent):
-    def __init__(self, name, model_client, messages, toolsets_list: list, handoffs=[], system_message="", console=None):
+    def __init__(self, api, name, model_client, messages, toolsets_list: list, handoffs=[], system_message="", console=None):
         """
         SingleAgent aggregates tools from multiple toolset objects and behaves like an AssistantAgent.
         
@@ -24,5 +24,5 @@ class SingleAgent(AssistantAgent):
             # We add the tool callables to our aggregated list.
             aggregated_tools.extend(toolset_list)
         
-        super().__init__(name, model_client, messages, handoffs, aggregated_tools, system_message, console)
+        super().__init__(name, model_client, messages, api, handoffs, aggregated_tools, system_message, console)
         self.toolsets_list = toolsets_list

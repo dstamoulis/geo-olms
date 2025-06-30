@@ -48,10 +48,9 @@ class Database:
             merged_gdf = merged_gdf.drop_duplicates(subset=['uoi'])
             self.images_gdf[dataset] = merged_gdf
 
-
     @agent_tool
     def query_dataset_images(
-        self, 
+        self,
         dataset: str, 
         start_date: Optional[str] = None, 
         end_date: Optional[str] = None

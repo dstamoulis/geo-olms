@@ -1,0 +1,15 @@
+Fetch xView1 images from Greece. Then run the Swin-L detector and plot the detections of category Passenger Vehicle!
+
+With natural language query
+--------------------------------------------------
+Elapsed Time: 8.3474 s
+Final Output:
+I have successfully fetched the xView1 images from Greece and run the Swin-L detector. A total of 24 images were processed, resulting in 23 detections of the category "Passenger Vehicle." The scatter plot of these detections has been added to the map.
+
+
+
+With json workflow (w downstream)
+--------------------------------------------------
+Elapsed Time: 14.9894 s
+Final Output:
+highlighting 23 detections of Passenger Vehicles using the Swin-L detector on the xView1 dataset images from Greece. The detection results have been successfully plotted.

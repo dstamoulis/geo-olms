@@ -125,3 +125,24 @@ def function_to_tool_json(func: Callable) -> str:
     # return json.dumps(tool_dict, indent=4)
     # print(json.dumps(tool_dict, indent=4))
     return tool_dict
+
+def function_to_tool_json_Response(func: Callable) -> str:
+    # Assume convert_function_to_tool returns a tuple (func, schema)
+    _func, schema = convert_function_to_tool(func)
+    
+    # Extract the top-level description for the tool.
+    tool_description = schema.get("description", "")
+    
+    # Remove extraneous keys from the schema for parameters.
+    schema.pop("title", None)
+    schema.pop("description", None)
+    
+    # Build the final tool schema dictionary.
+    tool_dict = {
+        "type": "function",
+        "name": func.__name__,
+        "description": tool_description,
+        "parameters": schema
+    }
+    
+    return tool_dict

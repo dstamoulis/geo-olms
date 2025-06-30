@@ -1,22 +1,29 @@
 from evaluate.agent_metrics import AgentMetrics
+import os
 
 def main():
 
-    gts_file = './results/geeo25_minival.json' 
-    agent_results_file =  './results/geeo25_minival.json' 
+    gts_path = "results/flow_gt/openai/gpt_4o_mini/single_agent/"
 
-    gts_file = './results/geeo25_val_run2.json'
-    agent_results_file = './results/geeo25_val_run1.json'
+    run_flow_ver = "flow_gpt_4o_mini" # flow_gt, flow_gpt_4o_mini
+    run_client = "openai" # openai, ollama
+    run_model = "gpt_4o_mini"
 
-    agent_metrics = AgentMetrics(gts_file, agent_results_file)
-    overall_correctness, error_details = agent_metrics.correctness()
-    metrics = agent_metrics.system_metrics()
-    # summary = agent_metrics.eval_all()
+    run_method = "geoflow" # geoflow, flow, swarm, seq_stateflow, group_stateflow, single_agent
 
-    print("Overall Correctness:", overall_correctness)
-    print("Error Types:", error_details)
-    print("System Metrics:", metrics)
-    # print("Full Summary:", summary)
+    results_path = f"results/{run_flow_ver}/{run_client}/{run_model}/{run_method}/"
+    agent_metrics = AgentMetrics(gts_path, results_path)
+
+    runs_from, runs_to = 0, 22
+    runs_id = [i for i in range(runs_from, runs_to)]
+
+    for run_id in runs_id: 
+        agent_metrics.evaluate_run(run_id)
+
+    agent_metrics.print_avg_llm_metrics()
+    agent_metrics.print_error_counts()
+    agent_metrics.print_unsuccess_counts()
+    agent_metrics.print_avg_agent_scores()
 
 if __name__ == "__main__":
     main()
